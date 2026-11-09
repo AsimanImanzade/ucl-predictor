@@ -41,6 +41,25 @@ def _coverage(_args: argparse.Namespace) -> int:
     return 0
 
 
+def _export(args: argparse.Namespace) -> int:
+    from datetime import UTC, datetime
+    from pathlib import Path
+
+    from uclpred.export import run_export
+
+    if args.as_of == "now":
+        as_of = datetime.now(UTC).replace(microsecond=0)
+    else:
+        as_of = datetime.fromisoformat(args.as_of)
+        if as_of.tzinfo is None:
+            as_of = as_of.replace(tzinfo=UTC)
+    out = Path(args.out)
+    if not out.is_absolute():
+        out = ROOT / out
+    print(run_export(as_of, out))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     parser = argparse.ArgumentParser(prog="uclpred")
@@ -56,6 +75,10 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser(
         "coverage", help="write reports/coverage.md and list duplicate team candidates"
     ).set_defaults(func=_coverage)
+    e = sub.add_parser("export", help="write season.json and lambdas.json snapshot")
+    e.add_argument("--as-of", required=True, help="ISO date/time (UTC) or 'now'")
+    e.add_argument("--out", required=True, help="output dir (relative to repo root)")
+    e.set_defaults(func=_export)
     args = parser.parse_args(argv)
     return args.func(args)
 
