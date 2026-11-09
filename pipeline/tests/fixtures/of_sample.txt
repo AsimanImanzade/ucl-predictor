@@ -1,0 +1,47 @@
+= UEFA Champions League sample
+
+▪ League, Matchday 1
+  Tue Sep 17 2024
+    18:45  BSC Young Boys (SUI)    v Aston Villa FC (ENG)     0-3 (0-2)
+           Juventus FC (ITA)       v PSV (NED)                3-1 (2-0)
+    21:00  Sporting Clube de Portugal (POR) v Lille OSC (FRA)          2-0 (1-0)
+           FC Bayern München (GER) v GNK Dinamo Zagreb (CRO)  9-2 (3-0)
+           Real Madrid CF (ESP)    v VfB Stuttgart (GER)      3-1 (0-0)
+           AC Milan (ITA)          v Liverpool FC (ENG)       1-3 (1-2)
+  Wed Sep 18
+    18:45  Bologna FC 1909 (ITA)   v FK Shakhtar Donetsk (UKR)  0-0
+           AC Sparta Praha (CZE)   v FC Red Bull Salzburg (AUT)  3-0 (2-0)
+    21:00  Manchester City FC (ENG) v FC Internazionale Milano (ITA)  0-0
+           Paris Saint-Germain FC (FRA) v Girona FC (ESP)          1-0 (0-0)
+           Club Brugge KV (BEL)    v Borussia Dortmund (GER)  0-3 (0-0)
+           Celtic FC (SCO)         v ŠK Slovan Bratislava (SVK)  5-1 (1-0)
+  Thu Sep 19
+    18:45  Feyenoord Rotterdam (NED) v Bayer 04 Leverkusen (GER)  0-4 (0-4)
+
+▪ Group A
+  Tue Sep 17 2013
+    20:45  Manchester United (ENG) v Bayer Leverkusen (GER)   4-2 (1-0)
+           Real Sociedad (ESP)     v Shakhtar Donetsk (UKR)   0-2 (0-0)
+  Wed Oct 2
+    20:45  Shakhtar Donetsk (UKR)  v Manchester United (ENG)  1-1 (0-1)
+
+▪ Finals, Final
+  Sat May 31
+    21:00  Paris Saint-Germain FC (FRA) v FC Internazionale Milano (ITA)  5-0 (2-0)
+
+▪ Final
+  Sat May 24
+    20:45  Real Madrid (ESP)       v Atlético Madrid (ESP)    4-1 a.e.t. (1-1, 0-1)
+
+▪ Round of 16
+  Tue Feb 18 2014
+  Wed Mar 12
+    21:00  AS Roma (ITA)           v Feyenoord (NED)          4-2 pen. 1-1 a.e.t. (1-1, 1-1)
+
+▪ Play-offs
+  Tue Aug 26 2025
+    17:45  FK Kairat (KAZ)         v Celtic FC (SCO)          3-2 pen. 0-0 a.e.t. (0-0)
+
+▪ 1. Round
+  Tue Jul 8 2025
+    19:00  The New Saints (WAL)    v KF Shkëndija 79 (MKD)    0-0
