@@ -81,3 +81,25 @@ def run_ingest(token: str) -> None:
     )
     print(counts.to_string())
     print(f"total rows: {len(df)} -> {MATCHES_PATH}")
+
+
+def run_coverage() -> str:
+    """Write reports/coverage.md; return a text summary incl. duplicate candidates."""
+    import pandas as pd
+
+    from uclpred.config import REFERENCE, REPORTS
+    from uclpred.coverage import coverage_report, duplicate_candidates
+    from uclpred.matches import load_matches
+
+    df = load_matches()
+    teams = json.loads((PROCESSED / "cl_2026_teams.json").read_text(encoding="utf-8"))
+    coefs = pd.read_csv(REFERENCE / "coefficients.csv")
+    report = coverage_report(df, teams, coefs)
+    REPORTS.mkdir(parents=True, exist_ok=True)
+    (REPORTS / "coverage.md").write_text(report, encoding="utf-8")
+    cands = duplicate_candidates(df)
+    return (
+        report
+        + f"\nDuplicate candidates: {len(cands)}\n"
+        + "\n".join(f"{a}  <->  {b}" for a, b in cands)
+    )

@@ -25,6 +25,22 @@ def _ingest(_args: argparse.Namespace) -> int:
     return 0
 
 
+def _coefficients(args: argparse.Namespace) -> int:
+    from uclpred.ingest.uefa_coefficients import fetch_coefficients, save_coefficients
+
+    df = fetch_coefficients(args.season_year)
+    save_coefficients(df)
+    print(f"coefficients {args.season_year}: {len(df)} clubs")
+    return 0
+
+
+def _coverage(_args: argparse.Namespace) -> int:
+    from uclpred.ingest.run import run_coverage
+
+    print(run_coverage())
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     parser = argparse.ArgumentParser(prog="uclpred")
@@ -32,6 +48,14 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser(
         "ingest", help="fetch all sources and build data/processed/matches.parquet"
     ).set_defaults(func=_ingest)
+    c = sub.add_parser(
+        "coefficients", help="fetch UEFA club coefficients into data/reference"
+    )
+    c.add_argument("--season-year", type=int, required=True)
+    c.set_defaults(func=_coefficients)
+    sub.add_parser(
+        "coverage", help="write reports/coverage.md and list duplicate team candidates"
+    ).set_defaults(func=_coverage)
     args = parser.parse_args(argv)
     return args.func(args)
 
