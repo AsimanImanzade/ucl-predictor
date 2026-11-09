@@ -7,3 +7,6 @@ node_modules/
 data/raw/
 data/cache/
 .ipynb_checkpoints/
+data/processed/
+data/export/
+.pytest_cache/
