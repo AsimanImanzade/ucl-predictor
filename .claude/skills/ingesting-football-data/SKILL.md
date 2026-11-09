@@ -1,6 +1,6 @@
 ---
 name: ingesting-football-data
-description: Use when fetching, caching, cleaning or joining match results, fixtures, Elo ratings, xG or betting odds; when team names don't match across sources; or when a feature might contain information from after a match's kickoff (data leakage, look-ahead bias).
+description: Use when fetching, caching, cleaning or joining match results, fixtures, UEFA coefficients or team ratings; when team names don't match across sources; or when a feature might contain information from after a match's kickoff (data leakage, look-ahead bias).
 ---
 
 # Ingesting Football Data
@@ -17,27 +17,31 @@ data/
   reference/team_aliases.csv       # source, source_name, team_id   (committed)
   processed/matches.parquet        # one row per match, canonical ids
   processed/ratings.parquet        # team_id, as_of, rating columns
-  fixtures/<season>.csv            # league-phase fixture list
 ```
 
-## Candidate sources (check terms before use)
+## Sources (v1)
 
 | Need | Source | Notes |
 |---|---|---|
-| European + domestic results, odds | football-data.co.uk CSVs | Closing odds are the benchmark for backtesting |
-| Daily club Elo | clubelo.com API | Point-in-time by date, so it's leakage-safe |
-| Fixtures / results | openfootball, UEFA site | Cross-check the league-phase fixture list |
-| xG | Understat or another provider | Coverage varies by league. Check robots.txt and terms |
+| Live CL results, current + previous domestic | football-data.org free tier | CL 2024-2026; PL/PD/BL1/SA/FL1/DED/PPL. Token from env `FOOTBALL_DATA_TOKEN` (never log or cache it). 10 req/min (sleep >= 6.5 s). Keep the attribution line. CL `/standings` returns 404, so compute the table ourselves |
+| Historical European results | openfootball champions-league TXT | cl/clq/el/elq/conf/confq, 2011-12..2025-26 (CC0) |
+| Historical domestic results | openfootball football.json | CC0 |
+| Club coefficients | UEFA coefficients endpoint (cached) | Value for season S = final ranking after S-1. Country codes are FIFA-style |
 
-Respect each site's terms and robots.txt, rate-limit requests, and cache raw downloads so they are fetched once.
+**Removed:** ClubElo (we compute our own Elo, see modeling-match-outcomes) and football-data.co.uk (terms forbid bots and ML training). No licensed odds source exists in v1. Respect terms and robots.txt, rate-limit, cache raw downloads.
 
 ## Rules
 
-1. **Canonical team ids.** Every source name maps through `team_aliases.csv` to a `team_id` (e.g. `inter`, `psg`). An unmapped name **fails the run** and is listed. It is never dropped or fuzzy-matched silently.
+1. **Canonical team ids.** Every source name maps through `team_aliases.csv` to a `team_id` (e.g. `ita-inter`, `esp-atletico-madrid`). An unmapped name **fails the run** and is listed. It is never dropped or fuzzy-matched silently.
 2. **Point-in-time.** Every feature row carries `as_of` (UTC). A prediction for a match at kickoff `t` may only use rows with `as_of < t`. Ratings are snapshotted per date, never the "latest" value.
 3. **Raw is immutable.** Fixes happen in transform code, so the pipeline is reproducible from `data/raw/`.
 4. **Validate after every load.** No duplicate matches, scores are non-negative integers, and every league-phase team has exactly 8 fixtures (4 home, 4 away). The league phase has 144 matches in total.
 5. **Neutral venues are flagged** (`neutral=True`), so the model doesn't add home advantage to a final.
+
+6. **Details** (alias CSV curation checklist, year-less date inference, 90-minute goals from football-data and openfootball): read [details.md](details.md) before touching `ingest/` or `team_aliases.csv`. Keys are FIFA codes plus exact `core_name()` output; never merge distinct clubs; football-data `fullTime` includes shoot-out goals, so use `regularTime`.
+7. **Fail loud.** Any non-404 fetch error raises after the loop; a silently missing competition-season corrupts Elo.
+8. **Undetermined fixtures** (null team ids, knockout rounds before the draw) are skipped. A non-null id missing from the team map raises.
+9. **Not a gap:** 2019-20 had single-leg QF/SF after Covid (119 CL matches, not 125).
 
 ## Common mistakes
 
@@ -45,5 +49,4 @@ Respect each site's terms and robots.txt, rate-limit requests, and cache raw dow
 |---|---|
 | Joining on raw names ("Man City" vs "Manchester City") | Always join on `team_id` |
 | Using today's Elo for a 2019 match | Join ratings on the date before kickoff |
-| Odds recorded after kickoff | Use closing odds only, with a timestamp before kickoff |
 | Re-downloading everything each run | Cache by date in `data/raw/` |

@@ -31,7 +31,11 @@ Without a backtest, "the model improved" is an opinion. A change ships only when
 
 1. Base rates (historical home/draw/away share)
 2. Elo-only model
-3. **Bookmaker closing odds, margin removed.** This is the bar to aim for. Getting close is a strong result.
+3. Elo + Dixon-Coles (the `elo-dc-v1` baseline), which is what any change must beat.
+
+No bookmaker-odds benchmark in v1: there is no licensed source (football-data.co.uk terms forbid bots). Add one only if a licensed feed appears.
+
+First sanity result (2025-26 league phase, fit as of 2025-09-01): Elo+DC RPS 0.2076 vs base-rate 0.2364.
 
 ## Tournament-level check
 

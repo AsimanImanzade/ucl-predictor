@@ -20,7 +20,7 @@ The simulator is only as correct as its rules. A perfect match model with one wr
 | Knockout play-off ("1/16") | Positions 9–24 | Two legs; 9–16 seeded (2nd leg at home) vs 17–24 |
 | Eliminated | Positions 25–36 | No drop into another competition |
 | R16 → QF → SF | 16 → 2 | Two legs, fixed bracket from the league positions + draw |
-| Final | 2 | One match, neutral venue |
+| Final | 2 | One match, neutral venue (2026/27: Estadio Metropolitano) |
 
 ## League-phase tiebreakers (equal points)
 
@@ -44,6 +44,11 @@ In simulation, disciplinary points are unknown. Skip step 9 and fall through to 
 Pairings, seeding sides and the draw are in [bracket-reference.md](bracket-reference.md). Read it before you touch the bracket code.
 
 Two-legged tie: aggregate score → if level, 30 min extra time in leg 2 (no away-goals rule) → if still level, penalties. Final: 90 min → extra time → penalties.
+
+## Simulator conventions
+
+- **2026/27 final:** Estadio Metropolitano, so `finalVenueTeamId = esp-atletico-madrid` (home advantage only if Atlético reach it, else neutral).
+- Leg-order conventions and the missing-coefficient default (0) are in [bracket-reference.md](bracket-reference.md).
 
 ## Verification rule
 

@@ -9,26 +9,34 @@ description: Use when building, fitting, tuning or changing the model that predi
 
 The model returns a **scoreline probability matrix** for a match. Win/draw/loss, expected goals and "most likely score" are all derived from that one matrix, so they can never disagree. The simulator samples scores from the same matrix, which makes goal-difference tiebreakers realistic.
 
-**REQUIRED SUB-SKILLS:** Use ingesting-football-data (data must be point-in-time) and backtesting-predictions (no model change ships without it).
+**REQUIRED SUB-SKILLS:** Use ingesting-football-data (point-in-time data) and backtesting-predictions (no model change ships without it).
 
 ## Interface (keep stable; the simulator and dashboard depend on it)
 
 ```python
-def predict_match(home_id: str, away_id: str, as_of: datetime,
-                  neutral: bool = False) -> ScoreMatrix: ...
-# ScoreMatrix.p[i, j] = P(home scores i, away scores j), i, j in 0..10, sums to 1
-# .outcome() -> (p_home, p_draw, p_away)   .expected_goals() -> (λ_home, λ_away)
+model.predict_match(home_id, away_id, neutral=False) -> np.ndarray  # p[i, j], 0..10, sums to 1
+model.lambdas(team_a, team_b, venue)  # venue "home" (a hosts) | "neutral" -> (λ_a, λ_b)
 ```
+`uclpred.models.score_matrix` derives outcome, expected goals and most-likely score from the one matrix. The exporter hands the simulator per-pair λ for each venue.
 
-## Baseline model: Dixon-Coles
+## Own Elo (`uclpred.elo`)
 
-- **Ratings:** each team gets an attack and a defence rating. λ_home = exp(attack_h − defence_a + home_adv) and λ_away = exp(attack_a − defence_h).
-- **Low-score correction:** the Dixon-Coles ρ term adjusts 0-0, 1-0, 0-1 and 1-1.
-- **Time decay:** each match is weighted by exp(−ξ·days_ago). Tune ξ by backtest, not by taste.
-- **Cross-league strength:** fit on European competitions plus domestic leagues together, so that leagues connect through European matches. Use club Elo as a prior or feature so that teams with few European matches still get sensible ratings.
-- **Home advantage:** fitted, not assumed. It is set to 0 when `neutral=True`.
+Replaces ClubElo. Single chronological pass over 90-minute results, point-in-time (only kickoff `< as_of`). K 20, home advantage 60 (0 at neutral venues), margin-of-victory multiplier. Seeding of unseen teams: 1500 top-flight, 1350 second-tier, 1400 unknown; both teams of a match are seeded before either is registered. Burn-in is 2010-11 domestic and 2011-12 European data.
 
-Gradient boosting or Elo blends may later sit **on top of** this model. Each one must beat it in backtests.
+## Baseline `elo-dc-v1`
+
+Poisson GLM (weighted, ridge):
+
+`log λ = μ + h·home + β·Δelo/100 + attack(team) + defence(opp)`
+
+- Time decay xi 0.0019/day, 4-year window; `euro_weight` 2 for `uefa.*` matches; ridge `alpha` 0.005.
+- Dixon-Coles rho is fitted separately with bounds, adjusting 0-0, 1-0, 0-1, 1-1.
+- Leagues connect through European matches; Elo carries cross-league strength. `alpha` sets the split between the Elo term and team effects, so tune it by backtest.
+- Home advantage is fitted, and not applied when neutral.
+
+**Known calibration issues (fix before trusting public numbers):** pre-season title odds are over-concentrated (Bayern 29.7%, max λ 5.4). Elo gets inflated by domestic dominance for clubs in weaker leagues. M4 should backtest alpha, calibration, and possibly in-simulation rating drift.
+
+Gradient boosting or Elo blends may later sit **on top of** this model, and each must beat it in backtests.
 
 ## Knockout extras
 

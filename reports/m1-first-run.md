@@ -3,7 +3,7 @@
 ## md00
 
 ```
-as of 2026-09-07T00:00:00Z  (/Users/asimanimanzade/Desktop/Champions League/data/export/md00)
+as of 2026-09-07T00:00:00Z  (data/export/md00)
 Team                       | Pts(exp) |  Top 8 | Top 24 |    R16 |     QF |     SF |  Final |    Win
 Bayern                     |    18.17 |  86.9% |  99.8% |  98.2% |  81.5% |  63.2% |  46.5% |  29.7%
 Arsenal                    |    17.15 |  78.3% |  99.4% |  96.1% |  76.0% |  56.1% |  38.8% |  23.8%
@@ -47,7 +47,7 @@ Check: sum Top 8 = 8.00, Top 24 = 24.00, Win = 1.00 | 50000 runs, seed 1, 1.3 s
 ## live
 
 ```
-as of 2026-11-09T20:25:01Z  (/Users/asimanimanzade/Desktop/Champions League/data/export/live)
+as of 2026-11-09T20:25:01Z  (data/export/live)
 Team                       | Pts(exp) |  Top 8 | Top 24 |    R16 |     QF |     SF |  Final |    Win
 PSG                        |    19.88 |  96.4% | 100.0% |  99.5% |  80.8% |  55.5% |  33.6% |  18.5%
 Real Madrid                |    19.51 |  94.2% | 100.0% |  98.9% |  69.8% |  38.1% |  17.4% |   7.7%
@@ -90,4 +90,4 @@ Check: sum Top 8 = 8.00, Top 24 = 24.00, Win = 1.00 | 50000 runs, seed 1, 1.0 s
 
 ## Sanity note
 
-Both runs: 50,000 runs, seed 1, run times 1.3 s (md00) and 1.0 s (live); footer sums are Top 8 = 8.00, Top 24 = 24.00, Win = 1.00. Pre-season favourites are Bayern (29.7%) and Arsenal (23.8%), then Barca, PSG and Inter, which is plausible for an Elo-driven model, though the top two look a little concentrated relative to market prices (the model has no squad-news or draw-luck uncertainty beyond match scores). In md00 every Top 8 and Top 24 probability is strictly inside (0,1). In the live table (72 of 144 played, as of 2026-11-09) PSG, Real Madrid, Arsenal and Bayern lead the league phase; several teams are already at 100.0% Top 24 or near 0%, which is expected at the halfway point. Nothing surprising beyond Como 1907 and Club Brugge sitting high in expected points, which follows from their real results so far.
+Both runs: 50,000 runs, seed 1, run times 1.3 s (md00) and 1.0 s (live); footer sums are Top 8 = 8.00, Top 24 = 24.00, Win = 1.00. Pre-season favourites are Bayern (29.7%) and Arsenal (23.8%), then Barça (9.6%) and PSG (8.0%), with Man City (4.1%) just ahead of Inter (3.7%); this is plausible for an Elo-driven model, though the top two look a little concentrated relative to market prices (the model has no squad-news or draw-luck uncertainty beyond match scores). In md00 every Top 8 and Top 24 probability is strictly inside (0,1). In the live table (72 of 144 played, as of 2026-11-09) PSG, Real Madrid, Arsenal and Bayern lead the league phase; several teams are already at 100.0% Top 24 or near 0%, which is expected at the halfway point. Nothing surprising beyond Como 1907 and Club Brugge sitting high in expected points, which follows from their real results so far.

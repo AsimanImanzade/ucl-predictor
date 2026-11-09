@@ -60,3 +60,9 @@ When a real draw has been made, steps 2–3 load the actual draw instead of rand
 - 9th and 10th swapping between runs changes the play-off opponent, but only within 23/24.
 - 1st and 2nd never meet before the final over 10,000 simulated draws.
 - A two-legged tie level on aggregate with equal away goals goes to extra time, not an away-goals winner.
+
+## Simulator conventions
+
+- **Leg order:** play-off, the unseeded side hosts leg 1; R16, the play-off winner hosts leg 1; QF and SF, a coin flip.
+- **Final venue 2026/27:** Estadio Metropolitano, `finalVenueTeamId = esp-atletico-madrid`; neutral for everyone else.
+- **Missing UEFA coefficient** (newcomers such as Como) defaults to 0, the lowest. It only matters at tiebreak step 10; log it.
