@@ -138,3 +138,26 @@ def test_client_403(monkeypatch, tmp_path):
     monkeypatch.setattr(requests, "get", lambda *a, **k: FakeResp(status=403))
     with pytest.raises(PermissionError):
         FootballDataClient("x").matches("CL", 2025)
+
+
+def _raw_matches():
+    return json.loads((FIX / "fd_matches_sample.json").read_text(encoding="utf-8"))["matches"]
+
+
+def test_undetermined_fixture_returns_none():
+    m = json.loads(json.dumps(_raw_matches()[0]))
+    null_team = {"id": None, "name": None, "shortName": None, "tla": None, "crest": None}
+    m["homeTeam"], m["awayTeam"] = dict(null_team), dict(null_team)
+    m["stage"], m["status"] = "LAST_16", "TIMED"
+    m["score"] = {
+        "winner": None,
+        "duration": "REGULAR",
+        "fullTime": {"home": None, "away": None},
+        "halfTime": {"home": None, "away": None},
+    }
+    assert normalize_fd_match(m, TEAM_COUNTRY) is None
+
+
+def test_unknown_team_id_raises():
+    with pytest.raises(KeyError):
+        normalize_fd_match(_raw_matches()[0], {})

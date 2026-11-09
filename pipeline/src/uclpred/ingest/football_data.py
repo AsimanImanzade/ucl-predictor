@@ -78,12 +78,19 @@ def _pair(d: dict | None) -> tuple[int | None, int | None]:
     return d.get("home"), d.get("away")
 
 
-def normalize_fd_match(m: dict, team_country: dict[int, str]) -> FdMatch:
+def normalize_fd_match(m: dict, team_country: dict[int, str]) -> FdMatch | None:
     """Normalise one API match. team_country maps fd team id -> ISO3 area code.
+
+    Returns None for an undetermined fixture (homeTeam or awayTeam id is null, as for
+    knockout ties not yet drawn); callers skip those. A non-null team id that is missing
+    from team_country raises KeyError.
 
     football-data's fullTime includes shoot-out goals for PENALTY_SHOOTOUT, so for any
     non-REGULAR duration the 90-minute score is regularTime and ET is regular + extra.
     """
+    home, away = m["homeTeam"], m["awayTeam"]
+    if home.get("id") is None or away.get("id") is None:
+        return None
     score = m.get("score") or {}
     duration = score.get("duration", "REGULAR")
     if duration == "REGULAR":
@@ -97,7 +104,6 @@ def normalize_fd_match(m: dict, team_country: dict[int, str]) -> FdMatch:
         else:
             eh, ea = hg + (xh or 0), ag + (xa or 0)
         ph, pa = _pair(score.get("penalties"))
-    home, away = m["homeTeam"], m["awayTeam"]
 
     def country(tid: int) -> str:
         iso = team_country[tid]
