@@ -21,7 +21,7 @@ model.lambdas(team_a, team_b, venue)  # venue "home" (a hosts) | "neutral" -> (Î
 
 ## Own Elo (`uclpred.elo`)
 
-Replaces ClubElo. Single chronological pass over 90-minute results, point-in-time (only kickoff `< as_of`). K 20, home advantage 60 (0 at neutral venues), margin-of-victory multiplier. Seeding of unseen teams: 1500 top-flight, 1350 second-tier, 1400 unknown; both teams of a match are seeded before either is registered. Burn-in is 2010-11 domestic and 2011-12 European data.
+Replaces ClubElo. Single chronological pass over 90-minute results, point-in-time (only kickoff `< as_of`). K 20, home advantage 60 (0 at neutral venues), margin-of-victory multiplier. Seeding on a team's first appearance: in a `uefa.*` match, the mean of that country's already-rated teams if there are >= 3, else 1400; in a `.2` league, 1350; in a `.1` league, that competition's rated-peer mean if >= 5 peers, else 1500. Both teams of a match are seeded before either is registered. Burn-in is 2010-11 domestic and 2011-12 European data.
 
 ## Baseline `elo-dc-v1`
 

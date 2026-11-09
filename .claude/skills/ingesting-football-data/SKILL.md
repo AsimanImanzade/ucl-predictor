@@ -14,9 +14,11 @@ Every probability the project shows comes from this data. Two failures matter mo
 ```
 data/
   raw/<source>/<YYYY-MM-DD>/...    # exactly as downloaded, never edited (git-ignored)
-  reference/team_aliases.csv       # source, source_name, team_id   (committed)
+  reference/team_aliases.csv       # country, variant_core, canonical_core   (committed)
+  reference/coefficients.csv       # season_year, team_id, name, country, total_5y
   processed/matches.parquet        # one row per match, canonical ids
-  processed/ratings.parquet        # team_id, as_of, rating columns
+  processed/cl_2026_fd.json        # football-data CL 2026 fixtures/results
+  processed/cl_2026_teams.json     # CL 2026 participants
 ```
 
 ## Sources (v1)
@@ -32,7 +34,7 @@ data/
 
 ## Rules
 
-1. **Canonical team ids.** Every source name maps through `team_aliases.csv` to a `team_id` (e.g. `ita-inter`, `esp-atletico-madrid`). An unmapped name **fails the run** and is listed. It is never dropped or fuzzy-matched silently.
+1. **Canonical team ids.** Every source name maps through `team_aliases.csv` to a `team_id` (e.g. `ita-internazionale-milano`, `esp-atletico-madrid`). An unmapped name **fails the run** and is listed. It is never dropped or fuzzy-matched silently.
 2. **Point-in-time.** Every feature row carries `as_of` (UTC). A prediction for a match at kickoff `t` may only use rows with `as_of < t`. Ratings are snapshotted per date, never the "latest" value.
 3. **Raw is immutable.** Fixes happen in transform code, so the pipeline is reproducible from `data/raw/`.
 4. **Validate after every load.** No duplicate matches, scores are non-negative integers, and every league-phase team has exactly 8 fixtures (4 home, 4 away). The league phase has 144 matches in total.
