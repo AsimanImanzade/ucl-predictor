@@ -66,6 +66,20 @@ def test_aet_without_parens_has_no_90min_goals():
     assert (m.et_home, m.et_away) == (2, 1)
 
 
+def test_season_end_august_is_next_year():
+    text = (
+        "▪ Round of 16\n  Tue Mar 10\n    21:00  A FC (ENG)  v B FC (ESP)  1-0 (0-0)\n"
+        "▪ Final\n  Fri Aug 7\n    21:00  C FC (ENG)  v D FC (ESP)  1-0 (0-0)\n"
+    )
+    ms = parse_football_txt(text, "2019-20")
+    assert [m.date.date().isoformat() for m in ms] == ["2020-03-10", "2020-08-07"]
+
+
+def test_qualifier_july_is_start_year():
+    text = "▪ 1. Round\n  Tue Jul 8\n    19:00  A FC (ENG)  v B FC (ESP)  1-0 (0-0)\n"
+    assert parse_football_txt(text, "2025-26")[0].date.date().isoformat() == "2025-07-08"
+
+
 def test_default_time_is_noon():
     text = "▪ X\n  Tue Dec 10 2013\n    A FC (ENG)  v B FC (ESP)  1-0 (0-0)\n"
     assert parse_football_txt(text, "2013-14")[0].date == datetime(2013, 12, 10, 12, 0, tzinfo=UTC)

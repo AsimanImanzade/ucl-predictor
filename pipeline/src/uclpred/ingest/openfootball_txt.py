@@ -79,6 +79,7 @@ def parse_football_txt(text: str, season: str) -> list[RawMatch]:
     year: int | None = None
     month = day = 0
     hh, mm = 12, 0
+    seen_next = False
     start_year = int(season[:4])
     for line in text.splitlines():
         s = line.strip()
@@ -89,8 +90,16 @@ def parse_football_txt(text: str, season: str) -> list[RawMatch]:
             continue
         if d := _DATE_RE.match(line):
             mon = _MONTHS[d[1]]
-            # Season-anchored: Jul-Dec -> start year, Jan-Jun -> start year + 1.
-            year = int(d[3]) if d[3] else (start_year if mon >= 7 else start_year + 1)
+            # Season-anchored: Jan-Jun -> start+1, Sep-Dec -> start. Jul/Aug -> start+1
+            # only once the file has produced a date in start+1 (season-end finals),
+            # else start (qualifiers). Explicit years win.
+            if d[3]:
+                year = int(d[3])
+            elif mon <= 6 or (mon <= 8 and seen_next):
+                year = start_year + 1
+            else:
+                year = start_year
+            seen_next = seen_next or year > start_year
             month, day = mon, int(d[2])
             hh, mm = 12, 0
             continue
