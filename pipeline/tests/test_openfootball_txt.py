@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 import requests
 
-from uclpred.ingest import http_cache
+from uclpred.ingest import http_cache, openfootball_txt
 from uclpred.ingest.openfootball_txt import parse_football_txt
 
 FIXTURE = Path(__file__).parent / "fixtures" / "of_sample.txt"
@@ -43,13 +43,27 @@ def test_time_inherited_and_year_inherited(matches):
     assert find(matches, "AC Sparta Praha").date == datetime(2024, 9, 18, 18, 45, tzinfo=UTC)
 
 
-def test_year_rolls_forward_when_month_goes_backwards():
+def test_year_season_anchored_across_groups():
     text = (
-        "▪ Group A\n  Tue Dec 10 2013\n    20:45  A FC (ENG)  v B FC (ESP)  1-0 (0-0)\n"
-        "  Wed Feb 19\n    20:45  C FC (ENG)  v D FC (ESP)  1-0 (0-0)\n"
+        "▪ Group A\n  Tue Sep 17 2013\n    20:45  A FC (ENG)  v B FC (ESP)  1-0 (0-0)\n"
+        "  Tue Dec 10\n    20:45  A FC (ENG)  v C FC (ESP)  1-0 (0-0)\n"
+        "▪ Group B\n  Tue Sep 17\n    20:45  D FC (ENG)  v E FC (ESP)  1-0 (0-0)\n"
+        "  Wed Feb 19\n    20:45  F FC (ENG)  v G FC (ESP)  1-0 (0-0)\n"
     )
     ms = parse_football_txt(text, "2013-14")
-    assert ms[1].date == datetime(2014, 2, 19, 20, 45, tzinfo=UTC)
+    assert [m.date.year for m in ms] == [2013, 2013, 2013, 2014]
+
+
+def test_yearless_feb_is_next_year():
+    text = "▪ X\n  Wed Feb 19\n    20:45  C FC (ENG)  v D FC (ESP)  1-0 (0-0)\n"
+    assert parse_football_txt(text, "2013-14")[0].date == datetime(2014, 2, 19, 20, 45, tzinfo=UTC)
+
+
+def test_aet_without_parens_has_no_90min_goals():
+    text = "▪ X\n  Wed Feb 19\n    20:45  C FC (ENG)  v D FC (ESP)  2-1 a.e.t.\n"
+    m = parse_football_txt(text, "2013-14")[0]
+    assert m.home_goals is None and m.away_goals is None
+    assert (m.et_home, m.et_away) == (2, 1)
 
 
 def test_default_time_is_noon():
@@ -132,3 +146,38 @@ def test_get_cached_404_raises_http_error(tmp_path, monkeypatch):
     with pytest.raises(requests.HTTPError):
         http_cache.get_cached("http://x", tmp_path / "f")
     assert not (tmp_path / "f").exists()
+
+
+def _http_error(status):
+    class R:
+        status_code = status
+
+    return requests.HTTPError(str(status), response=R())
+
+
+def test_load_euro_skips_404_and_tags(monkeypatch):
+    text = FIXTURE.read_bytes()
+
+    def fake(url, path, **kw):
+        if url.endswith("uefa.cl.txt"):
+            return text
+        raise _http_error(404)
+
+    monkeypatch.setattr(openfootball_txt, "get_cached", fake)
+    out = openfootball_txt.load_openfootball_euro("2024-25")
+    assert len(out) == 21 and {c for c, _ in out} == {"cl"}
+
+
+def test_load_euro_raises_after_loop_on_non_404(monkeypatch):
+    seen = []
+
+    def fake(url, path, **kw):
+        seen.append(url)
+        if url.endswith("uefa.el.txt"):
+            raise _http_error(500)
+        raise _http_error(404)
+
+    monkeypatch.setattr(openfootball_txt, "get_cached", fake)
+    with pytest.raises(RuntimeError, match=r"2024-25 uefa\.el\.txt: HTTP 500"):
+        openfootball_txt.load_openfootball_euro("2024-25")
+    assert len(seen) == len(openfootball_txt.EURO_FILES)

@@ -62,12 +62,12 @@ def _parse_score(score: str | None):
     score = score.strip()
     if m := _PEN_RE.match(score):
         pen_h, pen_a, et_h, et_a, h90, a90 = m.groups()
-        h90, a90 = (h90, a90) if h90 is not None else (et_h, et_a)
-        return int(h90), int(a90), int(et_h), int(et_a), int(pen_h), int(pen_a)
+        r90 = (int(h90), int(a90)) if h90 is not None else (None, None)
+        return (*r90, int(et_h), int(et_a), int(pen_h), int(pen_a))
     if m := _AET_RE.match(score):
         et_h, et_a, h90, a90 = m.groups()
-        h90, a90 = (h90, a90) if h90 is not None else (et_h, et_a)
-        return int(h90), int(a90), int(et_h), int(et_a), None, None
+        r90 = (int(h90), int(a90)) if h90 is not None else (None, None)
+        return (*r90, int(et_h), int(et_a), None, None)
     if m := _PLAIN_RE.match(score):
         return int(m[1]), int(m[2]), None, None, None, None
     return none6
@@ -89,12 +89,8 @@ def parse_football_txt(text: str, season: str) -> list[RawMatch]:
             continue
         if d := _DATE_RE.match(line):
             mon = _MONTHS[d[1]]
-            if d[3]:
-                year = int(d[3])
-            elif year is None:
-                year = start_year if mon >= 7 else start_year + 1
-            elif mon < month:
-                year += 1
+            # Season-anchored: Jul-Dec -> start year, Jan-Jun -> start year + 1.
+            year = int(d[3]) if d[3] else (start_year if mon >= 7 else start_year + 1)
             month, day = mon, int(d[2])
             hh, mm = 12, 0
             continue
@@ -119,6 +115,7 @@ def parse_football_txt(text: str, season: str) -> list[RawMatch]:
 def load_openfootball_euro(season: str) -> list[tuple[str, RawMatch]]:
     """Fetch (cached) and parse all European competition files for a season."""
     result: list[tuple[str, RawMatch]] = []
+    failures: list[str] = []
     for code, fname in EURO_FILES.items():
         url = BASE_URL.format(season=season, file=fname)
         path = RAW / "openfootball" / season / f"{fname}.txt"
@@ -127,7 +124,11 @@ def load_openfootball_euro(season: str) -> list[tuple[str, RawMatch]]:
         except requests.HTTPError as e:
             if e.response is not None and e.response.status_code == 404:
                 continue
+            status = e.response.status_code if e.response is not None else "?"
+            failures.append(f"{season} {fname}.txt: HTTP {status}")
             log.warning("openfootball %s failed: %s", url, e)
             continue
         result.extend((code, m) for m in parse_football_txt(raw.decode("utf-8"), season))
+    if failures:
+        raise RuntimeError("openfootball fetch failures: " + "; ".join(failures))
     return result
