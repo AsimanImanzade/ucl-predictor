@@ -56,6 +56,12 @@ def fetch_coefficients(
 
 def save_coefficients(df: pd.DataFrame, path=COEF_PATH) -> pd.DataFrame:
     """Replace rows for the fetched season year(s), keep the others."""
+    dup = df[df.duplicated(["season_year", "team_id"], keep=False)]
+    if len(dup):
+        raise ValueError(
+            "duplicate team_id within season_year (alias collision?): "
+            + ", ".join(sorted(set(dup["team_id"])))
+        )
     if path.exists():
         old = pd.read_csv(path)
         old = old[~old["season_year"].isin(df["season_year"].unique())]

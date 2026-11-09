@@ -46,3 +46,16 @@ def test_coverage_report_zero_matches_no_crash():
     assert "eng-ghost" in out
     assert "| 0 |" in out
     assert "missing" in out
+
+
+def test_save_coefficients_rejects_duplicate_team_ids(tmp_path):
+    import pytest
+
+    from uclpred.ingest.uefa_coefficients import save_coefficients
+
+    df = pd.DataFrame({
+        "season_year": [2026, 2026], "team_id": ["and-x", "and-x"],
+        "name": ["FC X", "UE X"], "country": ["AND", "AND"], "total_5y": [5.0, 3.5],
+    })  # fmt: skip
+    with pytest.raises(ValueError, match="and-x"):
+        save_coefficients(df, tmp_path / "c.csv")
