@@ -44,3 +44,13 @@ def test_empty_name_raises(resolver):
         resolver.resolve("GER", "")
     with pytest.raises(ValueError):
         resolver.resolve("GER", "FC")
+
+
+def test_core_name_transliterates_non_decomposable_letters():
+    assert core_name("FK Bodø/Glimt") == "bodo glimt"
+    assert core_name("Łódź") == "lodz"
+    assert core_name("Kasımpaşa") == "kasimpasa"
+
+
+def test_resolve_bodo_glimt(resolver):
+    assert resolver.resolve("NOR", "FK Bodø/Glimt") == "nor-bodo-glimt"

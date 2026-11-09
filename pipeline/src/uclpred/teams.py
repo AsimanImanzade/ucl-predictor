@@ -72,9 +72,24 @@ STOP_TOKENS = frozenset(
 )
 
 
+_TRANSLIT = str.maketrans(
+    {
+        "ø": "o",
+        "æ": "ae",
+        "œ": "oe",
+        "ł": "l",
+        "đ": "d",
+        "ð": "d",
+        "þ": "th",
+        "ß": "ss",
+        "ı": "i",
+    }
+)
+
+
 def core_name(name: str) -> str:
     """Normalise a club name: strip accents, lowercase, drop noise tokens."""
-    text = unicodedata.normalize("NFKD", name)
+    text = unicodedata.normalize("NFKD", name.lower().translate(_TRANSLIT))
     text = "".join(c for c in text if not unicodedata.combining(c)).lower()
     text = re.sub(r"[^a-z0-9]+", " ", text)
     tokens = [t for t in text.split() if not t.isdigit() and t not in STOP_TOKENS]
