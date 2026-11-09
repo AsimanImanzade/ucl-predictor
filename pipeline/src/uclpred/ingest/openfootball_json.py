@@ -27,7 +27,9 @@ def _parse(data: dict, country: str) -> list[RawMatch]:
         y, mo, d = (int(x) for x in m["date"].split("-"))
         # Times are as given (local), labelled UTC, like the TXT parser.
         date = datetime(y, mo, d, int(hh), int(mm), tzinfo=UTC)
-        ft = (m.get("score") or {}).get("ft")
+        score = m.get("score")
+        # Some files give a bare [home, away] list instead of {"ft": [...]}.
+        ft = score if isinstance(score, list) else (score or {}).get("ft")
         hg, ag = (ft[0], ft[1]) if ft else (None, None)
         out.append(
             RawMatch(

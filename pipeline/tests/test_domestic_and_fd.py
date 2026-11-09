@@ -161,3 +161,12 @@ def test_undetermined_fixture_returns_none():
 def test_unknown_team_id_raises():
     with pytest.raises(KeyError):
         normalize_fd_match(_raw_matches()[0], {})
+
+
+def test_football_json_list_score():
+    # Some 2025-26 files give "score" as a bare [home, away] list instead of {"ft": [...]}.
+    data = {"matches": [{"round": "Matchday 1", "date": "2025-08-16", "time": "12:30",
+                         "team1": "Aston Villa FC", "team2": "Newcastle United FC",
+                         "score": [1, 2]}]}  # fmt: skip
+    (m,) = openfootball_json._parse(data, "ENG")
+    assert (m.home_goals, m.away_goals) == (1, 2)
