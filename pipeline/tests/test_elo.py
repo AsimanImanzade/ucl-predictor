@@ -113,15 +113,19 @@ def _rated_league(n, comp="xx.1", base_goal=(1, 1)):
 
 
 def test_top_tier_seed_uses_mean_with_five_rated():
-    rows = _rated_league(3)  # 6 rated teams in xx.1
-    # make ratings differ: a big win for h0 (neutral)
-    rows[0] = (0, "xx.1", "xxx-h0", "xxx-a0", 5, 0, True)
-    df = frame(rows + [(10, "xx.1", "new-t", "xxx-h1", 0, 0, True)])
+    # 6 teams first seen in xx.2 (1350), then playing in xx.1: pool mean != init_top
+    rows = [(i, "xx.2", f"xxx-h{i}", f"xxx-a{i}", 1, 1, True) for i in range(3)]
+    rows += [(10 + i, "xx.1", f"xxx-h{i}", f"xxx-a{i}", 1, 1, True) for i in range(2)]
+    rows += [(12, "xx.1", "xxx-h2", "xxx-a2", 4, 0, True)]  # spread the ratings
+    df = frame(rows + [(20, "xx.1", "new-t", "xxx-h1", 0, 0, True)])
     res = run_elo(df)
-    at = T0 + timedelta(days=10)
+    at = T0 + timedelta(days=20)
     cur = [res.rating_as_of(t, at) for t in
            ["xxx-h0", "xxx-a0", "xxx-h1", "xxx-a1", "xxx-h2", "xxx-a2"]]
-    assert res.pre.iloc[-1].home_elo_pre == pytest.approx(sum(cur) / 6)
+    seeded = res.pre.iloc[-1].home_elo_pre
+    assert seeded == pytest.approx(sum(cur) / 6)
+    assert seeded != 1500.0
+    assert seeded != 1350.0 or len(set(cur)) > 1
 
 
 def test_top_tier_seed_init_top_with_few_rated():
@@ -139,22 +143,25 @@ def test_both_new_teams_seeded_symmetrically():
 
 
 def test_uefa_seed_country_mean_else_unknown():
+    # three Spanish teams with different seeds: 1350 (.2), 1400 (uefa, no peers), 1500 (.1)
     rows = [
-        (0, "xx.1", "esp-a", "esp-b", 1, 1, True),
-        (1, "xx.1", "esp-c", "ger-x", 1, 1, True),
+        (0, "xx.2", "esp-a", "ger-x", 1, 1, True),
+        (1, "uefa.cl", "esp-b", "fra-y", 1, 1, True),
+        (2, "xx.1", "esp-c", "ita-z", 1, 1, True),
     ]
-    # 3 spanish rated -> mean; ger has 1 -> unknown
     df = frame(rows + [
-        (10, "uefa.cl", "esp-new", "ger-new", 0, 0, True),
-        (11, "uefa.cl", "ita-new", "fra-new", 0, 0, True),
+        (10, "uefa.cl", "esp-new", "ned-new", 0, 0, True),
+        (11, "uefa.cl", "bel-new", "gre-new", 0, 0, True),
     ])
     res = run_elo(df)
     at = T0 + timedelta(days=10)
     mean = sum(res.rating_as_of(t, at) for t in ["esp-a", "esp-b", "esp-c"]) / 3
     pre = res.pre.set_index("match_id")
-    assert pre.loc["m002", "home_elo_pre"] == pytest.approx(mean)
-    assert pre.loc["m002", "away_elo_pre"] == 1400.0
-    assert pre.loc["m003", "home_elo_pre"] == 1400.0
+    got = pre.loc["m003", "home_elo_pre"]
+    assert got == pytest.approx(mean)
+    assert got not in (1500.0, 1400.0)
+    assert pre.loc["m003", "away_elo_pre"] == 1400.0  # ned: no peers
+    assert pre.loc["m004", "home_elo_pre"] == 1400.0
 
 
 def test_same_timestamp_processed_sequentially_by_match_id():
