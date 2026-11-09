@@ -17,7 +17,7 @@ The model returns a **scoreline probability matrix** for a match. Win/draw/loss,
 model.predict_match(home_id, away_id, neutral=False) -> np.ndarray  # p[i, j], 0..10, sums to 1
 model.lambdas(team_a, team_b, venue)  # venue "home" (a hosts) | "neutral" -> (λ_a, λ_b)
 ```
-`uclpred.models.score_matrix` derives outcome, expected goals and most-likely score from the one matrix. The exporter hands the simulator per-pair λ for each venue.
+`uclpred.models.score_matrix` derives outcome, expected goals and most-likely score from the one matrix.
 
 ## Own Elo (`uclpred.elo`)
 
@@ -35,8 +35,6 @@ Poisson GLM (weighted, ridge):
 - Home advantage is fitted, and not applied when neutral.
 
 **Known calibration issues (fix before trusting public numbers):** pre-season title odds are over-concentrated (Bayern 29.7%, max λ 5.4). Elo gets inflated by domestic dominance for clubs in weaker leagues. M4 should backtest alpha, calibration, and possibly in-simulation rating drift.
-
-Gradient boosting or Elo blends may later sit **on top of** this model, and each must beat it in backtests.
 
 ## Knockout extras
 
