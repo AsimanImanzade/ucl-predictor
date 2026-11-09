@@ -173,13 +173,13 @@ def test_load_euro_skips_404_and_tags(monkeypatch):
     text = FIXTURE.read_bytes()
 
     def fake(url, path, **kw):
-        if url.endswith("uefa.cl.txt"):
+        if url.endswith("/cl.txt"):
             return text
         raise _http_error(404)
 
     monkeypatch.setattr(openfootball_txt, "get_cached", fake)
     out = openfootball_txt.load_openfootball_euro("2024-25")
-    assert len(out) == 21 and {c for c, _ in out} == {"cl"}
+    assert len(out) == 21 and {c for c, _ in out} == {"uefa.cl"}
 
 
 def test_load_euro_raises_after_loop_on_non_404(monkeypatch):
@@ -187,11 +187,11 @@ def test_load_euro_raises_after_loop_on_non_404(monkeypatch):
 
     def fake(url, path, **kw):
         seen.append(url)
-        if url.endswith("uefa.el.txt"):
+        if url.endswith("/el.txt"):
             raise _http_error(500)
         raise _http_error(404)
 
     monkeypatch.setattr(openfootball_txt, "get_cached", fake)
-    with pytest.raises(RuntimeError, match=r"2024-25 uefa\.el\.txt: HTTP 500"):
+    with pytest.raises(RuntimeError, match=r"2024-25 el\.txt: HTTP 500"):
         openfootball_txt.load_openfootball_euro("2024-25")
     assert len(seen) == len(openfootball_txt.EURO_FILES)

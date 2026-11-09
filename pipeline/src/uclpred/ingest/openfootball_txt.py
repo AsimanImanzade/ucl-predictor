@@ -12,13 +12,14 @@ from uclpred.ingest.http_cache import get_cached
 
 log = logging.getLogger(__name__)
 
+# canonical competition code -> file stem in openfootball/champions-league (<season>/<stem>.txt)
 EURO_FILES = {
-    "cl": "uefa.cl",
-    "clq": "uefa.clq",
-    "el": "uefa.el",
-    "elq": "uefa.elq",
-    "conf": "uefa.ecl",
-    "confq": "uefa.eclq",
+    "uefa.cl": "cl",
+    "uefa.clq": "clq",
+    "uefa.el": "el",
+    "uefa.elq": "elq",
+    "uefa.ecl": "conf",
+    "uefa.eclq": "confq",
 }
 BASE_URL = "https://raw.githubusercontent.com/openfootball/champions-league/master/{season}/{file}.txt"
 FIRST_SEASON, LAST_SEASON = 2011, 2025  # start years: 2011-12 .. 2025-26
