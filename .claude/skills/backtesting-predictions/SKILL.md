@@ -33,13 +33,11 @@ Without a backtest, "the model improved" is an opinion. A change ships only when
 2. Elo-only model
 3. Elo + Dixon-Coles (the `elo-dc-v1` baseline), which is what any change must beat.
 
-No bookmaker-odds benchmark in v1: there is no licensed source (football-data.co.uk terms forbid bots). Add one only if a licensed feed appears.
-
-First sanity result (2025-26 league phase, fit as of 2025-09-01): Elo+DC RPS 0.2076 vs base-rate 0.2364.
+No bookmaker-odds benchmark: there is no licensed source.
 
 ## Tournament-level check
 
-The 36-team format exists only since 2024/25, so run the full simulator pre-season and at each matchday for those seasons. Report how much probability it gave each team's actual finish (top 8 / 9–24 / out, stage reached). With only a few seasons, treat this as a sanity check, not proof.
+The 36-team format exists only since 2024/25: score the probability given to each team's actual stage. With two seasons, this is a sanity check, not proof.
 
 ## Harness and gate
 
