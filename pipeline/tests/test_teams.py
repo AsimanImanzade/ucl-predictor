@@ -103,3 +103,11 @@ def test_alias_csv_empty_country_raises(tmp_path):
 def test_resolve_empty_country_raises(resolver):
     with pytest.raises(ValueError, match="country"):
         resolver.resolve("", "Arsenal")
+
+
+def test_olympiacos_and_paphos_aliases_unify():
+    r = TeamResolver()
+    assert r.resolve("GRE", "Olympiacos FC") == "gre-olympiakos-piraeus"
+    assert r.resolve("GRE", "Olympiakos SFP") == "gre-olympiakos-piraeus"
+    assert r.resolve("CYP", "Pafos FC") == r.resolve("CYP", "Paphos FC") == "cyp-paphos"
+    assert r.resolve("DEN", "F.C. Copenhagen") == "den-kobenhavn"
