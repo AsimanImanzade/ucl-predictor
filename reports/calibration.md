@@ -4,13 +4,13 @@ Elo v2 parameter search and v1 vs v2 backtest, generated 2026-11-10 by `uv run u
 
 ## Gate verdict
 
-Pre-registered gate (thresholds from Global Constraints), evaluated on the recorded numbers above.
+Pre-registered gate (thresholds from Global Constraints), evaluated on the recorded numbers below.
 
 | # | criterion (threshold) | v1 | v2 | result |
 |---|---|---|---|---|
-| 1 | League gap, gate scope 2019-20 ... 2025-26 (n=416): \|league gap v2\| <= 0.03 | -0.160 | -0.041 | **FAIL** |
-| 2 | Report seasons 2022-23 ... 2025-26 (n=2390): upper bound of 95% CI of delta RPS (v2 - v1) <= +0.001 | RPS 0.2086 | RPS 0.2105; delta +0.0019, CI [-0.0011, +0.0047] | **FAIL** |
-| 3 | Mean tournament log loss over 2024-25 and 2025-26: v2 at chosen sigma <= v1 at sigma = 0 | 1.3401 (sigma 0) | 1.3694 (sigma 70); +0.0293 | **FAIL** |
+| 1 | League gap, gate scope 2019-20 ... 2025-26 (n=416): \|league gap v2\| ≤ 0.03 | -0.160 | -0.041 | **FAIL** |
+| 2 | Report seasons 2022-23 ... 2025-26 (n=2390): the upper bound of the 95% CI of report-season ΔRPS (v2 − v1) ≤ +0.001 | RPS 0.2086 | RPS 0.2105; delta +0.0019, CI [-0.0011, +0.0047] | **FAIL** |
+| 3 | Mean tournament log loss over both past seasons (2024-25, 2025-26) for v2 at the chosen σ ≤ v1 at σ = 0 | 1.3401 (sigma 0) | 1.3694 (sigma 70); +0.0293 | **FAIL** |
 | 4 | User review of the md00 table | - | - | pending user review (not reached; no switch happened) |
 
 Gate: FAIL (criteria 1, 2, 3). Default model stays elo-dc-v1; no switch performed. Decision pending with the user.
@@ -19,10 +19,10 @@ Gate: FAIL (criteria 1, 2, 3). Default model stays elo-dc-v1; no switch performe
 
 Diagnostics outside the pre-registered gate; they do not change the verdict.
 
-- At equal regularisation (alpha 0.005) v2's Elo beats v1 on report seasons: delta -0.0012, CI [-0.0037, +0.0014] (Sensitivity section). The criterion 2 failure comes from the tuned alpha 0.0005, which was tuned on COVID-affected 2019-20/2020-21 and does not transfer.
-- Closing the league gap to the 0.03 band needs extreme settings (k=32, k_euro=3.0, g=1.0: gap -0.029 in the Sensitivity table) which cost accuracy (delta +0.0027, CI [-0.0005, +0.0059]).
-- Criterion 3's failure is small relative to its noise: a team-season bootstrap gives CI [-0.044, +0.103]. Aston Villa's 2024-25 quarter-final run (v1 P 0.077 vs v2 0.026) is about half the gap; 2025-26 is nearly tied (1.328 vs 1.321).
-- Rating uncertainty barely moves title concentration under v2 because v2's eloCoef (about 0.093 per 100 Elo) is about half of v1's (0.162): noise acts only on the Elo term, not on team attack/defence.
+- At equal regularisation (alpha 0.005) v2's Elo is not distinguishable from v1 on report seasons, with a point estimate slightly better (delta -0.0012, CI [-0.0037, +0.0014]; Sensitivity section). Hypothesis for the criterion 2 failure: alpha 0.0005 was selected on 2019-20 to 2021-22, which include COVID-affected seasons, a plausible reason it does not transfer.
+- Closing the league gap to the 0.03 band needs extreme settings (k=32, k_euro=3.0, g=1.0 @ alpha 0.005: gap -0.029 in the Sensitivity table) which cost accuracy (delta +0.0027, CI [-0.0005, +0.0059]).
+- Criterion 3's failure is small relative to its noise: a team-season bootstrap gives CI [-0.044, +0.103]. Aston Villa's 2024-25 quarter-final run (v1 P 0.077 vs v2 0.026) is about half the gap (both figures: diagnostic from the Task 7 review, reproducible from data/export/bt/*/*/chances_s*.json). 2025-26 is nearly tied (v2 @ σ70 1.3281 vs v1 @ σ0 1.3212; Tournament check table).
+- Rating uncertainty barely moves title concentration under v2 because v2's eloCoef (about 0.093 per 100 Elo) is about half of v1's (0.162) (source: data/export/bt/2024-25/<model>/lambdas.json): noise acts only on the Elo term, not on team attack/defence.
 - Hazard: re-running `uclpred backtest` rewrites `rating_sigma` to null in model_params.json (backtest.py:255); re-run `uclpred tournament-check` afterwards to restore it.
 
 ## Tournament check
