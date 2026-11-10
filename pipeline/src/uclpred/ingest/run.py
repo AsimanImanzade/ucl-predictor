@@ -22,7 +22,7 @@ from uclpred.teams import TeamResolver
 
 log = logging.getLogger(__name__)
 
-EURO_SEASONS = [season_label(y) for y in range(2011, 2026)]  # 2011-12 .. 2025-26
+EURO_SEASONS = [season_label(y) for y in range(2011, 2027)]  # 2011-12 .. 2026-27
 JSON_SEASONS = [season_label(y) for y in range(2010, 2027)]  # 2010-11 .. 2026-27
 FD_SEASONS = {"CL": [2024, 2025, 2026]}
 FD_SEASONS.update({c: [2025, 2026] for c in FD_COMPETITIONS if c != "CL"})

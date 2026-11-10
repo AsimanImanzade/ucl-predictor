@@ -195,3 +195,21 @@ def test_load_euro_raises_after_loop_on_non_404(monkeypatch):
     with pytest.raises(RuntimeError, match=r"2024-25 el\.txt: HTTP 500"):
         openfootball_txt.load_openfootball_euro("2024-25")
     assert len(seen) == len(openfootball_txt.EURO_FILES)
+
+
+def test_404_logged_at_info(monkeypatch, caplog):
+    import logging
+
+    import requests
+
+    from uclpred.ingest import openfootball_txt as o
+
+    def fake(url, path):
+        resp = requests.Response()
+        resp.status_code = 404
+        raise requests.HTTPError(response=resp)
+
+    monkeypatch.setattr(o, "get_cached", fake)
+    with caplog.at_level(logging.INFO, logger=o.log.name):
+        assert o.load_openfootball_euro("2026-27") == []
+    assert any("404" in r.message and "2026-27" in r.message for r in caplog.records)

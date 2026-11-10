@@ -133,6 +133,7 @@ def load_openfootball_euro(season: str) -> list[tuple[str, RawMatch]]:
             raw = get_cached(url, path)
         except requests.HTTPError as e:
             if e.response is not None and e.response.status_code == 404:
+                log.info("openfootball %s %s.txt: 404 (not published)", season, fname)
                 continue
             status = e.response.status_code if e.response is not None else "?"
             failures.append(f"{season} {fname}.txt: HTTP {status}")

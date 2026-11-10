@@ -77,3 +77,17 @@ def test_cross_country_duplicates_none():
     df = mk([("fra-monaco", "fra-lille", "fr.1", "openfootball")])
     assert cross_country_duplicates(df) == []
 
+
+
+def test_season_matrix_counts():
+    from uclpred.coverage import season_matrix
+
+    df = mk([
+        ("a-x", "a-y", "uefa.cl", "football-data"),
+        ("a-x", "a-z", "uefa.cl", "football-data"),
+        ("a-y", "a-z", "en.1", "openfootball"),
+    ])  # fmt: skip
+    out = season_matrix(df)
+    assert "| Competition | 2025-26 |" in out
+    assert "| uefa.cl | 2 |" in out
+    assert "| en.1 | 1 |" in out

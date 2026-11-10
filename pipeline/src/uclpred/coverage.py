@@ -57,6 +57,19 @@ def cross_country_duplicates(df: pd.DataFrame) -> list[tuple[str, str]]:
     ]
 
 
+def season_matrix(df: pd.DataFrame) -> str:
+    """Markdown matrix of row counts: rows = competition, columns = season."""
+    counts = df.groupby(["competition", "season"]).size().unstack(fill_value=0)
+    seasons = list(counts.columns)
+    lines = [
+        "| Competition | " + " | ".join(seasons) + " |",
+        "|---|" + "---:|" * len(seasons),
+    ]
+    for comp, row in counts.iterrows():
+        lines.append(f"| {comp} | " + " | ".join(str(int(v)) for v in row) + " |")
+    return "\n".join(lines)
+
+
 def team_stats(df: pd.DataFrame, team_id: str) -> dict:
     m = df[(df["home_id"] == team_id) | (df["away_id"] == team_id)]
     dom = m[_is_domestic(m["competition"])]
@@ -110,6 +123,7 @@ def coverage_report(
         + (", ".join(missing) or "none"),
         "",
     ]
+    lines += ["Matches per competition and season:", "", season_matrix(df), ""]
     xdup = cross_country_duplicates(df)
     lines += [
         f"Cross-country duplicate ids ({len(xdup)}): "
