@@ -42,6 +42,21 @@ def duplicate_candidates(df: pd.DataFrame) -> list[tuple[str, str]]:
     return out
 
 
+def cross_country_duplicates(df: pd.DataFrame) -> list[tuple[str, str]]:
+    """Id pairs with an identical slug after the country prefix but different prefixes."""
+    ids = pd.unique(pd.concat([df["home_id"], df["away_id"]]))
+    by_slug: dict[str, list[str]] = {}
+    for i in sorted(ids):
+        prefix, slug = i.split("-", 1)
+        by_slug.setdefault(slug, []).append(i)
+    return [
+        (a, b)
+        for group in by_slug.values()
+        for a, b in combinations(group, 2)
+        if a.split("-", 1)[0] != b.split("-", 1)[0]
+    ]
+
+
 def team_stats(df: pd.DataFrame, team_id: str) -> dict:
     m = df[(df["home_id"] == team_id) | (df["away_id"] == team_id)]
     dom = m[_is_domestic(m["competition"])]
@@ -65,7 +80,9 @@ def team_stats(df: pd.DataFrame, team_id: str) -> dict:
     }
 
 
-def coverage_report(df: pd.DataFrame, cl_teams: list[dict], coefs: pd.DataFrame) -> str:
+def coverage_report(
+    df: pd.DataFrame, cl_teams: list[dict], coefs: pd.DataFrame
+) -> str:
     from uclpred.teams import TeamResolver
 
     resolver = TeamResolver()
@@ -91,6 +108,12 @@ def coverage_report(df: pd.DataFrame, cl_teams: list[dict], coefs: pd.DataFrame)
         "",
         f"Teams with missing current-season domestic data ({len(missing)}): "
         + (", ".join(missing) or "none"),
+        "",
+    ]
+    xdup = cross_country_duplicates(df)
+    lines += [
+        f"Cross-country duplicate ids ({len(xdup)}): "
+        + (", ".join(f"{a} / {b}" for a, b in xdup) or "none"),
         "",
     ]
     return "\n".join(lines)

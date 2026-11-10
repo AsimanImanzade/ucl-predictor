@@ -16,6 +16,9 @@ ISO3_TO_FIFA: dict[str, str] = {
     "HRV": "CRO",
     "BGR": "BUL",
     "PRT": "POR",
+    # football-data labels; Monaco plays in the French league, so FRA is intentional.
+    "MCO": "FRA",
+    "SER": "SRB",
 }
 
 LEAGUE_COUNTRY: dict[str, str] = {
@@ -99,14 +102,20 @@ def core_name(name: str) -> str:
 class TeamResolver:
     def __init__(self, aliases_path: Path = DEFAULT_ALIASES_PATH):
         self._aliases: dict[tuple[str, str], str] = {}
-        with open(aliases_path, newline="", encoding="utf-8") as f:
-            for row in csv.DictReader(f):
-                key = (row["country"].strip().upper(), row["variant_core"].strip())
-                self._aliases[key] = row["canonical_core"].strip()
+        with open(aliases_path, newline="", encoding="utf-8-sig") as f:
+            for n, row in enumerate(csv.DictReader(f), start=2):
+                if not row["country"].strip():
+                    raise ValueError(f"{aliases_path}:{n}: empty country")
+                key = (self._fifa(row["country"]), core_name(row["variant_core"]))
+                if key in self._aliases:
+                    raise ValueError(f"{aliases_path}:{n}: duplicate alias {key}")
+                self._aliases[key] = core_name(row["canonical_core"])
 
     @staticmethod
     def _fifa(country: str) -> str:
         code = country.strip().upper()
+        if not code:
+            raise ValueError("empty country code")
         return ISO3_TO_FIFA.get(code, code)
 
     def core(self, country: str, name: str) -> str:

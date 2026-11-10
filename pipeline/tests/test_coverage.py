@@ -59,3 +59,21 @@ def test_save_coefficients_rejects_duplicate_team_ids(tmp_path):
     })  # fmt: skip
     with pytest.raises(ValueError, match="and-x"):
         save_coefficients(df, tmp_path / "c.csv")
+
+
+def test_cross_country_duplicates_found():
+    from uclpred.coverage import cross_country_duplicates
+
+    df = mk([
+        ("fra-monaco", "fra-lille", "fr.1", "openfootball"),
+        ("mco-monaco", "eng-arsenal", "uefa.cl", "football-data"),
+    ])  # fmt: skip
+    assert cross_country_duplicates(df) == [("fra-monaco", "mco-monaco")]
+
+
+def test_cross_country_duplicates_none():
+    from uclpred.coverage import cross_country_duplicates
+
+    df = mk([("fra-monaco", "fra-lille", "fr.1", "openfootball")])
+    assert cross_country_duplicates(df) == []
+
