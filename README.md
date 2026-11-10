@@ -29,13 +29,21 @@ uv run uclpred coefficients --season-year 2026 # UEFA club coefficients for the 
 uv run uclpred coverage                        # data coverage report (reports/coverage.md)
 uv run uclpred export --as-of 2026-09-07 --out data/export/md00   # pre-season (matchday 0) snapshot
 uv run uclpred export --as-of now --out data/export/live          # current state
+uv run uclpred ingest --processed-only         # no network: rebuild data/processed/cl_*_{fd,teams}.json from cached raw
+uv run uclpred export --as-of preseason --season 2025-26 --model elo-dc-v2 --out data/export/bt/2025-26/elo-dc-v2
+uv run uclpred backtest                        # elo-dc-v2 grid search + v1 vs v2 -> reports/calibration.md, reports/backtest_grid.csv, data/reference/model_params.json
+uv run uclpred tournament-check [--runs 50000] # past-season tournament check; chooses rating_sigma, updates reports/calibration.md
 ```
+
+`export` takes `--season` (default 2026-27) and `--model` (`elo-dc-v1` default, or `elo-dc-v2`). The default model stays `elo-dc-v1`; the gate verdict for `elo-dc-v2` is in [`reports/calibration.md`](reports/calibration.md).
 
 Simulate from the repo root (official runs: 50,000 runs, seed 1):
 
 ```sh
-pnpm --filter @uclpred/sim cli -- --input data/export/live [--runs 50000] [--seed 1]
+pnpm --filter @uclpred/sim cli -- --input data/export/live [--runs 50000] [--seed 1] [--sigma 70] [--out file.json]
 ```
+
+`--sigma` sets rating uncertainty in Elo points (needs `eloCoef` in `lambdas.json`); `--out` writes the chances JSON to the given path.
 
 Tests and checks:
 

@@ -41,14 +41,16 @@ First sanity result (2025-26 league phase, fit as of 2025-09-01): Elo+DC RPS 0.2
 
 The 36-team format exists only since 2024/25, so run the full simulator pre-season and at each matchday for those seasons. Report how much probability it gave each team's actual finish (top 8 / 9–24 / out, stage reached). With only a few seasons, treat this as a sanity check, not proof.
 
-## Output
+## Harness and gate
 
-Write `reports/backtest/<date>_<model>.md` with:
-- a metrics table vs the baselines
-- a calibration table
-- the seasons used and the commit hash
+Run from `pipeline/`:
 
-Include the delta vs the current model in the commit or PR message.
+- `uv run uclpred backtest` grid-searches the Elo v2 parameters on the tuning seasons only, scores v1 vs the chosen v2 on the report seasons (RPS, log loss, Brier, bootstrap CI of the RPS delta, calibration table, league gap) and writes `reports/calibration.md`, `reports/backtest_grid.csv` and `data/reference/model_params.json` (it keeps an existing `rating_sigma`).
+- `uv run uclpred tournament-check` re-exports each past season's preseason snapshot, simulates it for each rating sigma, scores the stage distributions and writes the "Tournament check" section and `rating_sigma`.
+
+The gate is pre-registered: thresholds and the selection rule (lowest tuning RPS, near-ties to the smaller |league gap|) are fixed before looking at report seasons. Diagnostics added later (alpha-matched or extended-setting variants, probes) go in a section labelled as outside the pre-registered selection. They explain a verdict; they never change it or re-select parameters.
+
+The Gate verdict section carries a "Written for commit" stamp; re-running a tool marks it stale, so regenerate the verdict after any change. Include the delta vs the current model in the commit or PR message.
 
 ## Common mistakes
 

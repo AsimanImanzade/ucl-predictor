@@ -4,6 +4,8 @@ Elo v2 parameter search and v1 vs v2 backtest, generated 2026-11-10 by `uv run u
 
 ## Gate verdict
 
+_Written for commit 0a3f05f on 2026-11-10; regenerate this verdict if any section below changes._
+
 Pre-registered gate (thresholds from Global Constraints), evaluated on the recorded numbers below.
 
 | # | criterion (threshold) | v1 | v2 | result |
@@ -17,13 +19,18 @@ Gate: FAIL (criteria 1, 2, 3). Default model stays elo-dc-v1; no switch performe
 
 ### Evidence for the decision
 
-Diagnostics outside the pre-registered gate; they do not change the verdict.
+Diagnostics from the final review, outside the pre-registered gate; they do not change the verdict.
 
 - At equal regularisation (alpha 0.005) v2's Elo is not distinguishable from v1 on report seasons, with a point estimate slightly better (delta -0.0012, CI [-0.0037, +0.0014]; Sensitivity section). Hypothesis for the criterion 2 failure: alpha 0.0005 was selected on 2019-20 to 2021-22, which include COVID-affected seasons, a plausible reason it does not transfer.
-- Closing the league gap to the 0.03 band needs extreme settings (k=32, k_euro=3.0, g=1.0 @ alpha 0.005: gap -0.029 in the Sensitivity table) which cost accuracy (delta +0.0027, CI [-0.0005, +0.0059]).
+- The one extended setting tried (k=32, k_euro=3.0, g=1.0 @ alpha 0.005) reached gap −0.029 (Sensitivity table) at an accuracy cost (Δ +0.0027, CI [−0.0005, +0.0059]).
 - Criterion 3's failure is small relative to its noise: a team-season bootstrap gives CI [-0.044, +0.103]. Aston Villa's 2024-25 quarter-final run (v1 P 0.077 vs v2 0.026) is about half the gap (both figures: diagnostic from the Task 7 review, reproducible from data/export/bt/*/*/chances_s*.json). 2025-26 is nearly tied (v2 @ σ70 1.3281 vs v1 @ σ0 1.3212; Tournament check table).
 - Rating uncertainty barely moves title concentration under v2 because v2's eloCoef (about 0.093 per 100 Elo) is about half of v1's (0.162) (source: data/export/bt/2024-25/<model>/lambdas.json): noise acts only on the Elo term, not on team attack/defence.
-- Hazard: re-running `uclpred backtest` rewrites `rating_sigma` to null in model_params.json (backtest.py:255); re-run `uclpred tournament-check` afterwards to restore it.
+- (a) Both models under-predict home wins on the report seasons by about 4.2 points (v2 44.2% vs 48.5% observed per the Calibration table; v1 @ alpha 0.005 44.3% vs 48.5% per the final-review probe); on tuning seasons v1 was close (43.7% vs 44.2%). This comes from the shared GLM home term, not the Elo.
+- (b) The criterion-1 failure is concentrated in early seasons: v2's gap over report seasons only is −0.024 (inside ±0.03; League gap table) vs −0.070 over tuning seasons, consistent with mid-size leagues entering the data in 2018-19.
+- (c) Euro-only clubs share a country pseudo-league (`<cty>.x`) and with g = 0.9 inherit a compatriot's European record (e.g. nor-viking 1776 v2 vs 1498 v1 on 2026-09-07); per the final-review probe these clubs account for about 0.013 of the +0.029 criterion-3 gap.
+- (d) Domestic data for be.1, gr.1, sco.1 and tr.1 is missing for 2021-22 – 2023-24 (pre-existing), so those clubs drop out of the league gap in those seasons and their v2 offsets freeze.
+
+Known identity issue (to fix in the next calibration round): Red Bull Salzburg is split across `aut-rb-salzburg` (572 matches) and `aut-red-bull-salzburg` (14 CL matches, used in the 2024-25 check with a too-low rating); pre-existing splits also exist for Lazio and Vitória SC. These are unlikely to flip the verdict but were not re-run.
 
 ## Tournament check
 
