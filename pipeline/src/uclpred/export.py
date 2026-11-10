@@ -69,6 +69,21 @@ def build_season(fd_matches, fd_teams, resolver, coefs, as_of: datetime) -> dict
     }
 
 
+def warn_unrated_teams(model, team_ids: list[str]) -> list[str]:
+    """Warn (never fail) for teams with no pre-as_of Elo or no training-window matches."""
+    flagged = []
+    for t in team_ids:
+        problems = []
+        if t not in model.ratings:
+            problems.append("no Elo rating before as_of (mean rating used)")
+        if t not in model.attack:
+            problems.append("no matches in the model's training window")
+        if problems:
+            flagged.append(t)
+            log.warning("%s: %s", t, "; ".join(problems))
+    return flagged
+
+
 def build_lambdas(model, team_ids: list[str]) -> dict:
     def matrix(venue: str):
         return [
@@ -162,7 +177,9 @@ def run_export(as_of: datetime, out: Path) -> str:
     elo = run_elo(matches)
     model = fit_baseline(matches, elo, as_of)
     season = build_season(fd_matches, fd_teams, TeamResolver(), coefs, as_of)
-    lambdas = build_lambdas(model, [t["id"] for t in season["teams"]])
+    team_ids = [t["id"] for t in season["teams"]]
+    warn_unrated_teams(model, team_ids)
+    lambdas = build_lambdas(model, team_ids)
     validate_snapshot(season, lambdas)
     write_snapshot(season, lambdas, out)
     vals = [

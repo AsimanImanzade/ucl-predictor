@@ -1,6 +1,7 @@
 import copy
 import json
 import math
+from types import SimpleNamespace
 from datetime import UTC, datetime
 
 import pytest
@@ -191,3 +192,20 @@ def test_unseen_team_lambda_in_range():
     for key in ("home", "neutral"):
         for a, b in lam[key][0][1], lam[key][1][0]:
             assert 0.05 <= a <= 6.0 and 0.05 <= b <= 6.0
+
+
+def test_warn_unrated_teams(caplog):
+    import logging
+
+    from uclpred.export import warn_unrated_teams
+
+    stub = SimpleNamespace(
+        ratings={"a": 1500.0, "b": 1500.0}, attack={"a": 0.0, "c": 0.0}
+    )
+    with caplog.at_level(logging.WARNING, logger="uclpred.export"):
+        bad = warn_unrated_teams(stub, ["a", "b", "c"])
+    assert bad == ["b", "c"]
+    msgs = [r.getMessage() for r in caplog.records]
+    assert any("b" in m and "training window" in m for m in msgs)
+    assert any("c" in m and "Elo" in m for m in msgs)
+    assert not any("'a'" in m or " a " in m for m in msgs)
