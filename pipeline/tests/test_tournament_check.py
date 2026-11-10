@@ -182,7 +182,7 @@ def test_tournament_check_exports_before_sim(monkeypatch, tmp_path):
     for y in ("2024", "2025"):
         (tmp_path / f"cl_{y}_fd.json").write_text("[]")
         (tmp_path / f"cl_{y}_teams.json").write_text("[]")
-    with pytest.raises(Exception):  # chances files do not exist; we only check call order
+    with pytest.raises(FileNotFoundError):  # chances files do not exist; we only check call order
         tc.run_tournament_check(runs=10)
     first = calls[0]
     assert first[0] == "export"
