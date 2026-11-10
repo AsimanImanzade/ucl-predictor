@@ -39,6 +39,10 @@ export interface Lambdas {
   teams: TeamId[];
   home: (LambdaPair | null)[][];
   neutral: (LambdaPair | null)[][];
+  /** GLM beta per 100 Elo points; required when ratingSigma > 0. */
+  eloCoef?: number;
+  /** Per-run team rating noise, in Elo points; missing means 0. */
+  ratingSigma?: number;
 }
 
 export type Overrides = Record<number, { homeGoals: number; awayGoals: number }>;

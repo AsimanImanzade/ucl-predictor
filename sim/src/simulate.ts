@@ -1,15 +1,17 @@
 import { createRng } from './rng.js';
-import { ScoreSampler } from './scores.js';
+import { NoisySampler, sampleNormals, ScoreSampler } from './scores.js';
 import { buildRecords, type MatchResult } from './table.js';
 import { rankTable } from './tiebreak.js';
 import { drawBracket, drawPlayoffs } from './bracket.js';
-import { playFinal, playTwoLegged } from './tie.js';
+import { playFinal, playTwoLegged, type MatchSampler } from './tie.js';
 import type { Lambdas, Overrides, Season, SimResult, Stage, TeamChances, TeamId } from './types.js';
 
 export interface SimOptions {
   runs: number;
   seed: number;
   overrides?: Overrides;
+  /** Elo-point sigma of per-run team rating noise; overrides lambdas.ratingSigma. */
+  ratingSigma?: number;
 }
 
 /**
@@ -20,7 +22,11 @@ export interface SimOptions {
 export function simulate(season: Season, lambdas: Lambdas, opts: SimOptions): SimResult {
   const { runs, seed, overrides } = opts;
   const rng = createRng(seed);
-  const sampler = new ScoreSampler(lambdas);
+  const baseSampler = new ScoreSampler(lambdas);
+  const sigma = opts.ratingSigma ?? lambdas.ratingSigma ?? 0;
+  if (!Number.isFinite(sigma) || sigma < 0) throw new Error('ratingSigma must be a finite number >= 0');
+  if (sigma > 0 && lambdas.eloCoef === undefined) throw new Error('ratingSigma > 0 requires lambdas.eloCoef');
+  let sampler: MatchSampler = baseSampler;
   const teamIds: TeamId[] = season.teams.map((t) => t.id);
   const n = teamIds.length;
   const teamIndex = new Map<TeamId, number>();
@@ -61,6 +67,12 @@ export function simulate(season: Season, lambdas: Lambdas, opts: SimOptions): Si
   };
 
   for (let run = 0; run < runs; run++) {
+    if (sigma > 0) {
+      const z = sampleNormals(n, rng);
+      const noise = new Map<TeamId, number>();
+      for (let i = 0; i < n; i++) noise.set(teamIds[i]!, sigma * z[i]!);
+      sampler = new NoisySampler(baseSampler, lambdas.eloCoef!, noise);
+    }
     for (let k = 0; k < open.length; k++) {
       const m = open[k]!;
       const [hg, ag] = sampler.sample(m.homeId, m.awayId, 'home', rng);

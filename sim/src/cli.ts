@@ -35,19 +35,32 @@ export function formatTable(season: Season, res: SimResult, ms: number): string 
 function main(): void {
   const input = arg('input');
   if (!input) {
-    console.error('usage: pnpm --filter @uclpred/sim cli -- --input <dir> [--runs 50000] [--seed 1]');
+    console.error('usage: pnpm --filter @uclpred/sim cli -- --input <dir> [--runs 50000] [--seed 1] [--sigma 0] [--out <file>]');
     console.error('  <dir> is absolute or relative to the repo root (pnpm runs this with cwd = sim/).');
     process.exit(2);
   }
   const runs = Number(arg('runs', '50000'));
   const seed = Number(arg('seed', '1'));
-  const dir = path.isAbsolute(input) ? input : path.resolve(process.cwd(), '..', input);
+  if (!Number.isFinite(runs) || !Number.isFinite(seed)) {
+    console.error('--runs and --seed must be finite numbers');
+    process.exit(2);
+  }
+  const sigmaArg = arg('sigma');
+  const sigma = sigmaArg === undefined ? undefined : Number(sigmaArg);
+  if (sigma !== undefined && (!Number.isFinite(sigma) || sigma < 0)) {
+    console.error('--sigma must be a finite number >= 0');
+    process.exit(2);
+  }
+  const fromRoot = (p: string): string => (path.isAbsolute(p) ? p : path.resolve(process.cwd(), '..', p));
+  const dir = fromRoot(input);
+  const outArg = arg('out');
+  const outPath = outArg ? fromRoot(outArg) : path.join(dir, 'chances.json');
   const season = JSON.parse(readFileSync(path.join(dir, 'season.json'), 'utf8')) as Season;
   const lambdas = JSON.parse(readFileSync(path.join(dir, 'lambdas.json'), 'utf8')) as Lambdas;
   const t0 = performance.now();
-  const res = simulate(season, lambdas, { runs, seed });
+  const res = simulate(season, lambdas, sigma === undefined ? { runs, seed } : { runs, seed, ratingSigma: sigma });
   const ms = performance.now() - t0;
-  writeFileSync(path.join(dir, 'chances.json'), JSON.stringify(res));
+  writeFileSync(outPath, JSON.stringify(res));
   console.log(`as of ${season.asOf}  (${dir})`);
   console.log(formatTable(season, res, ms));
 }

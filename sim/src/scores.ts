@@ -1,4 +1,5 @@
 import type { Lambdas, LambdaPair, TeamId } from './types.js';
+import type { MatchSampler } from './tie.js';
 
 export type Venue = 'home' | 'neutral';
 type Rng = () => number;
@@ -118,5 +119,41 @@ export class ScoreSampler {
       else lo = mid + 1;
     }
     return [Math.floor(lo / N), lo % N];
+  }
+}
+
+/** Standard normal draws via Box-Muller; uses both outputs of each pair. */
+export function sampleNormals(count: number, rng: Rng): number[] {
+  const out: number[] = [];
+  while (out.length < count) {
+    const u1 = 1 - rng(); // (0, 1]
+    const u2 = rng();
+    const r = Math.sqrt(-2 * Math.log(u1));
+    out.push(r * Math.cos(2 * Math.PI * u2));
+    if (out.length < count) out.push(r * Math.sin(2 * Math.PI * u2));
+  }
+  return out;
+}
+
+/**
+ * Per-run sampler with Elo noise: lambdas are scaled by exp(beta * (n_a - n_b) / 100),
+ * goals are independent Poisson.
+ */
+export class NoisySampler implements MatchSampler {
+  constructor(
+    private readonly base: ScoreSampler,
+    private readonly eloCoef: number,
+    private readonly noise: Map<TeamId, number>,
+  ) {}
+
+  lambda(a: TeamId, b: TeamId, venue: Venue): LambdaPair {
+    const [la, lb] = this.base.lambda(a, b, venue);
+    const d = ((this.noise.get(a) ?? 0) - (this.noise.get(b) ?? 0)) / 100;
+    return [la * Math.exp(this.eloCoef * d), lb * Math.exp(-this.eloCoef * d)];
+  }
+
+  sample(a: TeamId, b: TeamId, venue: Venue, rng: Rng): [number, number] {
+    const [la, lb] = this.lambda(a, b, venue);
+    return [samplePoisson(la, rng), samplePoisson(lb, rng)];
   }
 }
