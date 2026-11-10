@@ -2,6 +2,29 @@
 
 Elo v2 parameter search and v1 vs v2 backtest, generated 2026-11-10 by `uv run uclpred backtest`. Parameters chosen on tuning seasons 2019-20, 2020-21, 2021-22; compared on report seasons 2022-23, 2023-24, 2024-25, 2025-26.
 
+## Gate verdict
+
+Pre-registered gate (thresholds from Global Constraints), evaluated on the recorded numbers above.
+
+| # | criterion (threshold) | v1 | v2 | result |
+|---|---|---|---|---|
+| 1 | League gap, gate scope 2019-20 ... 2025-26 (n=416): \|league gap v2\| <= 0.03 | -0.160 | -0.041 | **FAIL** |
+| 2 | Report seasons 2022-23 ... 2025-26 (n=2390): upper bound of 95% CI of delta RPS (v2 - v1) <= +0.001 | RPS 0.2086 | RPS 0.2105; delta +0.0019, CI [-0.0011, +0.0047] | **FAIL** |
+| 3 | Mean tournament log loss over 2024-25 and 2025-26: v2 at chosen sigma <= v1 at sigma = 0 | 1.3401 (sigma 0) | 1.3694 (sigma 70); +0.0293 | **FAIL** |
+| 4 | User review of the md00 table | - | - | pending user review (not reached; no switch happened) |
+
+Gate: FAIL (criteria 1, 2, 3). Default model stays elo-dc-v1; no switch performed. Decision pending with the user.
+
+### Evidence for the decision
+
+Diagnostics outside the pre-registered gate; they do not change the verdict.
+
+- At equal regularisation (alpha 0.005) v2's Elo beats v1 on report seasons: delta -0.0012, CI [-0.0037, +0.0014] (Sensitivity section). The criterion 2 failure comes from the tuned alpha 0.0005, which was tuned on COVID-affected 2019-20/2020-21 and does not transfer.
+- Closing the league gap to the 0.03 band needs extreme settings (k=32, k_euro=3.0, g=1.0: gap -0.029 in the Sensitivity table) which cost accuracy (delta +0.0027, CI [-0.0005, +0.0059]).
+- Criterion 3's failure is small relative to its noise: a team-season bootstrap gives CI [-0.044, +0.103]. Aston Villa's 2024-25 quarter-final run (v1 P 0.077 vs v2 0.026) is about half the gap; 2025-26 is nearly tied (1.328 vs 1.321).
+- Rating uncertainty barely moves title concentration under v2 because v2's eloCoef (about 0.093 per 100 Elo) is about half of v1's (0.162): noise acts only on the Elo term, not on team attack/defence.
+- Hazard: re-running `uclpred backtest` rewrites `rating_sigma` to null in model_params.json (backtest.py:255); re-run `uclpred tournament-check` afterwards to restore it.
+
 ## Tournament check
 
 Past seasons 2024-25, 2025-26, preseason exports, 50,000 runs, seed 1. stage_log_loss is the mean over the 36 teams of -log P(actual stage), floored at 1e-6; brier_top8 scores the direct top-8 flag (played the Round of 16 without the play-offs); brier_top24 scores 'not out'; max_title_share is the largest title probability.
