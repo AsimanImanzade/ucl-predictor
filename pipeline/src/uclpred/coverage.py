@@ -47,7 +47,7 @@ def cross_country_duplicates(df: pd.DataFrame) -> list[tuple[str, str]]:
     ids = pd.unique(pd.concat([df["home_id"], df["away_id"]]))
     by_slug: dict[str, list[str]] = {}
     for i in sorted(ids):
-        prefix, slug = i.split("-", 1)
+        slug = i.split("-", 1)[1]
         by_slug.setdefault(slug, []).append(i)
     return [
         (a, b)
