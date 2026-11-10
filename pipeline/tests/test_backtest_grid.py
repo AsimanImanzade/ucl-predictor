@@ -67,13 +67,13 @@ def test_run_grid_shape_and_elo_reuse(monkeypatch):
     df = run_grid(pd.DataFrame(), ["2019-20"], grid)
     assert len(df) == 2
     assert {"k", "k_euro", "g", "alpha", "rps", "log_loss", "brier", "league_gap"} <= set(df.columns)
-    assert calls == {"elo": 2, "gap": 2}
+    assert calls == {"elo": 2, "gap": 4}
     assert (df["league_gap"] == 0.05).all()
 
     grid["alpha"] = [0.0005, 0.005]
     calls.update(elo=0, gap=0)
     df = run_grid(pd.DataFrame(), ["2019-20"], grid)
-    assert len(df) == 4 and calls == {"elo": 2, "gap": 2}
+    assert len(df) == 4 and calls == {"elo": 2, "gap": 4}
 
 
 def test_params_roundtrip(tmp_path, monkeypatch):
@@ -83,3 +83,31 @@ def test_params_roundtrip(tmp_path, monkeypatch):
         bt.load_model_params()
     p.write_text('{"elo-dc-v2": {"alpha": 0.002}}')
     assert bt.load_model_params()["elo-dc-v2"]["alpha"] == 0.002
+
+
+def test_select_alt_gap_column_and_candidates():
+    df = _grid_df([
+        {"k": 16.0, "rps": 0.1900, "league_gap": 0.01, "league_gap_tuning": 0.09},
+        {"k": 20.0, "rps": 0.1903, "league_gap": 0.09, "league_gap_tuning": 0.01},
+        {"k": 24.0, "rps": 0.1950},
+    ])  # fmt: skip
+    assert len(bt.tie_candidates(df)) == 2
+    assert select_params(df)["k"] == 16.0
+    assert select_params(df, gap_col="league_gap_tuning")["k"] == 20.0
+
+
+def test_merge_report_preserves_foreign_sections():
+    sections = [("Grid (top 10)", "new grid"), ("League gap", "new gap")]
+    old = (
+        "# Calibration report\n\nold intro\n\n## Grid (top 10)\n\nold grid\n\n"
+        "## Tournament check\n\ntc body\n\n## Gate verdict\n\nPASS\n\n"
+        "## League gap\n\nold gap\n"
+    )
+    out = bt.merge_report(old, "new intro", sections)
+    assert "old grid" not in out and "old gap" not in out and "old intro" not in out
+    assert "new grid" in out and "new gap" in out and "new intro" in out
+    assert "## Gate verdict\n\nPASS" in out and "## Tournament check\n\ntc body" in out
+    assert out.count("## Grid (top 10)") == 1
+    again = bt.merge_report(out, "new intro", sections)
+    assert again == out
+    assert bt.merge_report(None, "i", sections).startswith("# Calibration report")

@@ -4,7 +4,7 @@ Elo v2 parameter search and v1 vs v2 backtest, generated 2026-11-10 by `uv run u
 
 ## Grid (top 10)
 
-Tuning-season mean RPS, 81 grid points, sorted by RPS.
+Tuning-season mean RPS, 81 grid points, sorted by RPS. Full grid: `reports/backtest_grid.csv`.
 
 | k | k_euro | g | alpha | rps | log_loss | brier | league_gap |
 |---|---|---|---|---|---|---|---|
@@ -14,18 +14,49 @@ Tuning-season mean RPS, 81 grid points, sorted by RPS.
 | 24.0 | 1.0 | 0.7 | 0.0005 | 0.1996 | 0.9594 | 0.5664 | -0.067 |
 | 24.0 | 1.5 | 0.7 | 0.0005 | 0.1996 | 0.9593 | 0.5664 | -0.052 |
 | 20.0 | 1.5 | 0.7 | 0.0005 | 0.1997 | 0.9597 | 0.5666 | -0.057 |
-| 16.0 | 1.0 | 0.9 | 0.0005 | 0.1997 | 0.9600 | 0.5666 | -0.071 |
+| 16.0 | 1.0 | 0.9 | 0.0005 | 0.1997 | 0.9600 | 0.5666 | -0.070 |
 | 24.0 | 1.5 | 0.5 | 0.0005 | 0.1997 | 0.9598 | 0.5667 | -0.059 |
 | 20.0 | 1.5 | 0.9 | 0.0005 | 0.1997 | 0.9599 | 0.5667 | -0.052 |
 | 20.0 | 1.0 | 0.7 | 0.0005 | 0.1997 | 0.9600 | 0.5667 | -0.072 |
 
 ## Chosen parameters
 
-| k | k_euro | g | home_adv | alpha |
-|---|---|---|---|---|
-| 24.0 | 2.0 | 0.9 | 60.0 | 0.0005 |
+| k | k_euro | g | home_adv | alpha | rps | log_loss | brier | league_gap |
+|---|---|---|---|---|---|---|---|---|
+| 24.0 | 2.0 | 0.9 | 60.0 | 0.0005 | 0.1998 | 0.9600 | 0.5670 | -0.040 |
 
-Selection: lowest tuning-season RPS; ties within 0.0005 go to the smaller |league gap|.
+Selection: lowest tuning-season RPS; ties within 0.0005 go to the smaller |league gap|. The gap is the Global-Constraints scope (2019-20 ... 2025-26). A tuning-seasons-only gap (2019-20 ... 2021-22) selects the same Elo set (chosen set's tuning-only gap -0.070).
+
+### Candidates within 0.0005 of best (26)
+
+| k | k_euro | g | alpha | rps | log_loss | brier | league_gap |
+|---|---|---|---|---|---|---|---|
+| 24.0 | 1.0 | 0.9 | 0.0005 | 0.1995 | 0.9592 | 0.5663 | -0.061 |
+| 24.0 | 1.5 | 0.9 | 0.0005 | 0.1995 | 0.9592 | 0.5664 | -0.048 |
+| 20.0 | 1.0 | 0.9 | 0.0005 | 0.1995 | 0.9594 | 0.5663 | -0.065 |
+| 24.0 | 1.0 | 0.7 | 0.0005 | 0.1996 | 0.9594 | 0.5664 | -0.067 |
+| 24.0 | 1.5 | 0.7 | 0.0005 | 0.1996 | 0.9593 | 0.5664 | -0.052 |
+| 20.0 | 1.5 | 0.7 | 0.0005 | 0.1997 | 0.9597 | 0.5666 | -0.057 |
+| 16.0 | 1.0 | 0.9 | 0.0005 | 0.1997 | 0.9600 | 0.5666 | -0.070 |
+| 24.0 | 1.5 | 0.5 | 0.0005 | 0.1997 | 0.9598 | 0.5667 | -0.059 |
+| 20.0 | 1.5 | 0.9 | 0.0005 | 0.1997 | 0.9599 | 0.5667 | -0.052 |
+| 20.0 | 1.0 | 0.7 | 0.0005 | 0.1997 | 0.9600 | 0.5667 | -0.072 |
+| 16.0 | 1.5 | 0.9 | 0.0005 | 0.1997 | 0.9600 | 0.5667 | -0.056 |
+| 16.0 | 1.5 | 0.7 | 0.0005 | 0.1997 | 0.9601 | 0.5667 | -0.061 |
+| 20.0 | 2.0 | 0.7 | 0.0005 | 0.1998 | 0.9600 | 0.5668 | -0.047 |
+| 24.0 | 2.0 | 0.7 | 0.0005 | 0.1998 | 0.9598 | 0.5669 | -0.043 |
+| 20.0 | 2.0 | 0.9 | 0.0005 | 0.1998 | 0.9600 | 0.5669 | -0.044 |
+| 20.0 | 1.5 | 0.5 | 0.0005 | 0.1998 | 0.9602 | 0.5669 | -0.064 |
+| 24.0 | 1.0 | 0.5 | 0.0005 | 0.1998 | 0.9602 | 0.5669 | -0.075 |
+| 16.0 | 2.0 | 0.9 | 0.0005 | 0.1998 | 0.9602 | 0.5669 | -0.047 |
+| 16.0 | 2.0 | 0.7 | 0.0005 | 0.1998 | 0.9603 | 0.5670 | -0.052 |
+| 24.0 | 2.0 | 0.5 | 0.0005 | 0.1998 | 0.9601 | 0.5670 | -0.049 |
+| 24.0 | 2.0 | 0.9 | 0.0005 | 0.1998 | 0.9600 | 0.5670 | -0.040 |
+| 20.0 | 2.0 | 0.5 | 0.0005 | 0.1999 | 0.9603 | 0.5671 | -0.053 |
+| 16.0 | 1.0 | 0.7 | 0.0005 | 0.1999 | 0.9606 | 0.5671 | -0.078 |
+| 16.0 | 1.5 | 0.5 | 0.0005 | 0.1999 | 0.9606 | 0.5671 | -0.070 |
+| 20.0 | 1.0 | 0.5 | 0.0005 | 0.1999 | 0.9606 | 0.5671 | -0.081 |
+| 16.0 | 2.0 | 0.5 | 0.0005 | 0.2000 | 0.9608 | 0.5672 | -0.058 |
 
 ## Report seasons: v1 vs v2
 
@@ -35,6 +66,16 @@ Selection: lowest tuning-season RPS; ties within 0.0005 go to the smaller |leagu
 | elo-dc-v2 (chosen) | 0.2107 | 0.9885 | 0.5871 | 2390 |
 
 Delta RPS (v2 - v1): +0.0018, 95% CI [-0.0011, +0.0046] (1,000 bootstrap resamples of match ids, seed 1).
+
+## Sensitivity (outside the pre-registered selection)
+
+Diagnostic evaluations on the report seasons for the gate decision, not a re-selection. All rows use identical matches; delta is vs v1 @ alpha 0.005 (95% bootstrap CI); gate_gap uses the Gate 1 scope (2019-20 ... 2025-26).
+
+| variant | rps | log_loss | brier | delta_rps_vs_v1 | ci_lo | ci_hi | gate_gap |
+|---|---|---|---|---|---|---|---|
+| v1 @ alpha 0.0005 | 0.2103 | 0.9868 | 0.5867 | 0.0014 | -0.0008 | 0.0034 | -0.160 |
+| v2 chosen Elo @ alpha 0.005 | 0.2076 | 0.9769 | 0.5799 | -0.0013 | -0.0038 | 0.0013 | -0.040 |
+| v2 corner k=32 k_euro=3.0 g=1.0 @ alpha 0.005 | 0.2114 | 0.9890 | 0.5876 | 0.0025 | -0.0006 | 0.0058 | -0.027 |
 
 ## Calibration (v2)
 
@@ -55,11 +96,11 @@ Home-win probability bins on report seasons.
 
 ## League gap
 
-Mean (actual - expected Elo score) for mid-league clubs against Big-5 clubs in European matches.
+Mean (actual - expected Elo score) for mid-league clubs against Big-5 clubs in European matches, capped at season 2025-26.
 
 | model | scope | gap | n |
 |---|---|---|---|
-| elo-dc-v1 | 2019-20 onwards | -0.161 | 419 |
-| elo-dc-v2 | 2019-20 onwards | -0.040 | 419 |
-| elo-dc-v1 | report seasons | -0.152 | 268 |
-| elo-dc-v2 | report seasons | -0.023 | 268 |
+| elo-dc-v1 | Gate 1 scope: 2019-20 ... 2025-26 | -0.160 | 410 |
+| elo-dc-v2 | Gate 1 scope: 2019-20 ... 2025-26 | -0.040 | 410 |
+| elo-dc-v1 | Report seasons only: 2022-23 ... 2025-26 | -0.150 | 259 |
+| elo-dc-v2 | Report seasons only: 2022-23 ... 2025-26 | -0.023 | 259 |

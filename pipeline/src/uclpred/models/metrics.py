@@ -58,12 +58,14 @@ def league_gap(
     elo_pre: pd.DataFrame,
     home_adv: float,
     from_season: str = "2019-20",
+    to_season: str | None = None,
 ) -> tuple[float, int]:
     """Mean (actual - expected Elo score) from the mid-league side of European
     matches between a mid-league club and a Big-5 club.
 
     A club's label in a season is the competition of its last domestic FINISHED
-    match that season.
+    match that season. European matches are limited to seasons in
+    [from_season, to_season]; to_season=None means no upper cap.
     """
     fin = matches[matches["status"] == "FINISHED"]
     dom = fin[~fin["competition"].str.startswith("uefa.")].sort_values(
@@ -78,6 +80,8 @@ def league_gap(
     label = sides.groupby(["season", "club"])["competition"].last().to_dict()
 
     eu = fin[fin["competition"].str.startswith("uefa.") & (fin["season"] >= from_season)]
+    if to_season is not None:
+        eu = eu[eu["season"] <= to_season]
     pre = elo_pre.set_index("match_id")
     missing = [m for m in eu["match_id"] if m not in pre.index]
     if missing:

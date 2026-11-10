@@ -157,3 +157,21 @@ def test_calibration_table_edge_values():
     assert t.loc[1, "observed"] == 1.0
     assert t.loc[2, "mean_pred"] == pytest.approx(0.2)
     assert t.loc[2, "observed"] == 1.0
+
+
+def test_league_gap_to_season_cap():
+    rows = [
+        _row("d1", "2019-09-01", "2019-20", "nl.1", "ned-mid", "x", 1, 0),
+        _row("d2", "2019-09-02", "2019-20", "en.1", "eng-big", "y", 1, 0),
+        _row("d3", "2020-09-01", "2020-21", "nl.1", "ned-mid", "x", 1, 0),
+        _row("d4", "2020-09-02", "2020-21", "en.1", "eng-big", "y", 1, 0),
+        _row("e1", "2019-10-01", "2019-20", "uefa.cl", "ned-mid", "eng-big", 0, 1, neutral=True),
+        _row("e2", "2020-10-01", "2020-21", "uefa.cl", "ned-mid", "eng-big", 1, 0, neutral=True),
+    ]
+    m = pd.DataFrame(rows)
+    pre = pd.DataFrame({"match_id": m["match_id"], "home_elo_pre": 1500.0, "away_elo_pre": 1500.0})
+    assert league_gap(m, pre, 60.0) == (pytest.approx(0.0), 2)
+    gap, n = league_gap(m, pre, 60.0, to_season="2019-20")
+    assert n == 1 and gap == pytest.approx(-0.5)
+    gap, n = league_gap(m, pre, 60.0, from_season="2020-21", to_season="2020-21")
+    assert n == 1 and gap == pytest.approx(0.5)
