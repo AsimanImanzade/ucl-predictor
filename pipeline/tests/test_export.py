@@ -1,8 +1,8 @@
 import copy
 import json
 import math
-from types import SimpleNamespace
 from datetime import UTC, datetime
+from types import SimpleNamespace
 
 import pytest
 
