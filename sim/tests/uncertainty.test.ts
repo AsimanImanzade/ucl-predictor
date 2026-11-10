@@ -83,4 +83,11 @@ describe('rating uncertainty', () => {
       'ratingSigma > 0 requires lambdas.eloCoef',
     );
   });
+
+  it('sigma_with_null_eloCoef_throws', () => {
+    const l = makeLambdas({ eloCoef: null as unknown as number });
+    expect(() => simulate(open, l, { runs: 10, seed: 1, ratingSigma: 50 })).toThrow(
+      'ratingSigma > 0 requires lambdas.eloCoef',
+    );
+  });
 });

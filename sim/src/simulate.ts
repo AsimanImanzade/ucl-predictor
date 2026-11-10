@@ -25,7 +25,7 @@ export function simulate(season: Season, lambdas: Lambdas, opts: SimOptions): Si
   const baseSampler = new ScoreSampler(lambdas);
   const sigma = opts.ratingSigma ?? lambdas.ratingSigma ?? 0;
   if (!Number.isFinite(sigma) || sigma < 0) throw new Error('ratingSigma must be a finite number >= 0');
-  if (sigma > 0 && lambdas.eloCoef === undefined) throw new Error('ratingSigma > 0 requires lambdas.eloCoef');
+  if (sigma > 0 && (lambdas.eloCoef == null || !Number.isFinite(lambdas.eloCoef))) throw new Error('ratingSigma > 0 requires lambdas.eloCoef');
   let sampler: MatchSampler = baseSampler;
   const teamIds: TeamId[] = season.teams.map((t) => t.id);
   const n = teamIds.length;
