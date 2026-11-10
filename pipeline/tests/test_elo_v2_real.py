@@ -21,6 +21,19 @@ def test_elo_v2_real_data_ordering_and_speed():
         print(f"{t}: {v:.1f}")
     print({k: round(v) for k, v in res.league_levels_as_of(as_of).items()})
     assert elapsed < 10
+    # no same-kickoff leak: pre equals the point-in-time rating for every slot
+    fin = matches[matches["status"] == "FINISHED"].merge(res.pre, on="match_id")
+    bad = 0
+    for date, h, a, ph, pa in zip(
+        fin["date"], fin["home_id"], fin["away_id"],
+        fin["home_elo_pre"], fin["away_elo_pre"], strict=True,
+    ):  # fmt: skip
+        for team, pre in ((h, ph), (a, pa)):
+            cur = res.rating_as_of(team, date)
+            if cur is not None and abs(cur - pre) > 1e-9:
+                bad += 1
+    print(f"pre != rating_as_of slots: {bad}")
+    assert bad == 0
     for t in ("esp-real-madrid", "eng-liverpool"):
         assert r[t] > r["ned-psv"]
     # Atletico vs PSV is near parity with untuned defaults (k_euro-sensitive);

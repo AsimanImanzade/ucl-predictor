@@ -172,7 +172,52 @@ def test_new_league_seeded_from_country_peers():
     assert few.league_levels_as_of(d(10))["aaa.1"] == 1500.0
     two = run_elo_v2(frame([(0, "aaa.2", "aaa-3", "aaa-4", 1, 0)]))
     assert two.league_levels_as_of(d(10))["aaa.2"] == 1350.0
-    assert few.pre.iloc[0]["home_elo_pre"] == 1400.0  # aaa.x default
+
+
+def test_seeding_never_mixes_divisions():
+    # three aaa clubs in aaa.2 only: they must not seed a new aaa.1 level
+    rows = [
+        (0, "aaa.2", "aaa-1", "aaa-2", 1, 0),
+        (1, "aaa.2", "aaa-3", "aaa-2", 1, 0),
+        (2, "aaa.1", "aaa-9", "aaa-8", 1, 0),
+    ]
+    res = run_elo_v2(frame(rows))
+    assert res.league_levels_as_of(d(10))["aaa.1"] == 1500.0
+    # a new .2 level is the .1/.x peer mean minus (init_top - init_second)
+    rows = [
+        (0, "aaa.1", "aaa-1", "aaa-2", 2, 0),
+        (1, "aaa.1", "aaa-3", "aaa-4", 0, 1),
+        (50, "aaa.2", "aaa-5", "aaa-6", 1, 0),
+    ]
+    res = run_elo_v2(frame(rows))
+    mean = sum(res.rating_as_of(f"aaa-{i}", d(40)) for i in (1, 2, 3, 4)) / 4
+    assert res.league_levels_as_of(d(60))["aaa.2"] == pytest.approx(mean - 150.0)
+
+
+def test_same_kickoff_matches_use_group_snapshot():
+    rows = [
+        (0, "aaa.1", "aaa-a", "aaa-b", 1, 1),
+        (0, "aaa.1", "aaa-c", "aaa-d", 1, 1),
+        (0, "bbb.1", "bbb-a", "bbb-b", 1, 1),
+        (10, "uefa.cl", "aaa-a", "bbb-a", 3, 0),
+        (10, "uefa.cl", "bbb-b", "aaa-b", 0, 2),
+        (10, "aaa.1", "aaa-c", "aaa-d", 2, 0),
+    ]
+    df = frame(rows)
+    res = run_elo_v2(df)
+    for _, row in df.iterrows():
+        pre = res.pre[res.pre["match_id"] == row["match_id"]].iloc[0]
+        for team, col in (
+            (row["home_id"], "home_elo_pre"),
+            (row["away_id"], "away_elo_pre"),
+        ):
+            r = res.rating_as_of(team, row["date"])
+            if r is not None:
+                assert pre[col] == pytest.approx(r, abs=1e-9)
+    # aaa-d did not play in the cl matches but shares the moved league level
+    assert res.rating_as_of("aaa-d", d(20)) != pytest.approx(
+        res.rating_as_of("aaa-d", d(5))
+    )
 
 
 def test_k_euro_multiplier():

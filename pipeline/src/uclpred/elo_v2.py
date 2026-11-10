@@ -94,17 +94,17 @@ def run_elo_v2(matches: pd.DataFrame, params: EloV2Params | None = None) -> EloV
     def ensure_level(lg: str, cty: str, date) -> None:
         if lg in level:
             return
-        peers = country_clubs.get(cty, ())
-        if len(peers) >= 3:
-            val = sum(total(t) for t in peers) / len(peers)
-        elif lg.endswith(".1"):
-            val = p.init_top
-        elif lg.endswith(".2"):
-            val = p.init_second
+        # never mix divisions: only peers currently in a .1 / .x league count
+        peers = [
+            t for t in country_clubs.get(cty, ()) if not league_of[t].endswith(".2")
+        ]
+        mean = sum(total(t) for t in peers) / len(peers) if len(peers) >= 3 else None
+        if lg.endswith(".2"):
+            val = p.init_second if mean is None else mean - (p.init_top - p.init_second)
         elif lg.endswith(".x"):
-            val = p.init_unknown
+            val = p.init_unknown if mean is None else mean
         else:
-            val = p.init_top
+            val = p.init_top if mean is None else mean
         set_level(lg, val, date)
 
     def set_league(t: str, lg: str, date) -> None:
@@ -119,47 +119,78 @@ def run_elo_v2(matches: pd.DataFrame, params: EloV2Params | None = None) -> EloV
         hist[0].append(date)
         hist[1].append(val)
 
-    cols = zip(
-        df["match_id"], df["date"], df["competition"], df["home_id"], df["away_id"],
-        df["home_goals"].to_numpy(dtype="int64"), df["away_goals"].to_numpy(dtype="int64"),
-        df["neutral"], strict=True,
-    )  # fmt: skip
-    for mid, date, comp, h, a, hg, ag, neutral in cols:
-        euro = comp.startswith("uefa.")
-        for t in (h, a):
-            cty = t.split("-", 1)[0]
-            if t not in off:
-                lg = f"{cty}.x" if euro else comp
-                ensure_level(lg, cty, date)
-                dates[t] = []
-                ratings[t] = []
-                set_league(t, lg, date)
-                set_off(t, 0.0, date)
-                country_clubs.setdefault(cty, []).append(t)
-            elif not euro and league_of[t] != comp:
-                ensure_level(comp, cty, date)
-                new_off = total(t) - level[comp]
-                set_league(t, comp, date)
-                set_off(t, new_off, date)
-        rh, ra = total(h), total(a)
-        pre_rows.append((mid, rh, ra))
-        exp = expected_home(rh, ra, 0.0 if neutral else p.home_adv)
-        score = 1.0 if hg > ag else 0.5 if hg == ag else 0.0
-        delta = (
-            p.k * (p.k_euro if euro else 1.0) * mov_multiplier(hg - ag) * (score - exp)
-        )
-        if euro and league_of[h] != league_of[a]:
-            lh, la = league_of[h], league_of[a]
-            set_level(lh, level[lh] + p.g * delta, date)
-            set_level(la, level[la] - p.g * delta, date)
-            delta_off = (1.0 - p.g) * delta
-        else:
-            delta_off = delta
-        set_off(h, off[h] + delta_off, date)
-        set_off(a, off[a] - delta_off, date)
-        for t in (h, a):
+    mids = df["match_id"].tolist()
+    dts = df["date"].tolist()
+    comps = df["competition"].tolist()
+    hs = df["home_id"].tolist()
+    as_ = df["away_id"].tolist()
+    hgs = df["home_goals"].to_numpy(dtype="int64").tolist()
+    ags = df["away_goals"].to_numpy(dtype="int64").tolist()
+    neu = df["neutral"].tolist()
+    n = len(mids)
+    i = 0
+    while i < n:
+        j = i
+        while j < n and dts[j] == dts[i]:
+            j += 1
+        date = dts[i]
+        # (a) registrations, league switches and level seeding for the whole group
+        for m in range(i, j):
+            euro = comps[m].startswith("uefa.")
+            for t in (hs[m], as_[m]):
+                cty = t.split("-", 1)[0]
+                if t not in off:
+                    lg = f"{cty}.x" if euro else comps[m]
+                    ensure_level(lg, cty, date)
+                    dates[t] = []
+                    ratings[t] = []
+                    set_league(t, lg, date)
+                    set_off(t, 0.0, date)
+                    country_clubs.setdefault(cty, []).append(t)
+                elif not euro and league_of[t] != comps[m]:
+                    ensure_level(comps[m], cty, date)
+                    new_off = total(t) - level[comps[m]]
+                    set_league(t, comps[m], date)
+                    set_off(t, new_off, date)
+        # (b) every match's pre and delta from the state at the start of the group
+        updates = []
+        for m in range(i, j):
+            h, a = hs[m], as_[m]
+            euro = comps[m].startswith("uefa.")
+            rh, ra = total(h), total(a)
+            pre_rows.append((mids[m], rh, ra))
+            exp = expected_home(rh, ra, 0.0 if neu[m] else p.home_adv)
+            hg, ag = hgs[m], ags[m]
+            score = 1.0 if hg > ag else 0.5 if hg == ag else 0.0
+            delta = (
+                p.k
+                * (p.k_euro if euro else 1.0)
+                * mov_multiplier(hg - ag)
+                * (score - exp)
+            )
+            cross = euro and league_of[h] != league_of[a]
+            updates.append((h, a, delta, cross))
+        # (c) apply the additive deltas
+        lvl_delta: dict[str, float] = {}
+        off_delta: dict[str, float] = {}
+        for h, a, delta, cross in updates:
+            if cross:
+                lvl_delta[league_of[h]] = lvl_delta.get(league_of[h], 0.0) + p.g * delta
+                lvl_delta[league_of[a]] = lvl_delta.get(league_of[a], 0.0) - p.g * delta
+                d_off = (1.0 - p.g) * delta
+            else:
+                d_off = delta
+            off_delta[h] = off_delta.get(h, 0.0) + d_off
+            off_delta[a] = off_delta.get(a, 0.0) - d_off
+        for lg, dv in lvl_delta.items():
+            set_level(lg, level[lg] + dv, date)
+        for t, dv in off_delta.items():
+            set_off(t, off[t] + dv, date)
+        # (d) record post-group totals
+        for t in off_delta:
             dates[t].append(date)
             ratings[t].append(total(t))
+        i = j
     pre = pd.DataFrame(pre_rows, columns=["match_id", "home_elo_pre", "away_elo_pre"])
     return EloV2Result(
         pre=pre, _dates=dates, _ratings=ratings, _off=off_h, _lg=lg_h, _lvl=lvl_h
