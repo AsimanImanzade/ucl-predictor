@@ -60,6 +60,13 @@ def _export(args: argparse.Namespace) -> int:
     return 0
 
 
+def _backtest(_args: argparse.Namespace) -> int:
+    from uclpred.backtest import run_backtest
+
+    run_backtest()
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     parser = argparse.ArgumentParser(prog="uclpred")
@@ -79,6 +86,9 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument("--as-of", required=True, help="ISO date/time (UTC) or 'now'")
     e.add_argument("--out", required=True, help="output dir (relative to repo root)")
     e.set_defaults(func=_export)
+    sub.add_parser(
+        "backtest", help="grid-search elo-dc-v2, write model_params.json and calibration report"
+    ).set_defaults(func=_backtest)
     args = parser.parse_args(argv)
     return args.func(args)
 
