@@ -1,7 +1,9 @@
 import math
+import subprocess
 
 import pytest
 
+import uclpred.tournament_check as tc
 from uclpred.tournament_check import (
     actual_outcomes,
     actual_top8,
@@ -16,11 +18,15 @@ class FakeResolver:
         return f"{country.lower()}-{name.lower()}"
 
 
+def _name(i):
+    return chr(64 + i) if i <= 26 else f"T{i}"
+
+
 def _m(stage, home, away, winner="HOME_TEAM"):
     return {
         "stage": stage,
-        "homeTeam": {"id": home, "name": chr(64 + home)},
-        "awayTeam": {"id": away, "name": chr(64 + away)},
+        "homeTeam": {"id": home, "name": _name(home)},
+        "awayTeam": {"id": away, "name": _name(away)},
         "score": {"winner": winner},
     }
 
@@ -40,7 +46,7 @@ FD = [
 
 
 def test_actual_outcomes_labels():
-    got = actual_outcomes(FD, FakeResolver(), COUNTRY)
+    got = actual_outcomes(FD, FakeResolver(), COUNTRY, expected=None)
     lab = {k.split("-")[1]: v for k, v in got.items()}
     assert len(got) == 12
     assert lab["k"] == "winner"  # won the final as the away side
@@ -57,7 +63,7 @@ def test_actual_outcomes_labels():
 
 def test_actual_outcomes_out_for_league_only_team():
     fd = [_m("LEAGUE_STAGE", 1, 2), _m("PLAYOFFS", 1, 2)]
-    lab = actual_outcomes(fd + [_m("LEAGUE_STAGE", 3, 4)], FakeResolver(), COUNTRY)
+    lab = actual_outcomes(fd + [_m("LEAGUE_STAGE", 3, 4)], FakeResolver(), COUNTRY, expected=None)
     assert {k.split("-")[1]: v for k, v in lab.items()} == {
         "a": "po", "b": "po", "c": "out", "d": "out"
     }  # fmt: skip
@@ -125,3 +131,63 @@ def test_score_tournament_epsilon_floor():
 def test_choose_sigma_rule():
     assert choose_sigma({0: 1.00, 40: 1.004, 70: 1.002, 100: 1.009}) == 70
     assert choose_sigma({0: 1.00, 40: 0.95, 70: 0.99, 100: 0.97}) == 40
+
+
+def _full_fd():
+    """36 teams: 8 direct r16, 16 play-off teams (8 win), 12 out."""
+    fd = [_m("LEAGUE_STAGE", i, i + 1) for i in range(1, 37, 2)]
+    fd += [_m("PLAYOFFS", 9 + 2 * i, 10 + 2 * i) for i in range(8)]  # 9..24; home wins
+    r16 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 15, 17, 19, 21, 23]
+    fd += [_m("LAST_16", r16[i], r16[i + 8]) for i in range(8)]
+    qf = r16[:8]
+    fd += [_m("QUARTER_FINALS", qf[i], qf[i + 4]) for i in range(4)]
+    fd += [_m("SEMI_FINALS", 1, 3), _m("SEMI_FINALS", 2, 4)]
+    fd += [_m("FINAL", 1, 2)]
+    return fd
+
+
+C36 = {i: "ENG" for i in range(1, 37)}
+
+
+def test_actual_outcomes_full_counts():
+    lab = actual_outcomes(_full_fd(), FakeResolver(), C36)
+    from collections import Counter
+
+    assert Counter(lab.values()) == {"out": 12, "po": 8, "r16": 8, "qf": 4, "sf": 2,
+                                     "final": 1, "winner": 1}  # fmt: skip
+
+
+def test_actual_outcomes_rejects_wrong_counts():
+    with pytest.raises(ValueError, match="stage counts"):
+        actual_outcomes(_full_fd()[:-1], FakeResolver(), C36)  # no final
+    with pytest.raises(ValueError, match="stage counts"):
+        actual_outcomes(FD, FakeResolver(), COUNTRY)  # only 12 teams
+
+
+def test_actual_outcomes_rejects_unknown_knockout_team():
+    fd = _full_fd() + [_m("LAST_16", 1, 99)]
+    with pytest.raises(ValueError, match="not a league-phase"):
+        actual_outcomes(fd, FakeResolver(), {**C36, 99: "ENG"})
+
+
+def test_tournament_check_exports_before_sim(monkeypatch, tmp_path):
+    calls = []
+    monkeypatch.setattr(tc, "run_export", lambda **kw: calls.append(("export", kw)))
+    monkeypatch.setattr(subprocess, "run", lambda cmd, **kw: calls.append(("sim", cmd)))
+    monkeypatch.setattr(tc, "TeamResolver", lambda: object())
+    monkeypatch.setattr(tc, "PROCESSED", tmp_path)
+    monkeypatch.setattr(tc, "EXPORT", tmp_path / "export")
+    monkeypatch.setattr(tc, "actual_outcomes", lambda *a: {})
+    monkeypatch.setattr(tc, "actual_top8", lambda *a: set())
+    for y in ("2024", "2025"):
+        (tmp_path / f"cl_{y}_fd.json").write_text("[]")
+        (tmp_path / f"cl_{y}_teams.json").write_text("[]")
+    with pytest.raises(Exception):  # chances files do not exist; we only check call order
+        tc.run_tournament_check(runs=10)
+    first = calls[0]
+    assert first[0] == "export"
+    kw = first[1]
+    assert kw["season"] == "2024-25" and kw["model_name"] == "elo-dc-v1"
+    assert kw["as_of"] == tc.SEASONS["2024-25"]["preseason_as_of"]
+    assert kw["out"] == tmp_path / "export" / "bt" / "2024-25" / "elo-dc-v1"
+    assert calls[1][0] == "sim" and "--sigma" in calls[1][1]

@@ -7,7 +7,7 @@ import sys
 
 from dotenv import load_dotenv
 
-from uclpred.config import MODEL_NAME, ROOT, SEASONS
+from uclpred.config import MODEL_NAME, ROOT, SEASON, SEASONS
 
 
 def _ingest(args: argparse.Namespace) -> int:
@@ -114,7 +114,7 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument(
         "--as-of", required=True, help="ISO date/time (UTC), 'now' or 'preseason'"
     )
-    e.add_argument("--season", default="2026-27", choices=sorted(SEASONS))
+    e.add_argument("--season", default=SEASON, choices=sorted(SEASONS))
     e.add_argument("--model", default=MODEL_NAME, choices=["elo-dc-v1", "elo-dc-v2"])
     e.add_argument("--out", required=True, help="output dir (relative to repo root)")
     e.set_defaults(func=_export)

@@ -3,9 +3,11 @@
 import json
 import math
 import subprocess
+from datetime import UTC, datetime
 
 from uclpred.backtest import PARAMS_PATH, REPORT_PATH, _md_table, merge_report
 from uclpred.config import EXPORT, PROCESSED, ROOT, SEASONS
+from uclpred.export import run_export
 from uclpred.teams import TeamResolver
 
 STAGES = ["out", "po", "r16", "qf", "sf", "final", "winner"]
@@ -23,6 +25,7 @@ EPS = 1e-6
 SIGMA_TOL = 0.01
 SIGMA_DEFAULT = 70
 SECTION = "Tournament check"
+EXPECTED_COUNTS = {"out": 12, "po": 8, "r16": 8, "qf": 4, "sf": 2, "final": 1, "winner": 1}
 
 
 def _tid(team: dict, resolver, team_country) -> str:
@@ -33,8 +36,13 @@ def _sides(m: dict, resolver, team_country):
     return _tid(m["homeTeam"], resolver, team_country), _tid(m["awayTeam"], resolver, team_country)
 
 
-def actual_outcomes(fd_matches: list[dict], resolver, team_country) -> dict[str, str]:
-    """Team id -> highest stage reached, for every league-phase team."""
+def actual_outcomes(
+    fd_matches: list[dict], resolver, team_country, expected: dict[str, int] | None = EXPECTED_COUNTS
+) -> dict[str, str]:
+    """Team id -> highest stage reached, for every league-phase team.
+
+    Raises ValueError if a knockout participant is not a league-phase team or if
+    the stage counts differ from `expected` (36 teams; None skips the count check)."""
     rank = {s: i for i, s in enumerate(STAGES)}
     out: dict[str, str] = {}
     for m in fd_matches:
@@ -48,14 +56,20 @@ def actual_outcomes(fd_matches: list[dict], resolver, team_country) -> dict[str,
             continue
         sides = _sides(m, resolver, team_country)
         for t in sides:
-            if t in out and rank[stage] > rank[out[t]]:
+            if t not in out:
+                raise ValueError(f"knockout participant {t!r} ({stage}) is not a league-phase team")
+            if rank[stage] > rank[out[t]]:
                 out[t] = stage
         if stage == "final":
             w = (m.get("score") or {}).get("winner")
             if w in ("HOME_TEAM", "AWAY_TEAM"):
                 winner = sides[0] if w == "HOME_TEAM" else sides[1]
-    if winner is not None and winner in out:
+    if winner is not None:
         out[winner] = "winner"
+    if expected is not None:
+        counts = {st: sum(1 for v in out.values() if v == st) for st in STAGES}
+        if len(out) != sum(expected.values()) or counts != expected:
+            raise ValueError(f"unexpected stage counts {counts} for {len(out)} teams; want {expected}")
     return out
 
 
@@ -148,6 +162,13 @@ def run_tournament_check(runs: int = 50000) -> dict:
     for season in SEASON_LIST:
         actual, top8 = truth[season]
         for model in MODELS:
+            # fresh export so inputs match current data and model_params.json
+            run_export(
+                as_of=SEASONS[season]["preseason_as_of"],
+                out=EXPORT / "bt" / season / model,
+                season=season,
+                model_name=model,
+            )
             for sigma in SIGMAS:
                 _run_sim(season, model, sigma, runs)
                 path = EXPORT / "bt" / season / model / f"chances_s{sigma}.json"
@@ -200,7 +221,8 @@ def run_tournament_check(runs: int = 50000) -> dict:
         # keep the existing intro paragraph untouched
         head = existing.split("\n## ", 1)[0]
         intro = head.split("\n", 1)[1].strip() if "\n" in head else intro
-    REPORT_PATH.write_text(merge_report(existing, intro, [(SECTION, body)]))
+    stale = ("`uclpred tournament-check`", datetime.now(UTC).date().isoformat())
+    REPORT_PATH.write_text(merge_report(existing, intro, [(SECTION, body)], stale=stale))
     print(md)
     print(f"chosen sigma {chosen}; gate3 v2 {v2_ll:.4f} vs v1 {v1_ll:.4f} ({gate})")
     return {"rows": rows, "chosen": chosen, "v1": v1_ll, "v2": v2_ll}
