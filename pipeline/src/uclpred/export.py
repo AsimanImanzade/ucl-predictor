@@ -18,7 +18,15 @@ def iso_utc(dt: datetime) -> str:
     return dt.astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
-def build_season(fd_matches, fd_teams, resolver, coefs, as_of: datetime) -> dict:
+def build_season(
+    fd_matches,
+    fd_teams,
+    resolver,
+    coefs,
+    as_of: datetime,
+    season: str = SEASON,
+    final_venue_team: str | None = FINAL_VENUE_TEAM,
+) -> dict:
     team_country = {t["id"]: t["area"]["code"] for t in fd_teams}
     teams, fd_to_id = [], {}
     for t in fd_teams:
@@ -61,9 +69,9 @@ def build_season(fd_matches, fd_teams, resolver, coefs, as_of: datetime) -> dict
             "awayGoals": ag,
         })  # fmt: skip
     return {
-        "season": SEASON,
+        "season": season,
         "asOf": iso_utc(as_of),
-        "finalVenueTeamId": FINAL_VENUE_TEAM,
+        "finalVenueTeamId": final_venue_team,
         "teams": teams,
         "fixtures": fixtures,
     }
@@ -84,7 +92,12 @@ def warn_unrated_teams(model, team_ids: list[str]) -> list[str]:
     return flagged
 
 
-def build_lambdas(model, team_ids: list[str]) -> dict:
+def build_lambdas(
+    model,
+    team_ids: list[str],
+    rating_sigma: float = 0.0,
+    model_name: str = MODEL_NAME,
+) -> dict:
     def matrix(venue: str):
         return [
             [
@@ -96,8 +109,10 @@ def build_lambdas(model, team_ids: list[str]) -> dict:
 
     return {
         "asOf": iso_utc(model.as_of),
-        "model": MODEL_NAME,
+        "model": model_name,
         "rho": float(model.rho),
+        "eloCoef": float(model.coef_elo),
+        "ratingSigma": float(rating_sigma),
         "teams": list(team_ids),
         "home": matrix("home"),
         "neutral": matrix("neutral"),
@@ -156,32 +171,57 @@ def write_snapshot(season: dict, lambdas: dict, out: Path) -> None:
         )
 
 
-def run_export(as_of: datetime, out: Path) -> str:
+def run_export(
+    as_of: datetime,
+    out: Path,
+    season: str = SEASON,
+    model_name: str = MODEL_NAME,
+) -> str:
     import pandas as pd
 
-    from uclpred.config import PROCESSED, REFERENCE
-    from uclpred.elo import run_elo
+    from uclpred.config import PROCESSED, REFERENCE, SEASONS
     from uclpred.matches import load_matches
     from uclpred.models.baseline import fit_baseline
     from uclpred.teams import TeamResolver
 
-    fd_matches = json.loads((PROCESSED / "cl_2026_fd.json").read_text(encoding="utf-8"))
+    cfg = SEASONS[season]
+    fd_year = cfg["fd_year"]
+    fd_matches = json.loads(
+        (PROCESSED / f"cl_{fd_year}_fd.json").read_text(encoding="utf-8")
+    )
     fd_teams = json.loads(
-        (PROCESSED / "cl_2026_teams.json").read_text(encoding="utf-8")
+        (PROCESSED / f"cl_{fd_year}_teams.json").read_text(encoding="utf-8")
     )
     cdf = pd.read_csv(REFERENCE / "coefficients.csv")
-    cdf = cdf[cdf["season_year"] == 2026]
+    cdf = cdf[cdf["season_year"] == int(season[:4])]
     coefs = dict(zip(cdf["team_id"], cdf["total_5y"].astype(float), strict=True))
 
     matches = load_matches()
-    elo = run_elo(matches)
-    model = fit_baseline(matches, elo, as_of)
-    season = build_season(fd_matches, fd_teams, TeamResolver(), coefs, as_of)
-    team_ids = [t["id"] for t in season["teams"]]
+    rating_sigma = 0.0
+    if model_name == "elo-dc-v1":
+        from uclpred.elo import run_elo
+
+        model = fit_baseline(matches, run_elo(matches), as_of)
+    elif model_name == "elo-dc-v2":
+        from uclpred.backtest import load_model_params
+        from uclpred.elo_v2 import EloV2Params, run_elo_v2
+
+        params = load_model_params()["elo-dc-v2"]
+        elo = run_elo_v2(matches, EloV2Params(**params["elo"]))
+        model = fit_baseline(matches, elo, as_of, alpha=params["alpha"])
+        rating_sigma = float(params.get("rating_sigma") or 0.0)
+    else:
+        raise ValueError(f"unknown model {model_name!r}")
+    season_obj = build_season(
+        fd_matches, fd_teams, TeamResolver(), coefs, as_of,
+        season=season, final_venue_team=cfg["final_venue_team"],
+    )  # fmt: skip
+    team_ids = [t["id"] for t in season_obj["teams"]]
     warn_unrated_teams(model, team_ids)
-    lambdas = build_lambdas(model, team_ids)
-    validate_snapshot(season, lambdas)
-    write_snapshot(season, lambdas, out)
+    lambdas = build_lambdas(model, team_ids, rating_sigma, model_name)
+    validate_snapshot(season_obj, lambdas)
+    write_snapshot(season_obj, lambdas, out)
+    season = season_obj
     vals = [
         v
         for key in ("home", "neutral")
@@ -192,7 +232,9 @@ def run_export(as_of: datetime, out: Path) -> str:
     ]
     played = sum(f["played"] for f in season["fixtures"])
     return (
+        f"season: {season['season']}  model: {model_name}\n"
         f"as_of: {season['asOf']}\n"
+        f"eloCoef: {lambdas['eloCoef']:.4f}  ratingSigma: {lambdas['ratingSigma']}\n"
         f"played fixtures: {played}/{len(season['fixtures'])}\n"
         f"lambda min/max: {min(vals):.3f} / {max(vals):.3f}  -> {out}"
     )

@@ -2,8 +2,9 @@
 
 import json
 import logging
+from pathlib import Path
 
-from uclpred.config import PROCESSED
+from uclpred.config import PROCESSED, RAW
 from uclpred.ingest.football_data import (
     FD_COMPETITIONS,
     FootballDataClient,
@@ -26,6 +27,33 @@ EURO_SEASONS = [season_label(y) for y in range(2011, 2027)]  # 2011-12 .. 2026-2
 JSON_SEASONS = [season_label(y) for y in range(2010, 2027)]  # 2010-11 .. 2026-27
 FD_SEASONS = {"CL": [2024, 2025, 2026]}
 FD_SEASONS.update({c: [2025, 2026] for c in FD_COMPETITIONS if c != "CL"})
+
+
+def write_processed_cl(
+    years=(2024, 2025, 2026),
+    raw_root: Path = RAW / "football-data",
+    out_dir: Path = PROCESSED,
+) -> list[Path]:
+    """Network-free: copy each year's CL matches/teams from the newest raw dir holding them."""
+    out_dir.mkdir(parents=True, exist_ok=True)
+    written = []
+    for year in years:
+        for kind, key, name in (
+            ("matches", "matches", "fd"),
+            ("teams", "teams", "teams"),
+        ):
+            cands = sorted(
+                raw_root.glob(f"*/CL_{year}_{kind}.json"), key=lambda p: p.parent.name
+            )
+            if not cands:
+                raise FileNotFoundError(
+                    f"no cached CL_{year}_{kind}.json under {raw_root}"
+                )
+            body = json.loads(cands[-1].read_text(encoding="utf-8"))
+            dest = out_dir / f"cl_{year}_{name}.json"
+            dest.write_text(json.dumps(body[key]), encoding="utf-8")
+            written.append(dest)
+    return written
 
 
 def run_ingest(token: str) -> None:
@@ -62,15 +90,8 @@ def run_ingest(token: str) -> None:
             norm = (normalize_fd_match(m, team_country) for m in matches)
             rows = [(comp, label, m, "football-data") for m in norm if m is not None]
             frames.append(to_frame(rows, resolver))
-            if fd_code == "CL" and year == 2026:
-                PROCESSED.mkdir(parents=True, exist_ok=True)
-                (PROCESSED / "cl_2026_fd.json").write_text(
-                    json.dumps(matches), encoding="utf-8"
-                )
-                (PROCESSED / "cl_2026_teams.json").write_text(
-                    json.dumps(teams), encoding="utf-8"
-                )
 
+    write_processed_cl()
     df = combine(frames)
     validate_matches(df)
     MATCHES_PATH.parent.mkdir(parents=True, exist_ok=True)

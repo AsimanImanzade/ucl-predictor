@@ -42,6 +42,7 @@ def _fd_matches(status="SCHEDULED", date="2026-09-08T16:45:00Z"):
 
 class FakeModel:
     rho = -0.05
+    coef_elo = 0.1
     as_of = AS_OF
 
     def lambdas(self, a, b, venue):
@@ -209,3 +210,74 @@ def test_warn_unrated_teams(caplog):
     assert any("b" in m and "training window" in m for m in msgs)
     assert any("c" in m and "Elo" in m for m in msgs)
     assert not any("'a'" in m or " a " in m for m in msgs)
+
+
+def test_past_season_build_validates_with_label_and_venue():
+    s = build_season(
+        _fd_matches(date="2024-09-18T16:45:00Z"), _fd_teams(), TeamResolver(), {},
+        datetime(2024, 9, 16, tzinfo=UTC),
+        season="2024-25", final_venue_team="ger-bayern-munchen",
+    )  # fmt: skip
+    lam = build_lambdas(FakeModel(), [t["id"] for t in s["teams"]])
+    validate_snapshot(s, lam)
+    assert s["season"] == "2024-25"
+    assert s["finalVenueTeamId"] == "ger-bayern-munchen"
+    assert len(s["fixtures"]) == 144
+
+
+def test_build_lambdas_metadata_defaults_and_overrides():
+    ids = [t["id"] for t in _season()["teams"]]
+    model = FakeModel()
+    lam = build_lambdas(model, ids)
+    assert lam["eloCoef"] == 0.1 and lam["ratingSigma"] == 0.0
+    assert lam["model"] == "elo-dc-v1"
+    lam2 = build_lambdas(model, ids, rating_sigma=70.0, model_name="elo-dc-v2")
+    assert lam2["ratingSigma"] == 70.0 and lam2["model"] == "elo-dc-v2"
+
+
+def test_seasons_table():
+    from uclpred.config import (
+        FINAL_VENUE_TEAM,
+        PRESEASON_AS_OF,
+        SEASON,
+        SEASONS,
+    )  # fmt: skip
+
+    assert SEASONS["2024-25"] == {
+        "fd_year": 2024, "preseason_as_of": datetime(2024, 9, 16, tzinfo=UTC),
+        "final_venue_team": "ger-bayern-munchen",
+    }  # fmt: skip
+    assert SEASONS["2025-26"]["preseason_as_of"] == datetime(2025, 9, 15, tzinfo=UTC)
+    assert SEASONS["2025-26"]["final_venue_team"] is None
+    assert SEASONS["2026-27"]["fd_year"] == 2026
+    assert (SEASON, PRESEASON_AS_OF, FINAL_VENUE_TEAM) == (
+        "2026-27", SEASONS["2026-27"]["preseason_as_of"], "esp-atletico-madrid",
+    )  # fmt: skip
+
+
+def test_cli_preseason_resolves_per_season():
+    from uclpred.cli import resolve_as_of
+
+    assert resolve_as_of("preseason", "2024-25") == datetime(2024, 9, 16, tzinfo=UTC)
+    assert resolve_as_of("preseason", "2025-26") == datetime(2025, 9, 15, tzinfo=UTC)
+    assert resolve_as_of("2026-09-07", "2026-27") == datetime(2026, 9, 7, tzinfo=UTC)
+
+
+def test_write_processed_cl_uses_latest_dir_with_data(tmp_path):
+    from uclpred.ingest.run import write_processed_cl
+
+    raw = tmp_path / "raw"
+    for day, year, tag in (("2026-01-01", 2024, "old"), ("2026-02-01", 2024, "new"),
+                           ("2026-03-01", 2025, "x")):  # fmt: skip
+        d = raw / day
+        d.mkdir(parents=True)
+        (d / f"CL_{year}_matches.json").write_text(json.dumps({"matches": [tag]}))
+        (d / f"CL_{year}_teams.json").write_text(json.dumps({"teams": [tag, tag]}))
+    (raw / "2026-04-01").mkdir()  # newest dir has no CL data
+    out = tmp_path / "proc"
+    paths = write_processed_cl(years=(2024, 2025), raw_root=raw, out_dir=out)
+    assert sorted(p.name for p in paths) == [
+        "cl_2024_fd.json", "cl_2024_teams.json", "cl_2025_fd.json", "cl_2025_teams.json",
+    ]  # fmt: skip
+    assert json.loads((out / "cl_2024_fd.json").read_text()) == ["new"]
+    assert json.loads((out / "cl_2025_teams.json").read_text()) == ["x", "x"]

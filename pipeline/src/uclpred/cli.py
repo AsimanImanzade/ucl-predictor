@@ -7,10 +7,16 @@ import sys
 
 from dotenv import load_dotenv
 
-from uclpred.config import ROOT
+from uclpred.config import MODEL_NAME, ROOT, SEASONS
 
 
-def _ingest(_args: argparse.Namespace) -> int:
+def _ingest(args: argparse.Namespace) -> int:
+    if args.processed_only:
+        from uclpred.ingest.run import write_processed_cl
+
+        for p in write_processed_cl():
+            print(f"wrote {p}")
+        return 0
     load_dotenv(ROOT / ".env")
     token = os.environ.get("FOOTBALL_DATA_TOKEN")
     if not token:
@@ -41,22 +47,31 @@ def _coverage(_args: argparse.Namespace) -> int:
     return 0
 
 
-def _export(args: argparse.Namespace) -> int:
+def resolve_as_of(value: str, season: str):
     from datetime import UTC, datetime
+
+    from uclpred.config import SEASONS
+
+    if value == "now":
+        return datetime.now(UTC).replace(microsecond=0)
+    if value == "preseason":
+        return SEASONS[season]["preseason_as_of"]
+    as_of = datetime.fromisoformat(value)
+    if as_of.tzinfo is None:
+        as_of = as_of.replace(tzinfo=UTC)
+    return as_of
+
+
+def _export(args: argparse.Namespace) -> int:
     from pathlib import Path
 
     from uclpred.export import run_export
 
-    if args.as_of == "now":
-        as_of = datetime.now(UTC).replace(microsecond=0)
-    else:
-        as_of = datetime.fromisoformat(args.as_of)
-        if as_of.tzinfo is None:
-            as_of = as_of.replace(tzinfo=UTC)
+    as_of = resolve_as_of(args.as_of, args.season)
     out = Path(args.out)
     if not out.is_absolute():
         out = ROOT / out
-    print(run_export(as_of, out))
+    print(run_export(as_of, out, args.season, args.model))
     return 0
 
 
@@ -71,9 +86,15 @@ def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     parser = argparse.ArgumentParser(prog="uclpred")
     sub = parser.add_subparsers(dest="command", required=True)
-    sub.add_parser(
+    i = sub.add_parser(
         "ingest", help="fetch all sources and build data/processed/matches.parquet"
-    ).set_defaults(func=_ingest)
+    )
+    i.add_argument(
+        "--processed-only",
+        action="store_true",
+        help="no network: only rebuild data/processed/cl_{year}_{fd,teams}.json from cached raw",
+    )
+    i.set_defaults(func=_ingest)
     c = sub.add_parser(
         "coefficients", help="fetch UEFA club coefficients into data/reference"
     )
@@ -83,11 +104,16 @@ def main(argv: list[str] | None = None) -> int:
         "coverage", help="write reports/coverage.md and list duplicate team candidates"
     ).set_defaults(func=_coverage)
     e = sub.add_parser("export", help="write season.json and lambdas.json snapshot")
-    e.add_argument("--as-of", required=True, help="ISO date/time (UTC) or 'now'")
+    e.add_argument(
+        "--as-of", required=True, help="ISO date/time (UTC), 'now' or 'preseason'"
+    )
+    e.add_argument("--season", default="2026-27", choices=sorted(SEASONS))
+    e.add_argument("--model", default=MODEL_NAME, choices=["elo-dc-v1", "elo-dc-v2"])
     e.add_argument("--out", required=True, help="output dir (relative to repo root)")
     e.set_defaults(func=_export)
     sub.add_parser(
-        "backtest", help="grid-search elo-dc-v2, write model_params.json and calibration report"
+        "backtest",
+        help="grid-search elo-dc-v2, write model_params.json and calibration report",
     ).set_defaults(func=_backtest)
     args = parser.parse_args(argv)
     return args.func(args)

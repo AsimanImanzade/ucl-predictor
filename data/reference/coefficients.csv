@@ -1,4 +1,852 @@
 season_year,team_id,name,country,total_5y
+2024,alb-egnatia,KF Egnatia,ALB,1.475
+2024,alb-kukesi,FK Kukësi,ALB,2.5
+2024,alb-laci,KF Laçi,ALB,6.0
+2024,alb-partizani,FK Partizani,ALB,6.5
+2024,alb-teuta,KF Teuta,ALB,4.5
+2024,alb-tirana,KF Tirana,ALB,5.5
+2024,alb-vllaznia,KF Vllaznia,ALB,4.0
+2024,and-atletic-d-escaldes,Atlètic Club d'Escaldes,AND,2.5
+2024,and-inter-d-escaldes,Inter Club d'Escaldes,AND,6.0
+2024,and-santa-coloma,FC Santa Coloma,AND,5.5
+2024,and-ue-engordany,UE Engordany,AND,1.5
+2024,and-ue-sant-julia,UE Sant Julià,AND,1.5
+2024,and-ue-santa-coloma,UE Santa Coloma,AND,1.199
+2024,arm-alashkert,FC Alashkert,ARM,7.5
+2024,arm-ararat-armenia,FC Ararat-Armenia,ARM,8.0
+2024,arm-ararat-yerevan,FC Ararat Yerevan,ARM,2.5
+2024,arm-noah,FC Noah,ARM,2.125
+2024,arm-pyunik,FC Pyunik,ARM,8.0
+2024,arm-shirak,FC Shirak,ARM,2.125
+2024,arm-urartu,FC Urartu,ARM,3.5
+2024,aut-austria-wien,FK Austria Wien,AUT,8.0
+2024,aut-lask-linz,LASK,AUT,37.0
+2024,aut-rapid,SK Rapid,AUT,14.0
+2024,aut-salzburg,FC Salzburg,AUT,50.0
+2024,aut-sturm-graz,SK Sturm Graz,AUT,14.5
+2024,aut-tsv-hartberg,TSV Hartberg,AUT,6.52
+2024,aut-wolfsberger,Wolfsberger AC,AUT,13.5
+2024,aze-gabala,Gabala SC,AZE,4.5
+2024,aze-neftchi,Neftchi PFC,AZE,10.0
+2024,aze-qarabag,Qarabağ FK,AZE,33.0
+2024,aze-sabah,Sabah FC,AZE,4.025
+2024,aze-sabail,Sabail,AZE,4.025
+2024,aze-samaxi,FK Şamaxı,AZE,4.025
+2024,aze-sumqayit,Sumqayit FK,AZE,4.025
+2024,aze-zire,PFC Zire,AZE,4.025
+2024,bel-brugge,Club Brugge KV,BEL,64.0
+2024,bel-kaa-gent,KAA Gent,BEL,45.0
+2024,bel-krc-genk,KRC Genk,BEL,16.0
+2024,bel-r-charleroi,R. Charleroi SC,BEL,9.76
+2024,bel-r-standard-liege,R. Standard de Liège,BEL,9.76
+2024,bel-r-union-saint-gilloise,R. Union Saint-Gilloise,BEL,27.0
+2024,bel-royal-antwerp,Royal Antwerp FC,BEL,23.0
+2024,bel-rsc-anderlecht,RSC Anderlecht,BEL,14.5
+2024,bih-borac,FK Borac,BIH,5.5
+2024,bih-hsk-zrinjski-mostar,HŠK Zrinjski Mostar,BIH,9.5
+2024,bih-radnik-bijeljina,FK Radnik Bijeljina,BIH,2.0
+2024,bih-sarajevo,FK Sarajevo,BIH,6.5
+2024,bih-siroki-brijeg,NK Široki Brijeg,BIH,2.0
+2024,bih-tuzla-city,FK Tuzla City,BIH,2.0
+2024,bih-velez-mostar,FK Velež Mostar,BIH,3.5
+2024,bih-zeljeznicar,FK Željezničar,BIH,2.5
+2024,blr-bate-borisov,FC BATE Borisov,BLR,9.5
+2024,blr-dinamo-minsk,FC Dinamo-Minsk,BLR,4.5
+2024,blr-dynamo-brest,FC Dynamo Brest,BLR,4.0
+2024,blr-gomel,FC Gomel,BLR,1.5
+2024,blr-neman-grodno,FC Neman Grodno,BLR,2.0
+2024,blr-shakhtyor-soligorsk,FC Shakhtyor Soligorsk,BLR,6.5
+2024,blr-torpedo-belaz,FC Torpedo-Belaz ,BLR,3.0
+2024,blr-vitebsk,FC Vitebsk,BLR,1.325
+2024,bul-arda-kardzhali,PFC Arda Kardzhali 1924,BUL,4.075
+2024,bul-botev-plovdiv,PFC Botev Plovdiv,BUL,4.075
+2024,bul-cska,FC CSKA 1948,BUL,4.075
+2024,bul-cska-sofia,PFC CSKA Sofia,BUL,12.5
+2024,bul-levski-sofia,PFC Levski Sofia,BUL,6.0
+2024,bul-lokomotiv-plovdiv,PFC Lokomotiv Plovdiv 1926,BUL,5.5
+2024,bul-ludogorets,PFC Ludogorets 1945,BUL,26.0
+2024,bul-slavia-sofia,PFC Slavia Sofia,BUL,4.075
+2024,cro-dinamo,GNK Dinamo,CRO,50.0
+2024,cro-hajduk-split,HNK Hajduk Split,CRO,9.0
+2024,cro-lokomotiva-zagreb,NK Lokomotiva Zagreb,CRO,5.105
+2024,cro-osijek,NK Osijek,CRO,8.5
+2024,cro-rijeka,HNK Rijeka,CRO,12.0
+2024,cyp-aek-larnaca,AEK Larnaca FC,CYP,8.0
+2024,cyp-ael-limassol,AEL Limassol FC,CYP,4.42
+2024,cyp-anorthosis-famagusta,Anorthosis Famagusta FC,CYP,7.0
+2024,cyp-apoel,APOEL FC,CYP,14.5
+2024,cyp-apollon-limassol,Apollon Limassol FC,CYP,11.0
+2024,cyp-aris-limassol,Aris Limassol FC,CYP,4.5
+2024,cyp-omonia,Omonia FC,CYP,12.0
+2024,cze-bohemians-praha,Bohemians Praha 1905,CZE,7.21
+2024,cze-jablonec,FK Jablonec,CZE,8.0
+2024,cze-mlada-boleslav,FK Mladá Boleslav,CZE,7.21
+2024,cze-slavia-praha,SK Slavia Praha,CZE,53.0
+2024,cze-slovacko,1. FC Slovácko,CZE,7.21
+2024,cze-slovan-liberec,FC Slovan Liberec,CZE,7.21
+2024,cze-sparta-praha,AC Sparta Praha,CZE,22.5
+2024,cze-viktoria-plzen,FC Viktoria Plzeň,CZE,28.0
+2024,den-agf-aarhus,AGF Aarhus,DEN,6.29
+2024,den-brondby,Brøndby IF,DEN,7.0
+2024,den-esbjerg-fb,Esbjerg fB,DEN,6.29
+2024,den-f-c-copenhagen,F.C. Copenhagen,DEN,51.5
+2024,den-midtjylland,FC Midtjylland,DEN,25.5
+2024,den-nordsjaelland,FC Nordsjælland,DEN,7.0
+2024,den-randers,Randers FC,DEN,7.0
+2024,den-silkeborg,Silkeborg IF,DEN,6.29
+2024,den-sonderjyske,SønderjyskE,DEN,6.29
+2024,den-viborg,Viborg FF,DEN,6.29
+2024,eng-arsenal,Arsenal FC,ENG,72.0
+2024,eng-aston-villa,Aston Villa,ENG,20.86
+2024,eng-brighton-hove-albion,Brighton & Hove Albion,ENG,20.86
+2024,eng-chelsea,Chelsea FC,ENG,96.0
+2024,eng-leicester-city,Leicester City FC,ENG,23.0
+2024,eng-liverpool,Liverpool FC,ENG,114.0
+2024,eng-manchester-city,Manchester City,ENG,148.0
+2024,eng-manchester-united,Manchester United,ENG,92.0
+2024,eng-newcastle-united,Newcastle United FC,ENG,20.86
+2024,eng-tottenham-hotspur,Tottenham Hotspur,ENG,54.0
+2024,eng-west-ham-united,West Ham United FC,ENG,69.0
+2024,eng-wolverhampton-wanderers,Wolverhampton Wanderers FC,ENG,20.86
+2024,esp-atletico-madrid,Atlético de Madrid,ESP,89.0
+2024,esp-barcelona,FC Barcelona,ESP,91.0
+2024,esp-ca-osasuna,CA Osasuna,ESP,17.897
+2024,esp-getafe,Getafe CF,ESP,17.897
+2024,esp-granada,Granada CF,ESP,17.897
+2024,esp-rcd-espanyol,RCD Espanyol,ESP,17.897
+2024,esp-real-betis-balompie,Real Betis Balompié,ESP,33.0
+2024,esp-real-madrid,Real Madrid C.F.,ESP,136.0
+2024,esp-real-sociedad-futbol,Real Sociedad de Fútbol,ESP,51.0
+2024,esp-sevilla,Sevilla FC,ESP,84.0
+2024,esp-valencia,Valencia CF,ESP,17.897
+2024,esp-villarreal,Villarreal CF,ESP,82.0
+2024,est-fci-levadia-tallinn,FCI Levadia Tallinn,EST,6.0
+2024,est-flora-tallinn,FC Flora Tallinn,EST,11.0
+2024,est-jk-narva-trans,JK Narva Trans,EST,2.0
+2024,est-nomme-kalju,Nõmme Kalju FC,EST,3.0
+2024,est-paide-linnameeskond,Paide Linnameeskond,EST,5.0
+2024,fin-haka-valkeakoski,FC Haka Valkeakoski ,FIN,2.225
+2024,fin-hjk-helsinki,HJK Helsinki,FIN,11.5
+2024,fin-honka-espoo,FC Honka Espoo,FIN,3.5
+2024,fin-ilves-tampere,Ilves Tampere,FIN,2.225
+2024,fin-inter-turku,FC Inter Turku,FIN,4.0
+2024,fin-kups-kuopio,KuPS Kuopio,FIN,10.0
+2024,fin-rops-rovaniemi,RoPS Rovaniemi,FIN,2.225
+2024,fin-sjk-seinajoki,SJK Seinäjoki,FIN,2.225
+2024,fra-lille,LOSC Lille,FRA,47.0
+2024,fra-monaco,AS Monaco,FRA,24.0
+2024,fra-nantes,FC Nantes,FRA,13.366
+2024,fra-ogc-nice,OGC Nice,FRA,17.0
+2024,fra-olympique-lyonnais,Olympique Lyonnais,FRA,44.0
+2024,fra-olympique-marseille,Olympique de Marseille,FRA,48.0
+2024,fra-paris-saint-germain,Paris Saint-Germain,FRA,116.0
+2024,fra-racing-lens,RC Lens,FRA,13.366
+2024,fra-racing-strasbourg-alsace,Racing Club de Strasbourg Alsace,FRA,13.366
+2024,fra-saint-etienne,AS Saint-Étienne,FRA,13.366
+2024,fra-stade-reims,Stade de Reims ,FRA,13.366
+2024,fra-stade-rennais,Stade Rennais FC,FRA,43.0
+2024,fra-toulouse,Toulouse FC,FRA,13.366
+2024,fro-b36-torshavn,B36 Tórshavn,FRO,7.0
+2024,fro-havnar-boltfelag,Havnar Bóltfelag,FRO,6.0
+2024,fro-ki-klaksvik,KÍ Klaksvík,FRO,10.0
+2024,fro-nsi-runavik,NSÍ Runavík,FRO,2.5
+2024,fro-vikingur,Víkingur,FRO,2.5
+2024,geo-chikhura-sachkhere,FC Chikhura Sachkhere,GEO,1.525
+2024,geo-dila-gori,FC Dila Gori,GEO,4.0
+2024,geo-dinamo-batumi,FC Dinamo Batumi,GEO,5.5
+2024,geo-dinamo-tbilisi,FC Dinamo Tbilisi,GEO,8.0
+2024,geo-gagra,FC Gagra,GEO,1.525
+2024,geo-iberia-tbilisi,FC Iberia 1999 Tbilisi,GEO,4.5
+2024,geo-lokomotive-tbilisi,FC Lokomotive Tbilisi,GEO,2.0
+2024,geo-torpedo-kutaisi,FC Torpedo Kutaisi,GEO,2.5
+2024,ger-bayer-leverkusen,Bayer 04 Leverkusen,GER,90.0
+2024,ger-bayern-munchen,FC Bayern München,GER,144.0
+2024,ger-borussia-dortmund,Borussia Dortmund,GER,97.0
+2024,ger-borussia-vfl-monchengladbach,Borussia VfL 1900 Mönchengladbach,GER,21.0
+2024,ger-eintracht-frankfurt,Eintracht Frankfurt,GER,60.0
+2024,ger-freiburg,SC Freiburg,GER,28.0
+2024,ger-hoffenheim,TSG 1899 Hoffenheim,GER,17.324
+2024,ger-koln,1. FC Köln,GER,17.324
+2024,ger-rb-leipzig,RB Leipzig,GER,97.0
+2024,ger-union-berlin,1. FC Union Berlin,GER,23.0
+2024,ger-vfl-wolfsburg,VfL Wolfsburg,GER,22.5
+2024,gib-europa,Europa FC,GIB,5.5
+2024,gib-fcb-magpies,FCB Magpies,GIB,2.0
+2024,gib-lincoln-red-imps,Lincoln Red Imps FC,GIB,9.0
+2024,gib-mons-calpe-sports,Mons Calpe Sports Club,GIB,1.0
+2024,gib-st-joseph-s,St Joseph's FC,GIB,4.0
+2024,gre-aek,AEK Athens FC,GRE,10.0
+2024,gre-aris-thessaloniki,Aris Thessaloniki FC,GRE,9.0
+2024,gre-atromitos,Atromitos FC,GRE,6.305
+2024,gre-ofi-crete,OFI Crete FC,GRE,6.305
+2024,gre-olympiacos,Olympiacos FC,GRE,48.0
+2024,gre-panathinaikos,Panathinaikos FC,GRE,6.305
+2024,gre-paok,PAOK FC,GRE,37.0
+2024,hun-budapest-honved,Budapest Honvéd FC,HUN,4.375
+2024,hun-debreceni-vsc,Debreceni VSC,HUN,4.375
+2024,hun-fehervar,Fehérvár FC,HUN,7.5
+2024,hun-ferencvarosi-tc,Ferencvárosi TC,HUN,35.0
+2024,hun-kecskemeti-te,Kecskeméti TE,HUN,4.375
+2024,hun-kisvarda,Kisvárda FC,HUN,4.375
+2024,hun-puskas-akademia,Puskás Akadémia FC,HUN,4.375
+2024,hun-ujpest,Újpest FC,HUN,4.375
+2024,hun-zte,ZTE FC,HUN,4.375
+2024,irl-bohemian,Bohemian FC,IRL,3.0
+2024,irl-cork-city,Cork City FC,IRL,2.175
+2024,irl-derry-city,Derry City FC,IRL,4.0
+2024,irl-dundalk,Dundalk FC,IRL,8.5
+2024,irl-shamrock-rovers,Shamrock Rovers FC,IRL,9.5
+2024,irl-sligo-rovers,Sligo Rovers FC,IRL,3.0
+2024,irl-st-patrick-s-athletic,St. Patrick's Athletic,IRL,4.0
+2024,isl-breidablik,Breiðablik,ISL,8.5
+2024,isl-fh-hafnarfjordur,FH Hafnarfjördur,ISL,2.5
+2024,isl-ka-akureyri,KA Akureyri,ISL,2.0
+2024,isl-kr-reykjavik,KR Reykjavík,ISL,3.5
+2024,isl-stjarnan,Stjarnan,ISL,2.5
+2024,isl-valur,Valur,ISL,3.0
+2024,isl-vikingur-reykjavik,Víkingur Reykjavík,ISL,4.0
+2024,isr-ashdod,FC Ashdod,ISR,6.225
+2024,isr-beitar-jerusalem,Beitar Jerusalem FC,ISR,6.225
+2024,isr-bnei-yehuda-tel-aviv,Bnei Yehuda Tel-Aviv FC,ISR,6.225
+2024,isr-hapoel-beer-sheva,Hapoel Beer-Sheva FC,ISR,17.0
+2024,isr-maccabi-haifa,Maccabi Haifa FC,ISR,18.0
+2024,isr-maccabi-netanya,Maccabi Netanya FC,ISR,6.225
+2024,isr-maccabi-tel-aviv,Maccabi Tel-Aviv FC,ISR,35.5
+2024,ita-acf-fiorentina,ACF Fiorentina,ITA,42.0
+2024,ita-atalanta,Atalanta BC,ITA,81.0
+2024,ita-internazionale-milano,FC Internazionale Milano,ITA,101.0
+2024,ita-juventus,Juventus,ITA,80.0
+2024,ita-milan,AC Milan,ITA,59.0
+2024,ita-napoli,SSC Napoli,ITA,80.0
+2024,ita-roma,AS Roma,ITA,101.0
+2024,ita-s-s-lazio,S.S. Lazio,ITA,54.0
+2024,ita-torino,Torino FC,ITA,18.056
+2024,kaz-aktobe,FC Aktobe,KAZ,2.3
+2024,kaz-astana,FC Astana,KAZ,11.0
+2024,kaz-kairat-almaty,FC Kairat Almaty,KAZ,7.0
+2024,kaz-kaysar-kyzylorda,FC Kaysar Kyzylorda,KAZ,2.3
+2024,kaz-kyzylzhar-petropavlovsk,FC Kyzylzhar Petropavlovsk,KAZ,2.3
+2024,kaz-ordabasy,FC Ordabasy,KAZ,4.0
+2024,kaz-shakhter-karagandy,FC Shakhter Karagandy,KAZ,2.5
+2024,kaz-tobol,FC Tobol,KAZ,7.5
+2024,kos-ballkani,FC Ballkani,KOS,6.0
+2024,kos-drita,FC Drita,KOS,6.5
+2024,kos-dukagjini,KF Dukagjini,KOS,2.308
+2024,kos-feronikeli,KF Feronikeli,KOS,2.308
+2024,kos-gjilani,SC Gjilani,KOS,3.0
+2024,kos-llapi,KF Llapi,KOS,2.308
+2024,kos-prishtina,FC Prishtina,KOS,3.0
+2024,lie-vaduz,FC Vaduz,LIE,8.0
+2024,ltu-hegelmann,FC Hegelmann,LTU,1.7
+2024,ltu-kauno-zalgiris,FK Kauno Žalgiris,LTU,6.0
+2024,ltu-panevezys,FK Panevėžys,LTU,4.0
+2024,ltu-riteriai,FK Riteriai,LTU,2.5
+2024,ltu-suduva,FK Sūduva,LTU,7.5
+2024,ltu-zalgiris,FK Žalgiris,LTU,11.5
+2024,lux-cs-fola-esch,CS Fola Esch,LUX,6.0
+2024,lux-differdange,FC Differdange 03,LUX,3.5
+2024,lux-f91-diddeleng,F91 Diddeleng,LUX,8.5
+2024,lux-jeunesse-esch,AS Jeunesse Esch,LUX,1.725
+2024,lux-progres-niederkorn,FC Progrès Niederkorn,LUX,4.5
+2024,lux-racing-union-luxembourg,Racing FC Union Luxembourg,LUX,2.5
+2024,lux-swift-hesper,FC Swift Hesper,LUX,3.0
+2024,lux-union-titus-petange,Union Titus Petange,LUX,1.725
+2024,lva-auda,FK Auda,LVA,2.125
+2024,lva-liepaja,FK Liepāja,LVA,4.5
+2024,lva-rfs,FC RFS,LVA,8.0
+2024,lva-riga,Riga FC,LVA,11.0
+2024,lva-valmiera,Valmiera FC,LVA,5.5
+2024,lva-ventspils,FK Ventspils,LVA,3.5
+2024,mda-dinamo-auto-tiraspol,FC Dinamo-Auto Tiraspol,MDA,2.625
+2024,mda-milsami-orhei,FC Milsami Orhei,MDA,5.0
+2024,mda-petrocub,FC Petrocub,MDA,7.0
+2024,mda-sfintul-gheorghe,FC Sfintul Gheorghe,MDA,3.5
+2024,mda-sheriff-tiraspol,FC Sheriff Tiraspol,MDA,20.0
+2024,mda-speranta-nisporeni,FC Speranța Nisporeni,MDA,2.625
+2024,mda-zimbru-chisinau,FC Zimbru Chisinau,MDA,2.625
+2024,mkd-akademija-pandev,Akademija Pandev,MKD,2.0
+2024,mkd-makedonija-gp-skopje,FK Makedonija GP Skopje,MKD,3.5
+2024,mkd-renova,KF Renova,MKD,1.5
+2024,mkd-shkendija,KF Shkëndija,MKD,8.0
+2024,mkd-shkupi,FC Shkupi 1927,MKD,7.5
+2024,mkd-sileks,FC Sileks,MKD,2.5
+2024,mkd-struga,FC Struga,MKD,3.5
+2024,mlt-balzan,Balzan FC,MLT,2.5
+2024,mlt-birkirkara,Birkirkara FC,MLT,2.5
+2024,mlt-floriana,Floriana FC,MLT,3.0
+2024,mlt-gzira-united,Gzira United FC,MLT,7.0
+2024,mlt-hamrun-spartans-f-c,Hamrun Spartans F.C.,MLT,4.5
+2024,mlt-hibernians,Hibernians FC,MLT,6.5
+2024,mlt-mosta,Mosta FC,MLT,1.65
+2024,mlt-sirens,FC Sirens,MLT,1.65
+2024,mlt-valletta,Valletta FC,MLT,3.0
+2024,mne-arsenal-tivat,FK Arsenal Tivat,MNE,1.141
+2024,mne-buducnost-podgorica,FK Budućnost Podgorica,MNE,8.0
+2024,mne-decic,FK Dečić,MNE,2.0
+2024,mne-iskra-danilovgrad,FK Iskra Danilovgrad,MNE,2.0
+2024,mne-ofk-titograd,OFK Titograd,MNE,1.141
+2024,mne-podgorica,FK Podgorica,MNE,1.141
+2024,mne-sutjeska-niksic,FK Sutjeska-Nikšić,MNE,7.5
+2024,mne-zeta,FK Zeta,MNE,2.0
+2024,ned-ajax,AFC Ajax,NED,67.0
+2024,ned-az,AZ Alkmaar,NED,50.0
+2024,ned-feyenoord-rotterdam,Feyenoord,NED,57.0
+2024,ned-psv,PSV Eindhoven,NED,54.0
+2024,ned-twente,FC Twente,NED,12.26
+2024,ned-utrecht,FC Utrecht,NED,12.26
+2024,ned-vitesse,Vitesse,NED,12.26
+2024,ned-willem-ii,Willem II,NED,12.26
+2024,nir-ballymena-united,Ballymena United FC,NIR,1.841
+2024,nir-cliftonville,Cliftonville FC,NIR,2.0
+2024,nir-coleraine,Coleraine FC,NIR,2.5
+2024,nir-crusaders,Crusaders FC,NIR,4.5
+2024,nir-glentoran,Glentoran FC,NIR,3.0
+2024,nir-larne,Larne FC,NIR,4.5
+2024,nir-linfield,Linfield FC,NIR,10.0
+2024,nor-bodo-glimt,FK Bodø/Glimt,NOR,28.0
+2024,nor-brann,SK Brann,NOR,6.325
+2024,nor-haugesund,FK Haugesund,NOR,6.325
+2024,nor-lillestrom,Lillestrøm SK,NOR,6.325
+2024,nor-molde,Molde FK,NOR,28.5
+2024,nor-rosenborg,Rosenborg BK,NOR,10.0
+2024,nor-valerenga-fotball,Vålerenga Fotball,NOR,6.325
+2024,nor-viking,Viking FK,NOR,6.325
+2024,pol-kks-lech-poznan,KKS Lech Poznań,POL,19.0
+2024,pol-ks-lechia-gdansk,KS Lechia Gdańsk,POL,5.075
+2024,pol-legia-warszawa,Legia Warszawa,POL,18.0
+2024,pol-mks-cracovia-krakow,MKS Cracovia Kraków,POL,5.075
+2024,pol-mks-pogon-szczecin,MKS Pogoń Szczecin,POL,5.075
+2024,pol-piast-gliwice,Piast Gliwice,POL,5.075
+2024,pol-rakow-czestochowa,Raków Częstochowa,POL,8.0
+2024,pol-wks-slask-wroclaw,WKS Śląsk Wrocław,POL,5.075
+2024,por-arouca,FC Arouca,POR,11.263
+2024,por-benfica,SL Benfica,POR,79.0
+2024,por-braga,SC Braga,POR,49.0
+2024,por-gil-vicente,Gil Vicente FC,POR,11.263
+2024,por-pacos-ferreira,FC Paços de Ferreira,POR,11.263
+2024,por-porto,FC Porto,POR,77.0
+2024,por-rio-ave,Rio Ave FC,POR,11.263
+2024,por-santa-clara,CD Santa Clara,POR,11.263
+2024,por-sporting-clube-portugal,Sporting Clube de Portugal,POR,54.5
+2024,por-vitoria,Vitória SC,POR,11.263
+2024,rou-botosani,FC Botoşani,ROU,4.275
+2024,rou-cfr-cluj,CFR 1907 Cluj,ROU,26.5
+2024,rou-fcv-farul-constanta,FCV Farul  Constanța ,ROU,4.275
+2024,rou-fotbal-fcsb,Fotbal Club FCSB,ROU,10.5
+2024,rou-sepsi-osk-sfantu-gheorghe,Sepsi OSK Sfantu Gheorghe,ROU,6.0
+2024,rou-universitatea-craiova,Universitatea Craiova,ROU,7.0
+2024,rus-arsenal-tula,FC Arsenal Tula,RUS,4.593
+2024,rus-cska-moskva,PFC CSKA Moskva,RUS,7.0
+2024,rus-dynamo-moscow,FC Dynamo Moscow,RUS,4.593
+2024,rus-football-zenit,Football Club Zenit,RUS,22.0
+2024,rus-krasnodar,FC Krasnodar,RUS,14.0
+2024,rus-lokomotiv-moskva,FC Lokomotiv Moskva,RUS,16.0
+2024,rus-rostov,FC Rostov,RUS,4.593
+2024,rus-rubin,FC Rubin,RUS,4.593
+2024,rus-sochi,FC Sochi,RUS,4.593
+2024,rus-spartak-moskva,FC Spartak Moskva,RUS,14.5
+2024,sco-aberdeen,Aberdeen FC,SCO,11.5
+2024,sco-celtic,Celtic FC,SCO,32.0
+2024,sco-dundee-united,Dundee United FC,SCO,7.21
+2024,sco-heart-of-midlothian,Heart of Midlothian FC,SCO,7.21
+2024,sco-hibernian-f-c,Hibernian F.C.,SCO,7.21
+2024,sco-kilmarnock,Kilmarnock FC,SCO,7.21
+2024,sco-motherwell,Motherwell FC,SCO,7.21
+2024,sco-rangers,Rangers FC,SCO,63.0
+2024,sco-st-johnstone,St Johnstone FC,SCO,7.21
+2024,smr-la-fiorita,La Fiorita 1967,SMR,4.5
+2024,smr-s-s-folgore,S.S. Folgore,SMR,1.5
+2024,smr-s-s-tre-fiori-f-c,S.S. Tre Fiori F.C.,SMR,3.5
+2024,smr-sp-tre-penne,SP Tre Penne,SMR,5.5
+2024,smr-ss-cosmos,SS Cosmos,SMR,1.0
+2024,srb-crvena-zvezda,FK Crvena Zvezda,SRB,40.0
+2024,srb-cukaricki,FK Čukarički,SRB,8.0
+2024,srb-partizan-beograd,FK Partizan Beograd,SRB,25.5
+2024,srb-radnicki-nis,FK Radnicki Niš,SRB,5.555
+2024,srb-tsc,FK TSC,SRB,5.555
+2024,srb-vojvodina,FK Vojvodina,SRB,5.555
+2024,sui-basel,FC Basel 1893,SUI,52.0
+2024,sui-lugano,FC Lugano,SUI,8.0
+2024,sui-luzern,FC Luzern,SUI,6.595
+2024,sui-servette,Servette FC,SUI,9.0
+2024,sui-st-gallen,FC St. Gallen 1879,SUI,6.595
+2024,sui-thun,FC Thun,SUI,6.595
+2024,sui-young-boys,BSC Young Boys,SUI,34.5
+2024,sui-zurich,FC Zürich,SUI,6.595
+2024,svk-dac,FC DAC 1904,SVK,8.0
+2024,svk-mfk-ruzomberok,MFK Ružomberok,SVK,3.925
+2024,svk-msk-zilina,MŠK Žilina,SVK,5.0
+2024,svk-slovan-bratislava,ŠK Slovan Bratislava,SVK,30.5
+2024,svk-spartak-trnava,FC Spartak Trnava,SVK,8.0
+2024,svn-celje,NK Celje,SVN,4.5
+2024,svn-domzale,NK Domžale,SVN,4.5
+2024,svn-koper,FC Koper,SVN,2.65
+2024,svn-maribor,NK Maribor,SVN,9.5
+2024,svn-ns-mura,NŠ Mura,SVN,7.0
+2024,svn-olimpija-ljubljana,NK Olimpija Ljubljana,SVN,10.5
+2024,swe-aik-stockholm,AIK Stockholm,SWE,5.0
+2024,swe-djurgarden,Djurgården,SWE,16.5
+2024,swe-elfsborg,IF Elfsborg,SWE,4.3
+2024,swe-hacken,BK Häcken,SWE,6.0
+2024,swe-hammarby,Hammarby IF,SWE,5.5
+2024,swe-ifk-goteborg,IFK Göteborg,SWE,4.3
+2024,swe-ifk-norrkoping,IFK Norrköping,SWE,4.3
+2024,swe-kalmar,Kalmar FF,SWE,4.3
+2024,swe-malmo,Malmö FF,SWE,18.5
+2024,tur-adana-demirspor,Adana Demirspor,TUR,7.72
+2024,tur-alanyaspor,Alanyaspor,TUR,7.72
+2024,tur-besiktas-jk,Beşiktaş JK,TUR,12.0
+2024,tur-fenerbahce,Fenerbahçe SK,TUR,36.0
+2024,tur-galatasaray,Galatasaray A.Ş.,TUR,31.5
+2024,tur-istanbul-basaksehir,İstanbul Başakşehir FK,TUR,29.0
+2024,tur-konyaspor,Konyaspor,TUR,7.72
+2024,tur-sivasspor,Sivasspor,TUR,16.5
+2024,tur-trabzonspor-a-s,Trabzonspor A.Ş.,TUR,11.5
+2024,tur-yeni-malatyaspor,Yeni Malatyaspor,TUR,7.72
+2024,ukr-desna-chernihiv,FC Desna Chernihiv,UKR,5.6
+2024,ukr-dnipro,SC Dnipro-1,UKR,10.5
+2024,ukr-dynamo-kyiv,FC Dynamo Kyiv,UKR,26.5
+2024,ukr-kolos-kovalivka,Kolos Kovalivka,UKR,5.6
+2024,ukr-mariupol,FC Mariupol,UKR,5.6
+2024,ukr-olexandriya,FC Olexandriya,UKR,5.6
+2024,ukr-shakhtar-donetsk,FC Shakhtar Donetsk,UKR,63.0
+2024,ukr-vorskla-poltava,FC Vorskla Poltava,UKR,5.6
+2024,ukr-zorya-luhansk,FC Zorya Luhansk,UKR,18.5
+2024,wal-bala-town,Bala Town FC,WAL,3.5
+2024,wal-barry-town-united,Barry Town United FC,WAL,1.158
+2024,wal-cardiff-met,Cardiff Met FC ,WAL,1.158
+2024,wal-connah-s-quay-nomads,Connah's Quay Nomads FC,WAL,5.5
+2024,wal-haverfordwest-county,Haverfordwest County AFC,WAL,1.5
+2024,wal-new-saints,The New Saints FC,WAL,8.5
+2024,wal-newtown,Newtown AFC,WAL,2.5
+2024,wal-penybont,Penybont FC,WAL,1.158
+2025,alb-egnatia,KF Egnatia,ALB,2.5
+2025,alb-kukesi,FK Kukësi,ALB,1.575
+2025,alb-laci,KF Laçi,ALB,5.0
+2025,alb-partizani,FK Partizani,ALB,6.5
+2025,alb-teuta,KF Teuta,ALB,3.5
+2025,alb-tirana,KF Tirana,ALB,6.5
+2025,alb-vllaznia,KF Vllaznia,ALB,5.0
+2025,and-atletic-d-escaldes,Atlètic Club d'Escaldes,AND,3.5
+2025,and-inter-d-escaldes,Inter Club d'Escaldes,AND,7.5
+2025,and-santa-coloma,FC Santa Coloma,AND,4.0
+2025,and-ue-engordany,UE Engordany,AND,1.099
+2025,and-ue-sant-julia,UE Sant Julià,AND,1.099
+2025,and-ue-santa-coloma,UE Santa Coloma,AND,3.5
+2025,arm-alashkert,FC Alashkert,ARM,6.0
+2025,arm-ararat-armenia,FC Ararat-Armenia,ARM,7.5
+2025,arm-ararat-yerevan,FC Ararat Yerevan,ARM,2.5
+2025,arm-noah,FC Noah,ARM,5.0
+2025,arm-pyunik,FC Pyunik,ARM,8.5
+2025,arm-shirak,FC Shirak,ARM,2.45
+2025,arm-urartu,FC Urartu,ARM,4.0
+2025,aut-austria-wien,FK Austria Wien,AUT,7.5
+2025,aut-lask-linz,LASK,AUT,28.0
+2025,aut-rapid,SK Rapid,AUT,32.25
+2025,aut-salzburg,FC Salzburg,AUT,48.0
+2025,aut-sturm-graz,SK Sturm Graz,AUT,23.0
+2025,aut-tsv-hartberg,TSV Hartberg,AUT,7.29
+2025,aut-wolfsberger,Wolfsberger AC,AUT,9.5
+2025,aze-gabala,Gabala SC,AZE,3.925
+2025,aze-neftchi,Neftchi PFC,AZE,8.0
+2025,aze-qarabag,Qarabağ FK,AZE,32.0
+2025,aze-sabah,Sabah FC,AZE,4.0
+2025,aze-samaxi,FK Şamaxı,AZE,3.925
+2025,aze-sumqayit,Sumqayit FK,AZE,4.0
+2025,aze-zire,PFC Zire,AZE,4.0
+2025,bel-brugge,Club Brugge KV,BEL,71.75
+2025,bel-cercle-brugge,Cercle Brugge KSV,BEL,12.75
+2025,bel-kaa-gent,KAA Gent,BEL,42.0
+2025,bel-krc-genk,KRC Genk,BEL,11.37
+2025,bel-r-charleroi,R. Charleroi SC,BEL,11.37
+2025,bel-r-standard-liege,R. Standard de Liège,BEL,11.37
+2025,bel-r-union-saint-gilloise,R. Union Saint-Gilloise,BEL,36.0
+2025,bel-royal-antwerp,Royal Antwerp FC,BEL,20.5
+2025,bel-rsc-anderlecht,RSC Anderlecht,BEL,28.25
+2025,bih-borac,FK Borac,BIH,13.625
+2025,bih-hsk-zrinjski-mostar,HŠK Zrinjski Mostar,BIH,10.0
+2025,bih-sarajevo,FK Sarajevo,BIH,6.0
+2025,bih-siroki-brijeg,NK Široki Brijeg,BIH,2.606
+2025,bih-tuzla-city,FK Tuzla City,BIH,2.606
+2025,bih-velez-mostar,FK Velež Mostar,BIH,4.5
+2025,bih-zeljeznicar,FK Željezničar,BIH,2.606
+2025,blr-bate-borisov,FC BATE Borisov,BLR,7.0
+2025,blr-dinamo-minsk,FC Dinamo-Minsk,BLR,6.0
+2025,blr-dynamo-brest,FC Dynamo Brest,BLR,4.0
+2025,blr-gomel,FC Gomel,BLR,1.5
+2025,blr-isloch-minsk-region,FC Isloch Minsk Region ,BLR,1.2
+2025,blr-neman-grodno,FC Neman Grodno,BLR,3.5
+2025,blr-shakhtyor-soligorsk,FC Shakhtyor Soligorsk,BLR,4.5
+2025,blr-torpedo-belaz,FC Torpedo-Belaz ,BLR,4.0
+2025,bul-arda-kardzhali,PFC Arda Kardzhali 1924,BUL,3.975
+2025,bul-botev-plovdiv,PFC Botev Plovdiv,BUL,3.975
+2025,bul-cherno-more,PFC Cherno More,BUL,3.975
+2025,bul-cska,FC CSKA 1948,BUL,3.975
+2025,bul-cska-sofia,PFC CSKA Sofia,BUL,10.5
+2025,bul-levski-sofia,PFC Levski Sofia,BUL,4.5
+2025,bul-lokomotiv-plovdiv,PFC Lokomotiv Plovdiv 1926,BUL,3.975
+2025,bul-ludogorets,PFC Ludogorets 1945,BUL,24.0
+2025,bul-slavia-sofia,PFC Slavia Sofia,BUL,3.975
+2025,cro-dinamo,GNK Dinamo,CRO,56.0
+2025,cro-hajduk-split,HNK Hajduk Split,CRO,10.0
+2025,cro-lokomotiva-zagreb,NK Lokomotiva Zagreb,CRO,5.405
+2025,cro-osijek,NK Osijek,CRO,9.0
+2025,cro-rijeka,HNK Rijeka,CRO,12.0
+2025,cyp-aek-larnaca,AEK Larnaca FC,CYP,7.5
+2025,cyp-ael-limassol,AEL Limassol FC,CYP,5.507
+2025,cyp-anorthosis-famagusta,Anorthosis Famagusta FC,CYP,7.0
+2025,cyp-apoel,APOEL FC,CYP,17.25
+2025,cyp-apollon-limassol,Apollon Limassol FC,CYP,8.5
+2025,cyp-aris-limassol,Aris Limassol FC,CYP,5.507
+2025,cyp-omonia,Omonia FC,CYP,17.375
+2025,cyp-pafos,Pafos FC,CYP,11.125
+2025,cze-banik-ostrava,FC Baník Ostrava,CZE,8.82
+2025,cze-bohemians-praha,Bohemians Praha 1905,CZE,8.82
+2025,cze-jablonec,FK Jablonec,CZE,8.82
+2025,cze-mlada-boleslav,FK Mladá Boleslav,CZE,8.82
+2025,cze-slavia-praha,SK Slavia Praha,CZE,51.0
+2025,cze-slovacko,1. FC Slovácko,CZE,8.82
+2025,cze-slovan-liberec,FC Slovan Liberec,CZE,8.82
+2025,cze-sparta-praha,AC Sparta Praha,CZE,29.5
+2025,cze-viktoria-plzen,FC Viktoria Plzeň,CZE,39.25
+2025,den-agf-aarhus,AGF Aarhus,DEN,6.796
+2025,den-brondby,Brøndby IF,DEN,7.0
+2025,den-f-c-copenhagen,F.C. Copenhagen,DEN,44.875
+2025,den-midtjylland,FC Midtjylland,DEN,32.75
+2025,den-nordsjaelland,FC Nordsjælland,DEN,7.0
+2025,den-randers,Randers FC,DEN,7.0
+2025,den-silkeborg,Silkeborg IF,DEN,6.796
+2025,den-sonderjyske,SønderjyskE,DEN,6.796
+2025,den-viborg,Viborg FF,DEN,6.796
+2025,eng-arsenal,Arsenal FC,ENG,98.0
+2025,eng-aston-villa,Aston Villa,ENG,47.25
+2025,eng-brighton-hove-albion,Brighton & Hove Albion,ENG,23.039
+2025,eng-chelsea,Chelsea FC,ENG,109.0
+2025,eng-leicester-city,Leicester City FC,ENG,23.039
+2025,eng-liverpool,Liverpool FC,ENG,125.5
+2025,eng-manchester-city,Manchester City,ENG,137.75
+2025,eng-manchester-united,Manchester United,ENG,102.5
+2025,eng-newcastle-united,Newcastle United FC,ENG,23.039
+2025,eng-tottenham-hotspur,Tottenham Hotspur,ENG,70.25
+2025,eng-west-ham-united,West Ham United FC,ENG,69.0
+2025,esp-athletic,Athletic Club,ESP,26.75
+2025,esp-atletico-madrid,Atlético de Madrid,ESP,93.5
+2025,esp-barcelona,FC Barcelona,ESP,103.25
+2025,esp-ca-osasuna,CA Osasuna,ESP,18.89
+2025,esp-girona,Girona FC,ESP,18.89
+2025,esp-granada,Granada CF,ESP,18.89
+2025,esp-real-betis-balompie,Real Betis Balompié,ESP,52.25
+2025,esp-real-madrid,Real Madrid C.F.,ESP,143.5
+2025,esp-real-sociedad-futbol,Real Sociedad de Fútbol,ESP,65.0
+2025,esp-sevilla,Sevilla FC,ESP,58.0
+2025,esp-villarreal,Villarreal CF,ESP,82.0
+2025,est-fci-levadia-tallinn,FCI Levadia Tallinn,EST,6.5
+2025,est-flora-tallinn,FC Flora Tallinn,EST,11.5
+2025,est-jk-narva-trans,JK Narva Trans,EST,1.591
+2025,est-jk-tallinna-kalev,JK Tallinna Kalev,EST,1.591
+2025,est-nomme-kalju,Nõmme Kalju FC,EST,1.591
+2025,est-paide-linnameeskond,Paide Linnameeskond,EST,7.0
+2025,fin-haka-valkeakoski,FC Haka Valkeakoski ,FIN,2.35
+2025,fin-hjk-helsinki,HJK Helsinki,FIN,12.5
+2025,fin-honka-espoo,FC Honka Espoo,FIN,3.5
+2025,fin-ilves-tampere,Ilves Tampere,FIN,3.0
+2025,fin-inter-turku,FC Inter Turku,FIN,3.0
+2025,fin-kups-kuopio,KuPS Kuopio,FIN,10.0
+2025,fin-sjk-seinajoki,SJK Seinäjoki,FIN,2.35
+2025,fin-vps-vaasa,VPS Vaasa,FIN,2.35
+2025,fra-lille,LOSC Lille,FRA,66.0
+2025,fra-monaco,AS Monaco,FRA,41.0
+2025,fra-nantes,FC Nantes,FRA,14.618
+2025,fra-ogc-nice,OGC Nice,FRA,20.0
+2025,fra-olympique-lyonnais,Olympique Lyonnais,FRA,43.75
+2025,fra-olympique-marseille,Olympique de Marseille,FRA,48.0
+2025,fra-paris-saint-germain,Paris Saint-Germain,FRA,118.5
+2025,fra-racing-lens,RC Lens,FRA,14.618
+2025,fra-stade-brestois,Stade Brestois 29,FRA,16.75
+2025,fra-stade-reims,Stade de Reims ,FRA,14.618
+2025,fra-stade-rennais,Stade Rennais FC,FRA,40.0
+2025,fra-toulouse,Toulouse FC,FRA,14.618
+2025,fro-b36-torshavn,B36 Tórshavn,FRO,7.0
+2025,fro-havnar-boltfelag,Havnar Bóltfelag,FRO,6.0
+2025,fro-ki-klaksvik,KÍ Klaksvík,FRO,11.0
+2025,fro-nsi-runavik,NSÍ Runavík,FRO,2.15
+2025,fro-vikingur,Víkingur,FRO,4.0
+2025,geo-dila-gori,FC Dila Gori,GEO,4.0
+2025,geo-dinamo-batumi,FC Dinamo Batumi,GEO,7.0
+2025,geo-dinamo-tbilisi,FC Dinamo Tbilisi,GEO,7.0
+2025,geo-gagra,FC Gagra,GEO,1.325
+2025,geo-iberia-tbilisi,FC Iberia 1999 Tbilisi,GEO,4.5
+2025,geo-lokomotive-tbilisi,FC Lokomotive Tbilisi,GEO,2.0
+2025,geo-torpedo-kutaisi,FC Torpedo Kutaisi,GEO,3.0
+2025,ger-bayer-leverkusen,Bayer 04 Leverkusen,GER,95.25
+2025,ger-bayern-munchen,FC Bayern München,GER,135.25
+2025,ger-borussia-dortmund,Borussia Dortmund,GER,106.75
+2025,ger-borussia-vfl-monchengladbach,Borussia VfL 1900 Mönchengladbach,GER,17.266
+2025,ger-eintracht-frankfurt,Eintracht Frankfurt,GER,74.0
+2025,ger-freiburg,SC Freiburg,GER,28.0
+2025,ger-heidenheim,1. FC Heidenheim 1846,GER,17.266
+2025,ger-hoffenheim,TSG 1899 Hoffenheim,GER,19.0
+2025,ger-koln,1. FC Köln,GER,17.266
+2025,ger-rb-leipzig,RB Leipzig,GER,78.0
+2025,ger-union-berlin,1. FC Union Berlin,GER,23.0
+2025,ger-vfb-stuttgart,VfB Stuttgart,GER,17.266
+2025,ger-vfl-wolfsburg,VfL Wolfsburg,GER,17.266
+2025,gib-europa,Europa FC,GIB,4.5
+2025,gib-fcb-magpies,FCB Magpies,GIB,3.5
+2025,gib-lincoln-red-imps,Lincoln Red Imps FC,GIB,10.0
+2025,gib-mons-calpe-sports,Mons Calpe Sports Club,GIB,1.091
+2025,gib-st-joseph-s,St Joseph's FC,GIB,4.0
+2025,gre-aek,AEK Athens FC,GRE,9.5
+2025,gre-aris-thessaloniki,Aris Thessaloniki FC,GRE,7.862
+2025,gre-ofi-crete,OFI Crete FC,GRE,7.862
+2025,gre-olympiacos,Olympiacos FC,GRE,56.5
+2025,gre-panathinaikos,Panathinaikos FC,GRE,16.0
+2025,gre-paok,PAOK FC,GRE,42.25
+2025,hun-budapest-honved,Budapest Honvéd FC,HUN,4.8
+2025,hun-debreceni-vsc,Debreceni VSC,HUN,4.8
+2025,hun-fehervar,Fehérvár FC,HUN,8.0
+2025,hun-ferencvarosi-tc,Ferencvárosi TC,HUN,39.0
+2025,hun-kecskemeti-te,Kecskeméti TE,HUN,4.8
+2025,hun-kisvarda,Kisvárda FC,HUN,4.8
+2025,hun-paksi,Paksi FC,HUN,4.8
+2025,hun-puskas-akademia,Puskás Akadémia FC,HUN,6.5
+2025,hun-ujpest,Újpest FC,HUN,4.8
+2025,hun-zte,ZTE FC,HUN,4.8
+2025,irl-bohemian,Bohemian FC,IRL,3.0
+2025,irl-derry-city,Derry City FC,IRL,5.0
+2025,irl-dundalk,Dundalk FC,IRL,6.5
+2025,irl-shamrock-rovers,Shamrock Rovers FC,IRL,17.875
+2025,irl-shelbourne,Shelbourne FC,IRL,2.993
+2025,irl-sligo-rovers,Sligo Rovers FC,IRL,3.0
+2025,irl-st-patrick-s-athletic,St. Patrick's Athletic,IRL,5.5
+2025,isl-breidablik,Breiðablik,ISL,9.0
+2025,isl-fh-hafnarfjordur,FH Hafnarfjördur,ISL,2.704
+2025,isl-ka-akureyri,KA Akureyri,ISL,2.704
+2025,isl-kr-reykjavik,KR Reykjavík,ISL,2.704
+2025,isl-stjarnan,Stjarnan,ISL,2.704
+2025,isl-valur,Valur,ISL,3.0
+2025,isl-vikingur-reykjavik,Víkingur Reykjavík,ISL,10.75
+2025,isr-ashdod,FC Ashdod,ISR,6.325
+2025,isr-beitar-jerusalem,Beitar Jerusalem FC,ISR,6.325
+2025,isr-hapoel-beer-sheva,Hapoel Beer-Sheva FC,ISR,16.5
+2025,isr-maccabi-haifa,Maccabi Haifa FC,ISR,18.0
+2025,isr-maccabi-netanya,Maccabi Netanya FC,ISR,6.325
+2025,isr-maccabi-petah-tikva,Maccabi Petah-Tikva FC,ISR,6.325
+2025,isr-maccabi-tel-aviv,Maccabi Tel-Aviv FC,ISR,37.5
+2025,ita-acf-fiorentina,ACF Fiorentina,ITA,62.0
+2025,ita-atalanta,Atalanta BC,ITA,82.0
+2025,ita-bologna,Bologna FC 1909,ITA,19.446
+2025,ita-internazionale-milano,FC Internazionale Milano,ITA,116.25
+2025,ita-juventus,Juventus,ITA,74.25
+2025,ita-milan,AC Milan,ITA,78.0
+2025,ita-napoli,SSC Napoli,ITA,61.0
+2025,ita-roma,AS Roma,ITA,104.5
+2025,ita-s-s-lazio,S.S. Lazio,ITA,76.0
+2025,kaz-aktobe,FC Aktobe,KAZ,3.0
+2025,kaz-astana,FC Astana,KAZ,12.0
+2025,kaz-kairat-almaty,FC Kairat Almaty,KAZ,5.5
+2025,kaz-kaysar-kyzylorda,FC Kaysar Kyzylorda,KAZ,2.225
+2025,kaz-kyzylzhar-petropavlovsk,FC Kyzylzhar Petropavlovsk,KAZ,2.225
+2025,kaz-ordabasy,FC Ordabasy,KAZ,4.5
+2025,kaz-shakhter-karagandy,FC Shakhter Karagandy,KAZ,2.5
+2025,kaz-tobol,FC Tobol,KAZ,8.0
+2025,kos-ballkani,FC Ballkani,KOS,8.0
+2025,kos-drita,FC Drita,KOS,9.0
+2025,kos-dukagjini,KF Dukagjini,KOS,2.408
+2025,kos-gjilani,SC Gjilani,KOS,3.0
+2025,kos-llapi,KF Llapi,KOS,3.5
+2025,kos-malisheva,FC Malisheva,KOS,2.408
+2025,kos-prishtina,FC Prishtina,KOS,2.5
+2025,lie-vaduz,FC Vaduz,LIE,7.5
+2025,ltu-hegelmann,FC Hegelmann,LTU,1.65
+2025,ltu-kauno-zalgiris,FK Kauno Žalgiris,LTU,5.0
+2025,ltu-panevezys,FK Panevėžys,LTU,6.5
+2025,ltu-riteriai,FK Riteriai,LTU,1.65
+2025,ltu-siauliai,FC Šiauliai,LTU,1.65
+2025,ltu-suduva,FK Sūduva,LTU,5.0
+2025,ltu-transinvest,FK Transinvest,LTU,1.65
+2025,ltu-zalgiris,FK Žalgiris,LTU,12.0
+2025,lux-cs-fola-esch,CS Fola Esch,LUX,5.0
+2025,lux-differdange,FC Differdange 03,LUX,5.0
+2025,lux-f91-diddeleng,F91 Diddeleng,LUX,7.0
+2025,lux-progres-niederkorn,FC Progrès Niederkorn,LUX,4.5
+2025,lux-racing-union-luxembourg,Racing FC Union Luxembourg,LUX,2.5
+2025,lux-swift-hesper,FC Swift Hesper,LUX,3.0
+2025,lux-una-strassen,FC UNA Strassen,LUX,1.375
+2025,lux-union-titus-petange,Union Titus Petange,LUX,1.375
+2025,lva-auda,FK Auda,LVA,3.5
+2025,lva-liepaja,FK Liepāja,LVA,4.0
+2025,lva-rfs,FC RFS,LVA,11.0
+2025,lva-riga,Riga FC,LVA,10.0
+2025,lva-valmiera,Valmiera FC,LVA,5.5
+2025,lva-ventspils,FK Ventspils,LVA,2.45
+2025,mda-dinamo-auto-tiraspol,FC Dinamo-Auto Tiraspol,MDA,2.9
+2025,mda-milsami-orhei,FC Milsami Orhei,MDA,5.5
+2025,mda-petrocub,FC Petrocub,MDA,8.5
+2025,mda-sfintul-gheorghe,FC Sfintul Gheorghe,MDA,3.5
+2025,mda-sheriff-tiraspol,FC Sheriff Tiraspol,MDA,20.0
+2025,mda-zimbru-chisinau,FC Zimbru Chisinau,MDA,3.0
+2025,mkd-akademija-pandev,Akademija Pandev,MKD,1.233
+2025,mkd-makedonija-gp-skopje,FK Makedonija GP Skopje,MKD,2.5
+2025,mkd-renova,KF Renova,MKD,1.5
+2025,mkd-shkendija,KF Shkëndija,MKD,7.5
+2025,mkd-shkupi,FC Shkupi 1927,MKD,6.5
+2025,mkd-sileks,FC Sileks,MKD,2.5
+2025,mkd-struga,FC Struga,MKD,5.0
+2025,mkd-tikves,FK Tikves,MKD,1.233
+2025,mlt-balzan,Balzan FC,MLT,1.7
+2025,mlt-birkirkara,Birkirkara FC,MLT,2.5
+2025,mlt-floriana,Floriana FC,MLT,4.5
+2025,mlt-gzira-united,Gzira United FC,MLT,5.5
+2025,mlt-hamrun-spartans-f-c,Hamrun Spartans F.C.,MLT,6.0
+2025,mlt-hibernians,Hibernians FC,MLT,5.5
+2025,mlt-marsaxlokk,Marsaxlokk FC,MLT,1.7
+2025,mlt-mosta,Mosta FC,MLT,1.7
+2025,mlt-sirens,FC Sirens,MLT,1.7
+2025,mlt-sliema-wanderers,Sliema Wanderers FC,MLT,1.7
+2025,mlt-valletta,Valletta FC,MLT,1.7
+2025,mne-arsenal-tivat,FK Arsenal Tivat,MNE,1.441
+2025,mne-buducnost-podgorica,FK Budućnost Podgorica,MNE,8.0
+2025,mne-decic,FK Dečić,MNE,4.0
+2025,mne-iskra-danilovgrad,FK Iskra Danilovgrad,MNE,2.0
+2025,mne-mornar,FK Mornar,MNE,2.0
+2025,mne-podgorica,FK Podgorica,MNE,1.441
+2025,mne-sutjeska-niksic,FK Sutjeska-Nikšić,MNE,5.5
+2025,mne-zeta,FK Zeta,MNE,1.441
+2025,ned-ajax,AFC Ajax,NED,67.25
+2025,ned-az,AZ Alkmaar,NED,54.5
+2025,ned-feyenoord-rotterdam,Feyenoord,NED,71.0
+2025,ned-go-ahead-eagles,Go Ahead Eagles,NED,13.43
+2025,ned-psv,PSV Eindhoven,NED,69.25
+2025,ned-twente,FC Twente,NED,13.5
+2025,ned-vitesse,Vitesse,NED,13.43
+2025,ned-willem-ii,Willem II,NED,13.43
+2025,nir-cliftonville,Cliftonville FC,NIR,2.5
+2025,nir-coleraine,Coleraine FC,NIR,2.5
+2025,nir-crusaders,Crusaders FC,NIR,4.0
+2025,nir-glentoran,Glentoran FC,NIR,3.0
+2025,nir-larne,Larne FC,NIR,7.0
+2025,nir-linfield,Linfield FC,NIR,8.5
+2025,nor-bodo-glimt,FK Bodø/Glimt,NOR,49.0
+2025,nor-brann,SK Brann,NOR,7.937
+2025,nor-lillestrom,Lillestrøm SK,NOR,7.937
+2025,nor-molde,Molde FK,NOR,33.75
+2025,nor-rosenborg,Rosenborg BK,NOR,7.937
+2025,nor-tromso-il,Tromsø IL,NOR,7.937
+2025,nor-valerenga-fotball,Vålerenga Fotball,NOR,7.937
+2025,nor-viking,Viking FK,NOR,7.937
+2025,pol-jagiellonia-bialystok,Jagiellonia Białystok,POL,14.0
+2025,pol-kks-lech-poznan,KKS Lech Poznań,POL,19.0
+2025,pol-ks-lechia-gdansk,KS Lechia Gdańsk,POL,7.0
+2025,pol-legia-warszawa,Legia Warszawa,POL,31.0
+2025,pol-mks-cracovia-krakow,MKS Cracovia Kraków,POL,7.0
+2025,pol-mks-pogon-szczecin,MKS Pogoń Szczecin,POL,7.0
+2025,pol-piast-gliwice,Piast Gliwice,POL,7.0
+2025,pol-rakow-czestochowa,Raków Częstochowa,POL,8.0
+2025,pol-wisla-krakow,Wisła Kraków,POL,7.0
+2025,pol-wks-slask-wroclaw,WKS Śląsk Wrocław,POL,7.0
+2025,por-arouca,FC Arouca,POR,12.453
+2025,por-benfica,SL Benfica,POR,87.75
+2025,por-braga,SC Braga,POR,46.0
+2025,por-gil-vicente,Gil Vicente FC,POR,12.453
+2025,por-pacos-ferreira,FC Paços de Ferreira,POR,12.453
+2025,por-porto,FC Porto,POR,79.75
+2025,por-rio-ave,Rio Ave FC,POR,12.453
+2025,por-santa-clara,CD Santa Clara,POR,12.453
+2025,por-sporting-clube-portugal,Sporting Clube de Portugal,POR,59.0
+2025,por-vitoria,Vitória SC,POR,18.75
+2025,rou-botosani,FC Botoşani,ROU,4.65
+2025,rou-cfr-cluj,CFR 1907 Cluj,ROU,19.0
+2025,rou-cs-corvinul-hunedoara,CS Corvinul 1921 Hunedoara,ROU,4.65
+2025,rou-fcv-farul-constanta,FCV Farul  Constanța ,ROU,4.65
+2025,rou-fotbal-fcsb,Fotbal Club FCSB,ROU,22.5
+2025,rou-sepsi-osk-sfantu-gheorghe,Sepsi OSK Sfantu Gheorghe,ROU,6.0
+2025,rou-universitatea-craiova,Universitatea Craiova,ROU,6.5
+2025,rus-cska-moskva,PFC CSKA Moskva,RUS,4.526
+2025,rus-dynamo-moscow,FC Dynamo Moscow,RUS,4.526
+2025,rus-football-zenit,Football Club Zenit,RUS,13.0
+2025,rus-krasnodar,FC Krasnodar,RUS,8.0
+2025,rus-lokomotiv-moskva,FC Lokomotiv Moskva,RUS,10.0
+2025,rus-rostov,FC Rostov,RUS,4.526
+2025,rus-rubin,FC Rubin,RUS,4.526
+2025,rus-sochi,FC Sochi,RUS,4.526
+2025,rus-spartak-moskva,FC Spartak Moskva,RUS,12.0
+2025,sco-aberdeen,Aberdeen FC,SCO,9.5
+2025,sco-celtic,Celtic FC,SCO,38.0
+2025,sco-dundee-united,Dundee United FC,SCO,7.11
+2025,sco-heart-of-midlothian,Heart of Midlothian FC,SCO,11.5
+2025,sco-hibernian-f-c,Hibernian F.C.,SCO,7.11
+2025,sco-kilmarnock,Kilmarnock FC,SCO,7.11
+2025,sco-motherwell,Motherwell FC,SCO,7.11
+2025,sco-rangers,Rangers FC,SCO,71.25
+2025,sco-st-johnstone,St Johnstone FC,SCO,7.11
+2025,sco-st-mirren,St. Mirren FC,SCO,7.11
+2025,smr-la-fiorita,La Fiorita 1967,SMR,5.5
+2025,smr-s-s-folgore,S.S. Folgore,SMR,1.5
+2025,smr-s-s-tre-fiori-f-c,S.S. Tre Fiori F.C.,SMR,3.0
+2025,smr-sp-tre-penne,SP Tre Penne,SMR,5.0
+2025,smr-ss-cosmos,SS Cosmos,SMR,1.0
+2025,smr-virtus-a-c,Virtus A.C. 1964,SMR,1.5
+2025,srb-crvena-zvezda,FK Crvena Zvezda,SRB,44.0
+2025,srb-cukaricki,FK Čukarički,SRB,6.5
+2025,srb-partizan-beograd,FK Partizan Beograd,SRB,22.0
+2025,srb-radnicki,FK Radnički 1923,SRB,5.1
+2025,srb-radnicki-nis,FK Radnicki Niš,SRB,5.1
+2025,srb-tsc,FK TSC,SRB,9.625
+2025,srb-vojvodina,FK Vojvodina,SRB,7.5
+2025,sui-basel,FC Basel 1893,SUI,33.0
+2025,sui-lugano,FC Lugano,SUI,19.25
+2025,sui-luzern,FC Luzern,SUI,6.725
+2025,sui-servette,Servette FC,SUI,11.5
+2025,sui-st-gallen,FC St. Gallen 1879,SUI,6.725
+2025,sui-young-boys,BSC Young Boys,SUI,34.5
+2025,sui-zurich,FC Zürich,SUI,6.725
+2025,svk-dac,FC DAC 1904,SVK,8.0
+2025,svk-mfk-ruzomberok,MFK Ružomberok,SVK,5.0
+2025,svk-msk-zilina,MŠK Žilina,SVK,5.0
+2025,svk-slovan-bratislava,ŠK Slovan Bratislava,SVK,33.5
+2025,svk-spartak-trnava,FC Spartak Trnava,SVK,8.5
+2025,svn-bravo,NK Bravo,SVN,4.068
+2025,svn-celje,NK Celje,SVN,14.0
+2025,svn-domzale,NK Domžale,SVN,4.068
+2025,svn-koper,FC Koper,SVN,4.068
+2025,svn-maribor,NK Maribor,SVN,9.5
+2025,svn-ns-mura,NŠ Mura,SVN,6.0
+2025,svn-olimpija-ljubljana,NK Olimpija Ljubljana,SVN,17.375
+2025,swe-aik-stockholm,AIK Stockholm,SWE,5.425
+2025,swe-djurgarden,Djurgården,SWE,34.0
+2025,swe-elfsborg,IF Elfsborg,SWE,11.0
+2025,swe-hacken,BK Häcken,SWE,7.0
+2025,swe-hammarby,Hammarby IF,SWE,5.5
+2025,swe-ifk-goteborg,IFK Göteborg,SWE,5.425
+2025,swe-kalmar,Kalmar FF,SWE,5.425
+2025,swe-malmo,Malmö FF,SWE,14.5
+2025,tur-adana-demirspor,Adana Demirspor,TUR,8.78
+2025,tur-alanyaspor,Alanyaspor,TUR,8.78
+2025,tur-besiktas-jk,Beşiktaş JK,TUR,15.0
+2025,tur-fenerbahce,Fenerbahçe SK,TUR,47.25
+2025,tur-galatasaray,Galatasaray A.Ş.,TUR,38.25
+2025,tur-istanbul-basaksehir,İstanbul Başakşehir FK,TUR,23.0
+2025,tur-konyaspor,Konyaspor,TUR,8.78
+2025,tur-sivasspor,Sivasspor,TUR,16.5
+2025,tur-trabzonspor-a-s,Trabzonspor A.Ş.,TUR,11.0
+2025,ukr-desna-chernihiv,FC Desna Chernihiv,UKR,4.88
+2025,ukr-dnipro,SC Dnipro-1,UKR,10.5
+2025,ukr-dynamo-kyiv,FC Dynamo Kyiv,UKR,23.5
+2025,ukr-kolos-kovalivka,Kolos Kovalivka,UKR,4.88
+2025,ukr-kryvbas-kryvyi-rih,FC Kryvbas Kryvyi Rih,UKR,4.88
+2025,ukr-polissya,FC Polissya,UKR,4.88
+2025,ukr-shakhtar-donetsk,FC Shakhtar Donetsk,UKR,52.0
+2025,ukr-vorskla-poltava,FC Vorskla Poltava,UKR,4.88
+2025,ukr-zorya-luhansk,FC Zorya Luhansk,UKR,16.0
+2025,wal-bala-town,Bala Town FC,WAL,4.5
+2025,wal-barry-town-united,Barry Town United FC,WAL,1.358
+2025,wal-caernarfon-town,Caernarfon Town FC,WAL,1.5
+2025,wal-connah-s-quay-nomads,Connah's Quay Nomads FC,WAL,5.0
+2025,wal-haverfordwest-county,Haverfordwest County AFC,WAL,1.5
+2025,wal-new-saints,The New Saints FC,WAL,9.0
+2025,wal-newtown,Newtown AFC,WAL,2.5
+2025,wal-penybont,Penybont FC,WAL,1.358
 2026,alb-dinamo-city,FC Dinamo City,ALB,2.5
 2026,alb-egnatia,KF Egnatia,ALB,4.5
 2026,alb-laci,KF Laçi,ALB,3.5
