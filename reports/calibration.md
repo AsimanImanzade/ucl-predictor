@@ -2,6 +2,41 @@
 
 Elo v2 parameter search and v1 vs v2 backtest, generated 2026-11-10 by `uv run uclpred backtest`. Parameters chosen on tuning seasons 2019-20, 2020-21, 2021-22; compared on report seasons 2022-23, 2023-24, 2024-25, 2025-26.
 
+## Tournament check
+
+Past seasons 2024-25, 2025-26, preseason exports, 50,000 runs, seed 1. stage_log_loss is the mean over the 36 teams of -log P(actual stage), floored at 1e-6; brier_top8 scores the direct top-8 flag (played the Round of 16 without the play-offs); brier_top24 scores 'not out'; max_title_share is the largest title probability.
+
+| season | model | sigma | stage_log_loss | brier_top8 | brier_top24 | max_title_share |
+|---|---|---|---|---|---|---|
+| 2024-25 | elo-dc-v1 | 0 | 1.3590 | 0.1687 | 0.1277 | 0.2899 |
+| 2024-25 | elo-dc-v1 | 40 | 1.3578 | 0.1678 | 0.1283 | 0.2785 |
+| 2024-25 | elo-dc-v1 | 70 | 1.3601 | 0.1661 | 0.1297 | 0.2524 |
+| 2024-25 | elo-dc-v1 | 100 | 1.3652 | 0.1634 | 0.1315 | 0.2213 |
+| 2024-25 | elo-dc-v2 | 0 | 1.4150 | 0.1756 | 0.1532 | 0.1696 |
+| 2024-25 | elo-dc-v2 | 40 | 1.4143 | 0.1756 | 0.1530 | 0.1658 |
+| 2024-25 | elo-dc-v2 | 70 | 1.4107 | 0.1745 | 0.1529 | 0.1586 |
+| 2024-25 | elo-dc-v2 | 100 | 1.4107 | 0.1735 | 0.1528 | 0.1537 |
+| 2025-26 | elo-dc-v1 | 0 | 1.3212 | 0.1157 | 0.1530 | 0.1745 |
+| 2025-26 | elo-dc-v1 | 40 | 1.3256 | 0.1170 | 0.1531 | 0.1649 |
+| 2025-26 | elo-dc-v1 | 70 | 1.3377 | 0.1189 | 0.1542 | 0.1508 |
+| 2025-26 | elo-dc-v1 | 100 | 1.3540 | 0.1208 | 0.1571 | 0.1340 |
+| 2025-26 | elo-dc-v2 | 0 | 1.3286 | 0.0796 | 0.1568 | 0.2840 |
+| 2025-26 | elo-dc-v2 | 40 | 1.3271 | 0.0800 | 0.1565 | 0.2790 |
+| 2025-26 | elo-dc-v2 | 70 | 1.3281 | 0.0807 | 0.1570 | 0.2702 |
+| 2025-26 | elo-dc-v2 | 100 | 1.3296 | 0.0815 | 0.1577 | 0.2597 |
+| mean | elo-dc-v1 | 0 | 1.3401 | 0.1422 | 0.1403 | 0.2322 |
+| mean | elo-dc-v1 | 40 | 1.3417 | 0.1424 | 0.1407 | 0.2217 |
+| mean | elo-dc-v1 | 70 | 1.3489 | 0.1425 | 0.1420 | 0.2016 |
+| mean | elo-dc-v1 | 100 | 1.3596 | 0.1421 | 0.1443 | 0.1776 |
+| mean | elo-dc-v2 | 0 | 1.3718 | 0.1276 | 0.1550 | 0.2268 |
+| mean | elo-dc-v2 | 40 | 1.3707 | 0.1278 | 0.1547 | 0.2224 |
+| mean | elo-dc-v2 | 70 | 1.3694 | 0.1276 | 0.1549 | 0.2144 |
+| mean | elo-dc-v2 | 100 | 1.3701 | 0.1275 | 0.1552 | 0.2067 |
+
+Chosen rating_sigma for elo-dc-v2: **70**. Rule: lowest mean stage_log_loss over both seasons among [0, 40, 70, 100]; if the max-min spread of the four means is at most 0.01, choose 70. Observed spread 0.0024 (0: 1.3718, 40: 1.3707, 70: 1.3694, 100: 1.3701).
+
+Gate 3 comparison (mean stage_log_loss over both seasons): v2 at sigma 70 = 1.3694, v1 at sigma 0 = 1.3401; v2 <= v1: **FAIL**.
+
 ## Grid (top 10)
 
 Tuning-season mean RPS, 81 grid points, sorted by RPS. Full grid: `reports/backtest_grid.csv`.

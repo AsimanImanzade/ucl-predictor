@@ -82,6 +82,13 @@ def _backtest(_args: argparse.Namespace) -> int:
     return 0
 
 
+def _tournament_check(args: argparse.Namespace) -> int:
+    from uclpred.tournament_check import run_tournament_check
+
+    run_tournament_check(args.runs)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     parser = argparse.ArgumentParser(prog="uclpred")
@@ -115,6 +122,12 @@ def main(argv: list[str] | None = None) -> int:
         "backtest",
         help="grid-search elo-dc-v2, write model_params.json and calibration report",
     ).set_defaults(func=_backtest)
+    t = sub.add_parser(
+        "tournament-check",
+        help="simulate past seasons, score stage probabilities, choose rating_sigma",
+    )
+    t.add_argument("--runs", type=int, default=50000)
+    t.set_defaults(func=_tournament_check)
     args = parser.parse_args(argv)
     return args.func(args)
 

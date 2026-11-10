@@ -7,7 +7,7 @@
       "home_adv": 60.0
     },
     "alpha": 0.0005,
-    "rating_sigma": null
+    "rating_sigma": 70
   },
   "chosen_on": "2026-11-10",
   "tuning_seasons": [
