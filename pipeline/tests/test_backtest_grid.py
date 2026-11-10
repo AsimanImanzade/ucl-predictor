@@ -111,3 +111,54 @@ def test_merge_report_preserves_foreign_sections():
     again = bt.merge_report(out, "new intro", sections)
     assert again == out
     assert bt.merge_report(None, "i", sections).startswith("# Calibration report")
+
+
+def test_write_model_params_preserves_sigma(tmp_path):
+    p = tmp_path / "model_params.json"
+    p.write_text('{"elo-dc-v2": {"rating_sigma": 70}}')
+    out = bt.write_model_params({"k": 16.0}, 0.0005, "2026-01-01", path=p)
+    assert out["elo-dc-v2"]["rating_sigma"] == 70
+    import json
+
+    assert json.loads(p.read_text())["elo-dc-v2"]["rating_sigma"] == 70
+    p.unlink()
+    assert bt.write_model_params({"k": 16.0}, 0.0005, "2026-01-01", path=p)["elo-dc-v2"][
+        "rating_sigma"
+    ] is None
+
+
+CANON = [
+    "Gate verdict", "Tournament check", "Grid (top 10)", "Chosen parameters",
+    "Report seasons: v1 vs v2", "Calibration (v2)", "League gap",
+    "Sensitivity (outside the pre-registered selection)",
+]  # fmt: skip
+
+
+def _titles(text):
+    return [ln[3:] for ln in text.splitlines() if ln.startswith("## ")]
+
+
+def test_merge_report_fixed_order_from_either_tool():
+    bt_secs = [(t, "b") for t in reversed(CANON[2:])]
+    tc_secs = [("Tournament check", "t")]
+    old = "# Calibration report\n\nintro\n\n## Zzz extra\n\nx\n\n## Gate verdict\n\nv\n"
+    a = bt.merge_report(old, "intro", bt_secs)
+    assert _titles(a) == ["Gate verdict", *CANON[2:], "Zzz extra"]
+    a2 = bt.merge_report(a, "intro", tc_secs)
+    assert _titles(a2) == ["Gate verdict", "Tournament check", *CANON[2:], "Zzz extra"]
+    assert bt.merge_report(a2, "intro", tc_secs) == a2
+    assert bt.merge_report(a2, "intro", bt_secs) == bt.merge_report(
+        bt.merge_report(a2, "intro", bt_secs), "intro", bt_secs
+    )
+    assert _titles(bt.merge_report(a2, "intro", bt_secs)) == _titles(a2)
+
+
+def test_merge_report_stale_line_once():
+    old = "# Calibration report\n\nintro\n\n## Gate verdict\n\n_stamp_\n\nbody\n"
+    one = bt.merge_report(old, "i", [("League gap", "g")], stale=("tool-a", "2026-01-01"))
+    two = bt.merge_report(one, "i", [("League gap", "g")], stale=("tool-b", "2026-01-02"))
+    assert two.count("Stale:") == 1
+    assert "## Gate verdict\n\n> ⚠️ Stale: tool-b re-ran on 2026-01-02; numbers below may no" in two
+    assert "\n\n_stamp_\n\nbody" in two
+    # no gate section -> nothing inserted
+    assert "Stale" not in bt.merge_report(None, "i", [("League gap", "g")], stale=("t", "d"))

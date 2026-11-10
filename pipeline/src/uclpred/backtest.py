@@ -174,18 +174,74 @@ def _md_table(df: pd.DataFrame, fmt: dict[str, str] | None = None) -> str:
     return "\n".join(out)
 
 
-def merge_report(existing: str | None, intro: str, sections: list[tuple[str, str]]) -> str:
-    """Rebuild the report: title, intro and our own `## ` sections, followed by
-    any other `## ` section already in `existing` (e.g. appended by later tasks)."""
+SECTION_ORDER = [
+    "Gate verdict",
+    "Tournament check",
+    "Grid (top 10)",
+    "Chosen parameters",
+    "Report seasons: v1 vs v2",
+    "Calibration (v2)",
+    "League gap",
+    "Sensitivity (outside the pre-registered selection)",
+]
+STALE_RE = re.compile(r"(?m)^> ⚠️ Stale:.*\n\n?")
+
+
+def _title(block: str) -> str:
+    return block[3:].split("\n", 1)[0].strip()
+
+
+def _mark_stale(block: str, tool: str, date: str) -> str:
+    head, _, rest = block.partition("\n")
+    rest = STALE_RE.sub("", rest.lstrip("\n"))
+    line = f"> ⚠️ Stale: {tool} re-ran on {date}; numbers below may no longer match."
+    return f"{head}\n\n{line}\n\n{rest}"
+
+
+def merge_report(
+    existing: str | None,
+    intro: str,
+    sections: list[tuple[str, str]],
+    stale: tuple[str, str] | None = None,
+) -> str:
+    """Rebuild the report: title, intro and our own `## ` sections plus any other
+    `## ` section already in `existing`, emitted in SECTION_ORDER (unknown
+    sections after, in their existing order). With `stale=(tool, date)` a
+    warning line is put at the top of an existing Gate verdict section."""
     own = {t for t, _ in sections}
-    foreign: list[str] = []
+    blocks = [f"## {t}\n\n{b.strip()}\n" for t, b in sections]
     if existing:
         for block in re.split(r"(?m)^(?=## )", existing):
-            if block.startswith("## ") and block[3:].split("\n", 1)[0].strip() not in own:
-                foreign.append(block.rstrip() + "\n")
+            if block.startswith("## ") and _title(block) not in own:
+                blocks.append(block.rstrip() + "\n")
+    rank = {t: i for i, t in enumerate(SECTION_ORDER)}
+    blocks.sort(key=lambda b: rank.get(_title(b), len(rank)))  # stable
+    if stale:
+        blocks = [
+            _mark_stale(b, *stale).rstrip() + "\n" if _title(b) == "Gate verdict" else b
+            for b in blocks
+        ]
     parts = ["# Calibration report\n", intro.rstrip() + "\n"]
-    parts += [f"## {t}\n\n{b.strip()}\n" for t, b in sections]
-    return "\n".join(parts + foreign)
+    return "\n".join(parts + blocks)
+
+
+def write_model_params(elo: dict, alpha: float, chosen_on: str, path=None) -> dict:
+    """Write model_params.json, preserving an existing rating_sigma (only
+    tournament-check sets it)."""
+    path = path or PARAMS_PATH
+    sigma = None
+    if path.exists():
+        try:
+            sigma = json.loads(path.read_text()).get("elo-dc-v2", {}).get("rating_sigma")
+        except (ValueError, AttributeError):
+            sigma = None
+    params = {
+        "elo-dc-v2": {"elo": elo, "alpha": alpha, "rating_sigma": sigma},
+        "chosen_on": chosen_on,
+        "tuning_seasons": TUNING_SEASONS,
+    }
+    path.write_text(json.dumps(params, indent=2) + "\n")
+    return params
 
 
 def _scored(matches, elo, alpha, base):
@@ -248,16 +304,11 @@ def run_backtest(matches: pd.DataFrame | None = None) -> dict:
         for name, sc, d, gp in sens
     ])  # fmt: skip
 
-    params = {
-        "elo-dc-v2": {
-            "elo": {k: ch[k] for k in (*elo_keys, "home_adv")},
-            "alpha": ch["alpha"],
-            "rating_sigma": None,
-        },
-        "chosen_on": datetime.now(UTC).date().isoformat(),
-        "tuning_seasons": TUNING_SEASONS,
-    }
-    PARAMS_PATH.write_text(json.dumps(params, indent=2) + "\n")
+    params = write_model_params(
+        {k: ch[k] for k in (*elo_keys, "home_adv")},
+        ch["alpha"],
+        datetime.now(UTC).date().isoformat(),
+    )
     GRID_CSV_PATH.parent.mkdir(parents=True, exist_ok=True)
     grid_df.to_csv(GRID_CSV_PATH, index=False)
 
@@ -325,7 +376,7 @@ def run_backtest(matches: pd.DataFrame | None = None) -> dict:
     )
     REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
     existing = REPORT_PATH.read_text() if REPORT_PATH.exists() else None
-    REPORT_PATH.write_text(merge_report(existing, intro, sections))
+    REPORT_PATH.write_text(merge_report(existing, intro, sections, stale=("`uclpred backtest`", params["chosen_on"])))
     print(f"v1: {s1}\nv2: {s2}", flush=True)
     print(f"delta rps v2-v1: {d_mean:+.4f} CI [{d_lo:+.4f}, {d_hi:+.4f}]", flush=True)
     print(f"gap v1 {gap1:.3f} (n={n1}), v2 {gap2:.3f} (n={n2})", flush=True)
