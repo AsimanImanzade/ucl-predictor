@@ -37,10 +37,12 @@ def _matches():
         ("m5", "2019-08-10", "en.1", "a", "b", 5, 0, False),  # domestic: not evaluated
         ("m6", "2020-08-23", "uefa.cl", "b", "c", 3, 1, True),  # August final, other season
         ("m7", "2019-12-01", "uefa.cl", "a", "b", None, None, False),  # not finished
+        ("m8", "2019-10-02", "uefa.cl", "a", "b", 1, 0, False),  # other season
     ]
     for mid, d, comp, h, a, hg, ag, neu in specs:
         rows.append({
-            "match_id": mid, "date": _ts(d), "season": "2019-20", "competition": comp,
+            "match_id": mid, "date": _ts(d),
+            "season": "2020-21" if mid == "m8" else "2019-20", "competition": comp,
             "home_id": h, "away_id": a, "home_goals": hg, "away_goals": ag,
             "neutral": neu, "status": "FINISHED" if hg is not None else "SCHEDULED",
         })  # fmt: skip
@@ -51,11 +53,17 @@ def _matches():
 
 
 class _Stub:
+    """Encodes the checkpoint month it was fitted at into p_home."""
+
+    def __init__(self, as_of):
+        self.as_of = as_of
+
     def predict_match(self, home_id, away_id, neutral=False):
+        ph = 0.1 + self.as_of.month / 100
         m = np.zeros((11, 11))
-        m[1, 0] = 0.5  # home win
+        m[1, 0] = ph  # home win
         m[0, 0] = 0.3  # draw
-        m[0, 1] = 0.2  # away win
+        m[0, 1] = 0.7 - ph  # away win
         return m
 
 
@@ -64,7 +72,7 @@ def test_walk_forward_never_uses_match_on_or_after_checkpoint(monkeypatch):
 
     def fake_fit(matches, elo, as_of, alpha=0.005, **kw):
         calls.append(as_of)
-        return _Stub()
+        return _Stub(as_of)
 
     monkeypatch.setattr(bt, "fit_baseline", fake_fit)
     m = _matches()
@@ -76,13 +84,15 @@ def test_walk_forward_never_uses_match_on_or_after_checkpoint(monkeypatch):
     assert np.allclose(out[["p_home", "p_draw", "p_away"]].sum(axis=1), 1.0)
     # one fit per window with eval matches: Jul, Sep, Nov, Aug-2020
     assert [str(c.date()) for c in calls] == ["2019-07-01", "2019-09-01", "2019-11-01", "2020-08-01"]
+    assert "m8" not in set(out["match_id"])
     cps = monthly_checkpoints(m.loc[m["match_id"].isin(out["match_id"]), "date"])
     dates = m.set_index("match_id")["date"]
-    for mid in out["match_id"]:
-        d = dates[mid]
-        fit_asof = max(c for c in calls if c <= d)
+    for r in out.itertuples():
+        d = dates[r.match_id]
+        fit_asof = max(c for c in cps if c <= d)
         nxt = min(c for c in cps if c > fit_asof)
         assert fit_asof <= d < nxt
+        assert r.p_home == pytest.approx(0.1 + fit_asof.month / 100)
 
 
 def _preds(ids, probs, outcomes):
