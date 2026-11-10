@@ -96,3 +96,64 @@ def test_league_gap_neutral_and_missing_pre():
     assert n == 1 and gap == pytest.approx(0.0 - 0.5)
     with pytest.raises(ValueError):
         league_gap(m, pre[pre.match_id != "e1"], home_adv=60.0)
+
+
+def _frame(rows, pre_map):
+    m = pd.DataFrame(rows)
+    m["home_goals"] = m["home_goals"].astype("Int64")
+    m["away_goals"] = m["away_goals"].astype("Int64")
+    pre = pd.DataFrame({
+        "match_id": [r["match_id"] for r in rows],
+        "home_elo_pre": [pre_map.get(r["match_id"], (1500.0, 1500.0))[0] for r in rows],
+        "away_elo_pre": [pre_map.get(r["match_id"], (1500.0, 1500.0))[1] for r in rows],
+    })  # fmt: skip
+    return m, pre
+
+
+def test_league_gap_labels_are_per_season():
+    # ned-x: nl.1 (mid) in 2019-20, en.1 (Big-5) in 2020-21.
+    rows = [
+        _row("d1", "2019-09-01", "2019-20", "nl.1", "ned-x", "ned-y", 1, 0),
+        _row("d2", "2019-09-02", "2019-20", "en.1", "eng-big", "eng-y", 1, 0),
+        _row("d3", "2020-09-01", "2020-21", "en.1", "ned-x", "eng-z", 1, 0),
+        _row("d4", "2020-09-02", "2020-21", "pt.1", "por-mid", "por-y", 1, 0),
+        _row("d5", "2020-09-03", "2020-21", "en.1", "eng-big", "eng-y", 1, 0),
+        # 2019-20: ned-x is mid, eng-big Big-5; mid home wins
+        _row("e1", "2019-10-01", "2019-20", "uefa.cl", "ned-x", "eng-big", 2, 0),
+        # 2020-21: ned-x is Big-5, por-mid mid; mid home draws
+        _row("e2", "2020-10-01", "2020-21", "uefa.cl", "por-mid", "ned-x", 0, 0),
+    ]
+    m, pre = _frame(rows, {"e1": (1600.0, 1700.0), "e2": (1400.0, 1650.0)})
+    e1 = expected_home(1600.0, 1700.0, 60.0)
+    e2 = expected_home(1400.0, 1650.0, 60.0)
+    gap, n = league_gap(m, pre, home_adv=60.0)
+    assert n == 2
+    assert gap == pytest.approx(((1.0 - e1) + (0.5 - e2)) / 2)
+
+
+def test_league_gap_last_domestic_match_in_season_wins():
+    # tur-x plays tr.1 then en.1 within 2019-20; rows deliberately out of date order.
+    rows = [
+        _row("d2", "2020-01-15", "2019-20", "en.1", "tur-x", "eng-y", 1, 0),
+        _row("d1", "2019-09-01", "2019-20", "tr.1", "tur-x", "tur-y", 1, 0),
+        _row("d3", "2019-09-02", "2019-20", "pt.1", "por-mid", "por-y", 1, 0),
+        # tur-x is Big-5 (last), por-mid mid; por-mid is away and loses
+        _row("e1", "2020-02-20", "2019-20", "uefa.el", "tur-x", "por-mid", 3, 0),
+    ]
+    m, pre = _frame(rows, {"e1": (1700.0, 1550.0)})
+    e = expected_home(1700.0, 1550.0, 60.0)
+    gap, n = league_gap(m, pre, home_adv=60.0)
+    assert n == 1
+    assert gap == pytest.approx(e - 1.0)  # home S=1, mid is away: E - S
+
+
+def test_calibration_table_edge_values():
+    p = np.array([0.0, 0.1, 0.2, 0.3])
+    won = np.array([0, 1, 1, 0])
+    t = calibration_table(p, won, bins=10)
+    assert list(t["n"]) == [1, 1, 1, 1, 0, 0, 0, 0, 0, 0]
+    assert t.loc[0, "mean_pred"] == 0.0
+    assert t.loc[1, "mean_pred"] == pytest.approx(0.1)
+    assert t.loc[1, "observed"] == 1.0
+    assert t.loc[2, "mean_pred"] == pytest.approx(0.2)
+    assert t.loc[2, "observed"] == 1.0
