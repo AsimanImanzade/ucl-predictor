@@ -1,0 +1,233 @@
+.table-panel {
+  position: relative;
+  background: color-mix(in srgb, var(--stand) 88%, transparent);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.table-scroll {
+  position: relative;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ltable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9375rem;
+}
+
+.ltable th {
+  font-size: var(--step--1);
+  font-weight: 500;
+  color: var(--dim);
+  text-align: right;
+  padding: var(--s3) var(--s2);
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+
+.ltable td {
+  padding: var(--s2) var(--s2);
+  text-align: right;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.ltable tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.ltable .col-team {
+  text-align: left;
+  width: 100%;
+  max-width: 220px;
+}
+
+.ltable .col-rank {
+  text-align: right;
+  padding-left: var(--s4);
+  color: var(--silver);
+  width: 1%;
+  position: relative;
+}
+
+/* Zone rail: Top 8 bright, 9-24 dimmer, 25-36 none. Shape (solid / dashed) also differs. */
+.ltable tr[data-zone='top8'] .col-rank::before,
+.ltable tr[data-zone='playoff'] .col-rank::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+}
+.ltable tr[data-zone='top8'] .col-rank::before {
+  background: var(--floodlight);
+}
+.ltable tr[data-zone='playoff'] .col-rank::before {
+  background: repeating-linear-gradient(180deg, var(--dim) 0 4px, transparent 4px 7px);
+}
+
+.ltable .col-pts {
+  font-weight: 700;
+  color: var(--floodlight);
+}
+
+.ltable .col-gap {
+  padding-left: var(--s4);
+}
+
+.ltable td.col-prob {
+  padding-top: var(--s2);
+  padding-bottom: var(--s2);
+}
+
+.ltable .muted {
+  color: var(--silver);
+}
+
+/* Sticky rank + team on small screens */
+@media (max-width: 767px) {
+  .ltable .col-rank,
+  .ltable .col-team {
+    position: sticky;
+    background: var(--stand);
+    z-index: 1;
+  }
+  .ltable .col-rank {
+    left: 0;
+    min-width: 40px;
+  }
+  .ltable .col-team {
+    left: 40px;
+    max-width: 136px;
+    min-width: 136px;
+    box-shadow: 6px 0 8px -6px rgba(0, 0, 0, 0.55);
+  }
+  .ltable .col-team .badge {
+    max-width: 120px;
+  }
+  .ltable .hide-sm {
+    display: none;
+  }
+}
+
+.form {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.form__pill {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.form__pill--W {
+  background: var(--wdl-home);
+  color: var(--night);
+}
+.form__pill--D {
+  background: var(--wdl-draw);
+  color: var(--floodlight);
+}
+.form__pill--L {
+  box-shadow: inset 0 0 0 1px var(--dim);
+  color: var(--silver);
+}
+
+.zone-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s5);
+  padding: var(--s3) var(--s4);
+  border-top: 1px solid var(--rule);
+  font-size: var(--step--1);
+  color: var(--dim);
+}
+
+.zone-key__item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+}
+
+.zone-key__swatch {
+  width: 3px;
+  height: 14px;
+  border-radius: 2px;
+}
+.zone-key__swatch--top8 {
+  background: var(--floodlight);
+}
+.zone-key__swatch--playoff {
+  background: repeating-linear-gradient(180deg, var(--dim) 0 4px, transparent 4px 7px);
+}
+
+.team-link {
+  text-decoration: none;
+  display: inline-flex;
+  max-width: 100%;
+}
+.team-link:hover .badge__name {
+  text-decoration: underline;
+  text-decoration-color: var(--beam);
+  text-underline-offset: 3px;
+}
+
+.ltable abbr {
+  text-decoration: none;
+}
+
+.ltable tbody tr {
+  position: relative;
+}
+
+@media (max-width: 1023px) {
+  .ltable .hide-md {
+    display: none;
+  }
+}
+
+.th-sort {
+  appearance: none;
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  padding: 4px 0;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.th-sort:hover,
+.th-sort.is-on {
+  color: var(--floodlight);
+}
+
+.ltable--compact .hide-sm,
+.ltable--compact .hide-md,
+.ltable--compact .hide-compact {
+  display: none;
+}
+.ltable--compact {
+  font-size: 0.875rem;
+}
+.ltable--compact .col-team .badge {
+  max-width: 150px;
+}
+.ltable--compact td,
+.ltable--compact th {
+  padding-left: 6px;
+  padding-right: 6px;
+}
+.ltable--compact .prob {
+  min-width: 48px;
+}

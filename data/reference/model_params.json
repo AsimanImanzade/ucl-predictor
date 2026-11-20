@@ -1,0 +1,29 @@
+{
+  "elo-dc-v2": {
+    "elo": {
+      "k": 24.0,
+      "k_euro": 2.0,
+      "g": 0.9,
+      "home_adv": 60.0
+    },
+    "alpha": 0.0005,
+    "rating_sigma": 70
+  },
+  "elo-dc-v2.1": {
+    "elo": {
+      "k": 24,
+      "k_euro": 2.0,
+      "g": 0.9,
+      "g_pseudo": 0.0,
+      "home_adv": 60
+    },
+    "alpha": 0.005,
+    "rating_sigma": 0
+  },
+  "chosen_on": "2026-11-10",
+  "tuning_seasons": [
+    "2019-20",
+    "2020-21",
+    "2021-22"
+  ]
+}

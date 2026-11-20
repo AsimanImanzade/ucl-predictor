@@ -1,0 +1,288 @@
+{
+ "matches": [
+  {
+   "area": {
+    "id": 2077,
+    "name": "Europe",
+    "code": "EUR",
+    "flag": "https://crests.football-data.org/EUR.svg"
+   },
+   "competition": {
+    "id": 2001,
+    "name": "UEFA Champions League",
+    "code": "CL",
+    "type": "CUP",
+    "emblem": "https://crests.football-data.org/CL.png"
+   },
+   "season": {
+    "id": 2454,
+    "startDate": "2025-09-16",
+    "endDate": "2026-05-30",
+    "currentMatchday": 8,
+    "winner": null
+   },
+   "id": 551981,
+   "utcDate": "2025-09-16T16:45:00Z",
+   "status": "FINISHED",
+   "matchday": 1,
+   "stage": "LEAGUE_STAGE",
+   "group": null,
+   "lastUpdated": "2026-06-13T20:20:17Z",
+   "homeTeam": {
+    "id": 77,
+    "name": "Athletic Club",
+    "shortName": "Athletic",
+    "tla": "ATH",
+    "crest": "https://crests.football-data.org/77.png"
+   },
+   "awayTeam": {
+    "id": 57,
+    "name": "Arsenal FC",
+    "shortName": "Arsenal",
+    "tla": "ARS",
+    "crest": "https://crests.football-data.org/57.png"
+   },
+   "score": {
+    "winner": "AWAY_TEAM",
+    "duration": "REGULAR",
+    "fullTime": {
+     "home": 0,
+     "away": 2
+    },
+    "halfTime": {
+     "home": 0,
+     "away": 0
+    }
+   },
+   "odds": {
+    "msg": "Activate Odds-Package in User-Panel to retrieve odds."
+   },
+   "referees": [
+    {
+     "id": 43952,
+     "name": "Donatas Rumšas",
+     "type": "REFEREE",
+     "nationality": "Lithuania"
+    }
+   ]
+  },
+  {
+   "area": {
+    "id": 2077,
+    "name": "Europe",
+    "code": "EUR",
+    "flag": "https://crests.football-data.org/EUR.svg"
+   },
+   "competition": {
+    "id": 2001,
+    "name": "UEFA Champions League",
+    "code": "CL",
+    "type": "CUP",
+    "emblem": "https://crests.football-data.org/CL.png"
+   },
+   "season": {
+    "id": 2454,
+    "startDate": "2025-09-16",
+    "endDate": "2026-05-30",
+    "currentMatchday": 8,
+    "winner": null
+   },
+   "id": 552063,
+   "utcDate": "2026-02-25T20:00:00Z",
+   "status": "FINISHED",
+   "matchday": 2,
+   "stage": "PLAYOFFS",
+   "group": null,
+   "lastUpdated": "2026-06-13T20:20:17Z",
+   "homeTeam": {
+    "id": 109,
+    "name": "Juventus FC",
+    "shortName": "Juventus",
+    "tla": "JUV",
+    "crest": "https://crests.football-data.org/109.png"
+   },
+   "awayTeam": {
+    "id": 610,
+    "name": "Galatasaray SK",
+    "shortName": "Galatasaray",
+    "tla": "GAL",
+    "crest": "https://crests.football-data.org/610.png"
+   },
+   "score": {
+    "winner": "HOME_TEAM",
+    "duration": "EXTRA_TIME",
+    "fullTime": {
+     "home": 3,
+     "away": 2
+    },
+    "halfTime": {
+     "home": 1,
+     "away": 0
+    },
+    "regularTime": {
+     "home": 3,
+     "away": 0
+    },
+    "extraTime": {
+     "home": 0,
+     "away": 2
+    }
+   },
+   "odds": {
+    "msg": "Activate Odds-Package in User-Panel to retrieve odds."
+   },
+   "referees": [
+    {
+     "id": 38806,
+     "name": "João Pinheiro",
+     "type": "REFEREE",
+     "nationality": "Portugal"
+    }
+   ]
+  },
+  {
+   "area": {
+    "id": 2077,
+    "name": "Europe",
+    "code": "EUR",
+    "flag": "https://crests.football-data.org/EUR.svg"
+   },
+   "competition": {
+    "id": 2001,
+    "name": "UEFA Champions League",
+    "code": "CL",
+    "type": "CUP",
+    "emblem": "https://crests.football-data.org/CL.png"
+   },
+   "season": {
+    "id": 2454,
+    "startDate": "2025-09-16",
+    "endDate": "2026-05-30",
+    "currentMatchday": 8,
+    "winner": null
+   },
+   "id": 552096,
+   "utcDate": "2026-05-30T16:00:00Z",
+   "status": "FINISHED",
+   "matchday": null,
+   "stage": "FINAL",
+   "group": null,
+   "lastUpdated": "2026-06-13T20:20:17Z",
+   "homeTeam": {
+    "id": 524,
+    "name": "Paris Saint-Germain FC",
+    "shortName": "PSG",
+    "tla": "PSG",
+    "crest": "https://crests.football-data.org/524.png"
+   },
+   "awayTeam": {
+    "id": 57,
+    "name": "Arsenal FC",
+    "shortName": "Arsenal",
+    "tla": "ARS",
+    "crest": "https://crests.football-data.org/57.png"
+   },
+   "score": {
+    "winner": "HOME_TEAM",
+    "duration": "PENALTY_SHOOTOUT",
+    "fullTime": {
+     "home": 5,
+     "away": 4
+    },
+    "halfTime": {
+     "home": 0,
+     "away": 1
+    },
+    "regularTime": {
+     "home": 1,
+     "away": 1
+    },
+    "extraTime": {
+     "home": 0,
+     "away": 0
+    },
+    "penalties": {
+     "home": 4,
+     "away": 3
+    }
+   },
+   "odds": {
+    "msg": "Activate Odds-Package in User-Panel to retrieve odds."
+   },
+   "referees": [
+    {
+     "id": 15408,
+     "name": "Daniel Siebert",
+     "type": "REFEREE",
+     "nationality": "Germany"
+    }
+   ]
+  },
+  {
+   "area": {
+    "id": 2077,
+    "name": "Europe",
+    "code": "EUR",
+    "flag": "https://crests.football-data.org/EUR.svg"
+   },
+   "competition": {
+    "id": 2001,
+    "name": "UEFA Champions League",
+    "code": "CL",
+    "type": "CUP",
+    "emblem": "https://crests.football-data.org/CL.png"
+   },
+   "season": {
+    "id": 2454,
+    "startDate": "2025-09-16",
+    "endDate": "2026-05-30",
+    "currentMatchday": 8,
+    "winner": null
+   },
+   "id": 999999,
+   "utcDate": "2025-09-16T16:45:00Z",
+   "status": "POSTPONED",
+   "matchday": 1,
+   "stage": "LEAGUE_STAGE",
+   "group": null,
+   "lastUpdated": "2026-06-13T20:20:17Z",
+   "homeTeam": {
+    "id": 77,
+    "name": "Athletic Club",
+    "shortName": "Athletic",
+    "tla": "ATH",
+    "crest": "https://crests.football-data.org/77.png"
+   },
+   "awayTeam": {
+    "id": 57,
+    "name": "Arsenal FC",
+    "shortName": "Arsenal",
+    "tla": "ARS",
+    "crest": "https://crests.football-data.org/57.png"
+   },
+   "score": {
+    "winner": null,
+    "duration": "REGULAR",
+    "fullTime": {
+     "home": null,
+     "away": null
+    },
+    "halfTime": {
+     "home": null,
+     "away": null
+    }
+   },
+   "odds": {
+    "msg": "Activate Odds-Package in User-Panel to retrieve odds."
+   },
+   "referees": [
+    {
+     "id": 43952,
+     "name": "Donatas Rumšas",
+     "type": "REFEREE",
+     "nationality": "Lithuania"
+    }
+   ]
+  }
+ ]
+}

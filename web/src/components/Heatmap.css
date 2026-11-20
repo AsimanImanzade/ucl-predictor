@@ -1,0 +1,57 @@
+.heatmap {
+  overflow-x: auto;
+}
+
+.heatmap table {
+  border-collapse: separate;
+  border-spacing: 2px;
+  font-size: var(--step--1);
+  font-variant-numeric: tabular-nums;
+  margin: 0 auto;
+}
+
+.heatmap th {
+  color: var(--dim);
+  font-weight: 600;
+  padding: 4px 6px;
+}
+
+.heatmap td {
+  width: 58px;
+  height: 40px;
+  text-align: center;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.heatmap__corner {
+  position: relative;
+  min-width: 72px;
+  height: 40px;
+}
+
+.heatmap__axis {
+  position: absolute;
+  font-size: 11px;
+  font-weight: 500;
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.heatmap__axis--home {
+  left: 2px;
+  bottom: 2px;
+}
+.heatmap__axis--away {
+  right: 2px;
+  top: 2px;
+}
+
+@media (max-width: 480px) {
+  .heatmap td {
+    width: 44px;
+    height: 34px;
+    font-size: 11px;
+  }
+}

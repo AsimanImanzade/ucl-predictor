@@ -1,0 +1,504 @@
+{
+ "aut-lask-linz": {
+  "id": "aut-lask-linz",
+  "name": "LASK",
+  "fullName": "LASK Linz",
+  "code": "LAS",
+  "crest": "https://crests.football-data.org/2016.png",
+  "colors": [
+   "#15171c",
+   "#f4f6fa"
+  ],
+  "country": "AUT",
+  "coefficient": 21,
+  "venue": "Raiffeisen Arena"
+ },
+ "aze-sabah": {
+  "id": "aze-sabah",
+  "name": "Sabah",
+  "fullName": "Sabah FK",
+  "code": "SAB",
+  "crest": "https://crests.football-data.org/10233.png",
+  "colors": [
+   "#5d6c94"
+  ],
+  "country": "AZE",
+  "coefficient": 6
+ },
+ "bel-brugge": {
+  "id": "bel-brugge",
+  "name": "Club Brugge",
+  "fullName": "Club Brugge KV",
+  "code": "BRU",
+  "crest": "https://crests.football-data.org/851.png",
+  "colors": [
+   "#1f4fbf",
+   "#15171c"
+  ],
+  "country": "BEL",
+  "coefficient": 75.25,
+  "venue": "Jan Breydelstadion"
+ },
+ "cze-slavia-praha": {
+  "id": "cze-slavia-praha",
+  "name": "Slavia Praha",
+  "fullName": "SK Slavia Praha",
+  "code": "SLP",
+  "crest": "https://crests.football-data.org/930.png",
+  "colors": [
+   "#d01f2f",
+   "#f4f6fa"
+  ],
+  "country": "CZE",
+  "coefficient": 44,
+  "venue": "Sinobo Stadium"
+ },
+ "eng-arsenal": {
+  "id": "eng-arsenal",
+  "name": "Arsenal",
+  "fullName": "Arsenal FC",
+  "code": "ARS",
+  "crest": "https://crests.football-data.org/57.png",
+  "colors": [
+   "#d01f2f",
+   "#f4f6fa"
+  ],
+  "country": "ENG",
+  "coefficient": 119,
+  "venue": "Emirates Stadium"
+ },
+ "eng-aston-villa": {
+  "id": "eng-aston-villa",
+  "name": "Aston Villa",
+  "fullName": "Aston Villa FC",
+  "code": "AVL",
+  "crest": "https://crests.football-data.org/58.png",
+  "colors": [
+   "#7b1e3a",
+   "#78b7e6"
+  ],
+  "country": "ENG",
+  "coefficient": 83,
+  "venue": "Villa Park"
+ },
+ "eng-liverpool": {
+  "id": "eng-liverpool",
+  "name": "Liverpool",
+  "fullName": "Liverpool FC",
+  "code": "LIV",
+  "crest": "https://crests.football-data.org/64.png",
+  "colors": [
+   "#d01f2f",
+   "#f4f6fa"
+  ],
+  "country": "ENG",
+  "coefficient": 130,
+  "venue": "Anfield"
+ },
+ "eng-manchester-city": {
+  "id": "eng-manchester-city",
+  "name": "Man City",
+  "fullName": "Manchester City FC",
+  "code": "MCI",
+  "crest": "https://crests.football-data.org/65.png",
+  "colors": [
+   "#78b7e6",
+   "#f4f6fa"
+  ],
+  "country": "ENG",
+  "coefficient": 125.5,
+  "venue": "Etihad Stadium"
+ },
+ "eng-manchester-united": {
+  "id": "eng-manchester-united",
+  "name": "Man United",
+  "fullName": "Manchester United FC",
+  "code": "MUN",
+  "crest": "https://crests.football-data.org/66.png",
+  "colors": [
+   "#d01f2f",
+   "#f4f6fa"
+  ],
+  "country": "ENG",
+  "coefficient": 76.5,
+  "venue": "Old Trafford"
+ },
+ "esp-atletico-madrid": {
+  "id": "esp-atletico-madrid",
+  "name": "Atleti",
+  "fullName": "Club Atlético de Madrid",
+  "code": "ATL",
+  "crest": "https://crests.football-data.org/78.png",
+  "colors": [
+   "#d01f2f",
+   "#f4f6fa"
+  ],
+  "country": "ESP",
+  "coefficient": 104.75,
+  "venue": "Estadio Wanda Metropolitano"
+ },
+ "esp-barcelona": {
+  "id": "esp-barcelona",
+  "name": "Barça",
+  "fullName": "FC Barcelona",
+  "code": "BAR",
+  "crest": "https://crests.football-data.org/81.png",
+  "colors": [
+   "#d01f2f",
+   "#14295e"
+  ],
+  "country": "ESP",
+  "coefficient": 113.25,
+  "venue": "Camp Nou"
+ },
+ "esp-real-betis-balompie": {
+  "id": "esp-real-betis-balompie",
+  "name": "Real Betis",
+  "fullName": "Real Betis Balompié",
+  "code": "BET",
+  "crest": "https://crests.football-data.org/90.png",
+  "colors": [
+   "#138a43",
+   "#f4f6fa"
+  ],
+  "country": "ESP",
+  "coefficient": 74.5,
+  "venue": "Estadio Benito Villamarín"
+ },
+ "esp-real-madrid": {
+  "id": "esp-real-madrid",
+  "name": "Real Madrid",
+  "fullName": "Real Madrid CF",
+  "code": "RMA",
+  "crest": "https://crests.football-data.org/86.png",
+  "colors": [
+   "#f4f6fa",
+   "#5b2a86"
+  ],
+  "country": "ESP",
+  "coefficient": 144.5,
+  "venue": "Estadio Santiago Bernabéu"
+ },
+ "esp-villarreal": {
+  "id": "esp-villarreal",
+  "name": "Villarreal",
+  "fullName": "Villarreal CF",
+  "code": "VIL",
+  "crest": "https://crests.football-data.org/94.png",
+  "colors": [
+   "#f5c400",
+   "#1f4fbf"
+  ],
+  "country": "ESP",
+  "coefficient": 59,
+  "venue": "Estadio de la Cerámica"
+ },
+ "fra-lille": {
+  "id": "fra-lille",
+  "name": "Lille",
+  "fullName": "Lille OSC",
+  "code": "LIL",
+  "crest": "https://crests.football-data.org/521.png",
+  "colors": [
+   "#f4f6fa",
+   "#d01f2f"
+  ],
+  "country": "FRA",
+  "coefficient": 68.75,
+  "venue": "Stade Pierre-Mauroy"
+ },
+ "fra-paris-saint-germain": {
+  "id": "fra-paris-saint-germain",
+  "name": "PSG",
+  "fullName": "Paris Saint-Germain FC",
+  "code": "PSG",
+  "crest": "https://crests.football-data.org/524.png",
+  "colors": [
+   "#d01f2f",
+   "#1f4fbf"
+  ],
+  "country": "FRA",
+  "coefficient": 132,
+  "venue": "Parc des Princes"
+ },
+ "fra-racing-lens": {
+  "id": "fra-racing-lens",
+  "name": "RC Lens",
+  "fullName": "Racing Club de Lens",
+  "code": "RCL",
+  "crest": "https://crests.football-data.org/546.png",
+  "colors": [
+   "#d01f2f",
+   "#f5c400"
+  ],
+  "country": "FRA",
+  "coefficient": 16.699,
+  "venue": "Stade Bollaert-Delelis"
+ },
+ "ger-bayern-munchen": {
+  "id": "ger-bayern-munchen",
+  "name": "Bayern",
+  "fullName": "FC Bayern München",
+  "code": "FCB",
+  "crest": "https://crests.football-data.org/5.png",
+  "colors": [
+   "#d01f2f",
+   "#f4f6fa"
+  ],
+  "country": "GER",
+  "coefficient": 147.5,
+  "venue": "Allianz Arena"
+ },
+ "ger-borussia-dortmund": {
+  "id": "ger-borussia-dortmund",
+  "name": "Dortmund",
+  "fullName": "Borussia Dortmund",
+  "code": "BVB",
+  "crest": "https://crests.football-data.org/4.png",
+  "colors": [
+   "#15171c",
+   "#f5c400"
+  ],
+  "country": "GER",
+  "coefficient": 100.75,
+  "venue": "Signal Iduna Park"
+ },
+ "ger-rb-leipzig": {
+  "id": "ger-rb-leipzig",
+  "name": "RB Leipzig",
+  "fullName": "RB Leipzig",
+  "code": "RBL",
+  "crest": "https://crests.football-data.org/721.png",
+  "colors": [
+   "#f4f6fa",
+   "#d01f2f"
+  ],
+  "country": "GER",
+  "coefficient": 61,
+  "venue": "Red Bull Arena"
+ },
+ "ger-vfb-stuttgart": {
+  "id": "ger-vfb-stuttgart",
+  "name": "Stuttgart",
+  "fullName": "VfB Stuttgart",
+  "code": "VFB",
+  "crest": "https://crests.football-data.org/10.png",
+  "colors": [
+   "#f4f6fa",
+   "#d01f2f"
+  ],
+  "country": "GER",
+  "coefficient": 27.5,
+  "venue": "Mercedes-Benz Arena"
+ },
+ "gre-aek": {
+  "id": "gre-aek",
+  "name": "AEK Athens",
+  "fullName": "PAE AEK",
+  "code": "AEK",
+  "crest": "https://crests.football-data.org/1899.png",
+  "colors": [
+   "#f5c400",
+   "#15171c"
+  ],
+  "country": "GRE",
+  "coefficient": 24,
+  "venue": "Olympiako Stadio Spyros Louis"
+ },
+ "ita-como": {
+  "id": "ita-como",
+  "name": "Como 1907",
+  "fullName": "Como 1907",
+  "code": "COM",
+  "crest": "https://crests.football-data.org/7397.png",
+  "colors": [
+   "#78b7e6",
+   "#f4f6fa"
+  ],
+  "country": "ITA",
+  "coefficient": 0,
+  "venue": "Stadio Giuseppe Sinigaglia"
+ },
+ "ita-internazionale-milano": {
+  "id": "ita-internazionale-milano",
+  "name": "Inter",
+  "fullName": "FC Internazionale Milano",
+  "code": "INT",
+  "crest": "https://crests.football-data.org/108.png",
+  "colors": [
+   "#1f4fbf",
+   "#15171c"
+  ],
+  "country": "ITA",
+  "coefficient": 127,
+  "venue": "Stadio Giuseppe Meazza"
+ },
+ "ita-napoli": {
+  "id": "ita-napoli",
+  "name": "Napoli",
+  "fullName": "SSC Napoli",
+  "code": "NAP",
+  "crest": "https://crests.football-data.org/113.png",
+  "colors": [
+   "#78b7e6",
+   "#f4f6fa"
+  ],
+  "country": "ITA",
+  "coefficient": 63,
+  "venue": "Stadio San Paolo"
+ },
+ "ita-roma": {
+  "id": "ita-roma",
+  "name": "Roma",
+  "fullName": "AS Roma",
+  "code": "ROM",
+  "crest": "https://crests.football-data.org/100.png",
+  "colors": [
+   "#7a1f2b",
+   "#f07c1b"
+  ],
+  "country": "ITA",
+  "coefficient": 97.75,
+  "venue": "Stadio Olimpico"
+ },
+ "ned-feyenoord-rotterdam": {
+  "id": "ned-feyenoord-rotterdam",
+  "name": "Feyenoord",
+  "fullName": "Feyenoord Rotterdam",
+  "code": "FEY",
+  "crest": "https://crests.football-data.org/675.png",
+  "colors": [
+   "#d01f2f",
+   "#f4f6fa"
+  ],
+  "country": "NED",
+  "coefficient": 71,
+  "venue": "Stadion Feijenoord"
+ },
+ "ned-psv": {
+  "id": "ned-psv",
+  "name": "PSV",
+  "fullName": "PSV",
+  "code": "PSV",
+  "crest": "https://crests.football-data.org/674.png",
+  "colors": [
+   "#d01f2f",
+   "#f4f6fa"
+  ],
+  "country": "NED",
+  "coefficient": 71.25,
+  "venue": "Philips Stadion"
+ },
+ "nor-bodo-glimt": {
+  "id": "nor-bodo-glimt",
+  "name": "Bodø/Glimt",
+  "fullName": "FK Bodø/Glimt",
+  "code": "BOD",
+  "crest": "https://crests.football-data.org/5721.png",
+  "colors": [
+   "#f5c400",
+   "#15171c"
+  ],
+  "country": "NOR",
+  "coefficient": 64,
+  "venue": "Aspmyra Stadion"
+ },
+ "nor-viking": {
+  "id": "nor-viking",
+  "name": "Viking",
+  "fullName": "Viking FK",
+  "code": "VIK",
+  "crest": "https://crests.football-data.org/5720.png",
+  "colors": [
+   "#102a6b",
+   "#f4f6fa"
+  ],
+  "country": "NOR",
+  "coefficient": 8.247,
+  "venue": "SR-Bank Arena"
+ },
+ "por-porto": {
+  "id": "por-porto",
+  "name": "Porto",
+  "fullName": "FC Porto",
+  "code": "FCP",
+  "crest": "https://crests.football-data.org/503.png",
+  "colors": [
+   "#1f4fbf",
+   "#f4f6fa"
+  ],
+  "country": "POR",
+  "coefficient": 80.75,
+  "venue": "Estádio Do Dragão"
+ },
+ "por-sporting-clube-portugal": {
+  "id": "por-sporting-clube-portugal",
+  "name": "Sporting CP",
+  "fullName": "Sporting Clube de Portugal",
+  "code": "SPO",
+  "crest": "https://crests.football-data.org/498.png",
+  "colors": [
+   "#138a43",
+   "#f4f6fa"
+  ],
+  "country": "POR",
+  "coefficient": 84,
+  "venue": "Estádio José Alvalade"
+ },
+ "svk-slovan-bratislava": {
+  "id": "svk-slovan-bratislava",
+  "name": "Slovan Bratislava",
+  "fullName": "ŠK Slovan Bratislava",
+  "code": "SBA",
+  "crest": "https://crests.football-data.org/7509.png",
+  "colors": [
+   "#8cc4ec",
+   "#f4f6fa"
+  ],
+  "country": "SVK",
+  "coefficient": 36,
+  "venue": "Štadión Tehelné pole"
+ },
+ "tur-fenerbahce": {
+  "id": "tur-fenerbahce",
+  "name": "Fenerbahçe",
+  "fullName": "Fenerbahçe SK",
+  "code": "FEN",
+  "crest": "https://crests.football-data.org/613.png",
+  "colors": [
+   "#f5c400",
+   "#1f4fbf"
+  ],
+  "country": "TUR",
+  "coefficient": 57.75,
+  "venue": "Ülker Stadyumu Fenerbahçe Şükrü Saracoğlu Spor Kompleksi"
+ },
+ "tur-galatasaray": {
+  "id": "tur-galatasaray",
+  "name": "Galatasaray",
+  "fullName": "Galatasaray SK",
+  "code": "GAL",
+  "crest": "https://crests.football-data.org/610.png",
+  "colors": [
+   "#d01f2f",
+   "#f5c400"
+  ],
+  "country": "TUR",
+  "coefficient": 53.5,
+  "venue": "Türk Telekom Arena"
+ },
+ "ukr-shakhtar-donetsk": {
+  "id": "ukr-shakhtar-donetsk",
+  "name": "Shakhtar",
+  "fullName": "FK Shakhtar Donetsk",
+  "code": "SHD",
+  "crest": "https://crests.football-data.org/1887.png",
+  "colors": [
+   "#f07c1b",
+   "#15171c"
+  ],
+  "country": "UKR",
+  "coefficient": 56.25,
+  "venue": "Oblasny SportKomplex Metalist"
+ }
+}

@@ -1,0 +1,379 @@
+import copy
+import json
+import math
+from datetime import UTC, datetime
+from types import SimpleNamespace
+
+import pytest
+
+from uclpred.export import build_lambdas, build_season, validate_snapshot
+from uclpred.models.baseline import BaselineModel
+from uclpred.teams import TeamResolver
+
+N = 36
+AS_OF = datetime(2026, 9, 7, tzinfo=UTC)
+
+
+def _fd_teams():
+    return [
+        {"id": 1000 + i, "name": f"Club{chr(65 + i // 6)}{chr(65 + i % 6)} FC",
+         "shortName": f"C{i}", "tla": f"T{i:02d}", "crest": f"http://c/{i}.png",
+         "area": {"code": "GER", "name": "Germany"}}
+        for i in range(N)
+    ]  # fmt: skip
+
+
+def _fd_matches(status="SCHEDULED", date="2026-09-08T16:45:00Z"):
+    """144 fixtures: each team plays 4 home and 4 away (i hosts i+1..i+4 mod 36)."""
+    out, mid = [], 1
+    for i in range(N):
+        for k in range(1, 5):
+            j = (i + k) % N
+            out.append({
+                "id": mid, "utcDate": date, "status": status, "matchday": k,
+                "stage": "LEAGUE_STAGE",
+                "homeTeam": {"id": 1000 + i, "name": f"H{i}"},
+                "awayTeam": {"id": 1000 + j, "name": f"A{j}"},
+                "score": {"duration": "REGULAR", "fullTime": {"home": 2, "away": 1}},
+            })  # fmt: skip
+            mid += 1
+    return out
+
+
+class FakeModel:
+    rho = -0.05
+    coef_elo = 0.1
+    as_of = AS_OF
+
+    def lambdas(self, a, b, venue):
+        return (1.5 if venue == "home" else 1.3, 1.1)
+
+
+def _season(matches=None, as_of=AS_OF):
+    return build_season(
+        matches or _fd_matches(), _fd_teams(), TeamResolver(), {}, as_of
+    )
+
+
+def _snapshot():
+    season = _season()
+    lam = build_lambdas(
+        FakeModel(), [t["id"] for t in season["teams"]], model_name="elo-dc-v1"
+    )
+    return season, lam
+
+
+def test_future_kickoff_finished_is_unplayed():
+    s = _season(_fd_matches(status="FINISHED"))
+    assert all(not f["played"] for f in s["fixtures"])
+    assert all(f["homeGoals"] is None and f["awayGoals"] is None for f in s["fixtures"])
+
+
+def test_finished_before_as_of_is_played():
+    s = _season(_fd_matches(status="FINISHED"), as_of=datetime(2026, 9, 9, tzinfo=UTC))
+    assert all(f["played"] for f in s["fixtures"])
+    assert s["fixtures"][0]["homeGoals"] == 2 and s["fixtures"][0]["awayGoals"] == 1
+
+
+def test_postponed_unplayed_but_counted():
+    ms = _fd_matches(status="FINISHED", date="2026-09-01T16:45:00Z")
+    ms[0]["status"] = "POSTPONED"
+    s = _season(ms)
+    assert len(s["fixtures"]) == 144
+    assert s["fixtures"][0]["played"] is False
+    assert s["fixtures"][0]["homeGoals"] is None
+    assert sum(f["played"] for f in s["fixtures"]) == 143
+
+
+def test_season_shape_and_ordering():
+    s = _season()
+    assert s["season"] == "2026-27"
+    assert s["asOf"] == "2026-09-07T00:00:00Z"
+    assert s["finalVenueTeamId"] == "esp-atletico-madrid"
+    ids = [t["id"] for t in s["teams"]]
+    assert ids == sorted(ids) and len(set(ids)) == N
+    assert set(s["teams"][0]) == {
+        "id",
+        "fdId",
+        "name",
+        "shortName",
+        "tla",
+        "crest",
+        "country",
+        "coefficient",
+    }
+    assert s["teams"][0]["country"] == "GER"
+    assert s["teams"][0]["coefficient"] == 0.0
+    f = s["fixtures"][0]
+    assert set(f) == {
+        "id",
+        "matchday",
+        "utcDate",
+        "homeId",
+        "awayId",
+        "played",
+        "homeGoals",
+        "awayGoals",
+    }
+    keys = [(f["utcDate"], f["id"]) for f in s["fixtures"]]
+    assert keys == sorted(keys)
+
+
+def test_non_league_stage_excluded():
+    ms = _fd_matches()
+    ms.append({**copy.deepcopy(ms[0]), "id": 999, "stage": "PLAYOFFS"})
+    assert len(_season(ms)["fixtures"]) == 144
+
+
+def test_coefficient_lookup():
+    ids = [t["id"] for t in _season()["teams"]]
+    s = build_season(_fd_matches(), _fd_teams(), TeamResolver(), {ids[0]: 12.5}, AS_OF)
+    assert s["teams"][0]["coefficient"] == 12.5
+    assert s["teams"][1]["coefficient"] == 0.0
+
+
+def test_lambdas_shape():
+    season, lam = _snapshot()
+    assert lam["model"] == "elo-dc-v1"
+    assert lam["asOf"] == season["asOf"]
+    assert lam["rho"] == -0.05
+    assert lam["teams"] == [t["id"] for t in season["teams"]]
+    for key in ("home", "neutral"):
+        m = lam[key]
+        assert len(m) == N and all(len(r) == N for r in m)
+        assert all(m[i][i] is None for i in range(N))
+        assert m[0][1] == [1.5 if key == "home" else 1.3, 1.1]
+    json.dumps(lam, allow_nan=False)
+
+
+def test_validate_ok():
+    validate_snapshot(*_snapshot())
+
+
+def test_validate_rejects_143_fixtures():
+    season, lam = _snapshot()
+    season["fixtures"].pop()
+    with pytest.raises(ValueError, match="144"):
+        validate_snapshot(season, lam)
+
+
+def test_validate_rejects_five_home_games():
+    season, lam = _snapshot()
+    f = next(f for f in season["fixtures"] if f["homeId"] != season["teams"][0]["id"])
+    f["homeId"] = season["teams"][0]["id"]
+    with pytest.raises(ValueError, match="home"):
+        validate_snapshot(season, lam)
+
+
+def test_validate_rejects_nan_lambda():
+    season, lam = _snapshot()
+    lam["home"][0][1] = [math.nan, 1.0]
+    with pytest.raises(ValueError, match="lambda"):
+        validate_snapshot(season, lam)
+
+
+def test_validate_rejects_out_of_range_lambda():
+    season, lam = _snapshot()
+    lam["neutral"][2][3] = [0.01, 7.0]
+    with pytest.raises(ValueError, match="lambda"):
+        validate_snapshot(season, lam)
+
+
+def test_validate_rejects_team_order_mismatch():
+    season, lam = _snapshot()
+    lam["teams"][0], lam["teams"][1] = lam["teams"][1], lam["teams"][0]
+    with pytest.raises(ValueError, match="order"):
+        validate_snapshot(season, lam)
+
+
+def test_unseen_team_lambda_in_range():
+    model = BaselineModel(
+        as_of=AS_OF, rho=-0.05, mu=0.2, coef_home=0.25, coef_elo=0.1,
+        attack={}, defence={}, ratings={"x": 1700.0}, mean_elo=1500.0,
+    )  # fmt: skip
+    lam = build_lambdas(model, ["x", "unseen"])
+    for key in ("home", "neutral"):
+        for a, b in lam[key][0][1], lam[key][1][0]:
+            assert 0.05 <= a <= 6.0 and 0.05 <= b <= 6.0
+
+
+def test_warn_unrated_teams(caplog):
+    import logging
+
+    from uclpred.export import warn_unrated_teams
+
+    stub = SimpleNamespace(
+        ratings={"a": 1500.0, "b": 1500.0}, attack={"a": 0.0, "c": 0.0}
+    )
+    with caplog.at_level(logging.WARNING, logger="uclpred.export"):
+        bad = warn_unrated_teams(stub, ["a", "b", "c"])
+    assert bad == ["b", "c"]
+    msgs = [r.getMessage() for r in caplog.records]
+    assert any("b" in m and "training window" in m for m in msgs)
+    assert any("c" in m and "Elo" in m for m in msgs)
+    assert not any("'a'" in m or " a " in m for m in msgs)
+
+
+def test_past_season_build_validates_with_label_and_venue():
+    s = build_season(
+        _fd_matches(date="2024-09-18T16:45:00Z"), _fd_teams(), TeamResolver(), {},
+        datetime(2024, 9, 16, tzinfo=UTC),
+        season="2024-25", final_venue_team="ger-bayern-munchen",
+    )  # fmt: skip
+    lam = build_lambdas(FakeModel(), [t["id"] for t in s["teams"]])
+    validate_snapshot(s, lam)
+    assert s["season"] == "2024-25"
+    assert s["finalVenueTeamId"] == "ger-bayern-munchen"
+    assert len(s["fixtures"]) == 144
+
+
+def test_build_lambdas_metadata_defaults_and_overrides():
+    ids = [t["id"] for t in _season()["teams"]]
+    model = FakeModel()
+    lam = build_lambdas(model, ids, model_name="elo-dc-v1")
+    assert lam["eloCoef"] == 0.1 and lam["ratingSigma"] == 0.0
+    assert lam["model"] == "elo-dc-v1"
+    lam2 = build_lambdas(model, ids, rating_sigma=70.0, model_name="elo-dc-v2")
+    assert lam2["ratingSigma"] == 70.0 and lam2["model"] == "elo-dc-v2"
+
+
+def test_seasons_table():
+    from uclpred.config import (
+        FINAL_VENUE_TEAM,
+        PRESEASON_AS_OF,
+        SEASON,
+        SEASONS,
+    )  # fmt: skip
+
+    assert SEASONS["2024-25"] == {
+        "fd_year": 2024, "preseason_as_of": datetime(2024, 9, 16, tzinfo=UTC),
+        "final_venue_team": "ger-bayern-munchen",
+    }  # fmt: skip
+    assert SEASONS["2025-26"]["preseason_as_of"] == datetime(2025, 9, 15, tzinfo=UTC)
+    assert SEASONS["2025-26"]["final_venue_team"] is None
+    assert SEASONS["2026-27"]["fd_year"] == 2026
+    assert (SEASON, PRESEASON_AS_OF, FINAL_VENUE_TEAM) == (
+        "2026-27", SEASONS["2026-27"]["preseason_as_of"], "esp-atletico-madrid",
+    )  # fmt: skip
+
+
+def test_cli_preseason_resolves_per_season():
+    from uclpred.cli import resolve_as_of
+
+    assert resolve_as_of("preseason", "2024-25") == datetime(2024, 9, 16, tzinfo=UTC)
+    assert resolve_as_of("preseason", "2025-26") == datetime(2025, 9, 15, tzinfo=UTC)
+    assert resolve_as_of("2026-09-07", "2026-27") == datetime(2026, 9, 7, tzinfo=UTC)
+
+
+def test_write_processed_cl_uses_latest_dir_with_data(tmp_path):
+    from uclpred.ingest.run import write_processed_cl
+
+    raw = tmp_path / "raw"
+    for day, year, tag in (("2026-01-01", 2024, "old"), ("2026-02-01", 2024, "new"),
+                           ("2026-03-01", 2025, "x")):  # fmt: skip
+        d = raw / day
+        d.mkdir(parents=True)
+        (d / f"CL_{year}_matches.json").write_text(json.dumps({"matches": [tag]}))
+        (d / f"CL_{year}_teams.json").write_text(json.dumps({"teams": [tag, tag]}))
+    (raw / "2026-04-01").mkdir()  # newest dir has no CL data
+    out = tmp_path / "proc"
+    paths = write_processed_cl(years=(2024, 2025), raw_root=raw, out_dir=out)
+    assert sorted(p.name for p in paths) == [
+        "cl_2024_fd.json", "cl_2024_teams.json", "cl_2025_fd.json", "cl_2025_teams.json",
+    ]  # fmt: skip
+    assert json.loads((out / "cl_2024_fd.json").read_text()) == ["new"]
+    assert json.loads((out / "cl_2025_teams.json").read_text()) == ["x", "x"]
+
+
+def test_fit_named_model_v21_passes_g_pseudo(monkeypatch):
+    import uclpred.backtest as bt
+    import uclpred.elo_v2 as ev2
+    import uclpred.models.baseline as bl
+    from uclpred.export import fit_named_model
+
+    entry = {
+        "elo": {"k": 24, "k_euro": 2.0, "g": 0.9, "g_pseudo": 0.0, "home_adv": 60},
+        "alpha": 0.005,
+        "rating_sigma": 0,
+    }
+    monkeypatch.setattr(bt, "load_model_params", lambda: {"elo-dc-v2.1": entry})
+    seen = {}
+
+    def fake_elo(matches, params):
+        seen["params"] = params
+        return "ELO"
+
+    def fake_fit(matches, elo, as_of, alpha=None):
+        seen["alpha"], seen["elo"] = alpha, elo
+        return "MODEL"
+
+    monkeypatch.setattr(ev2, "run_elo_v2", fake_elo)
+    monkeypatch.setattr(bl, "fit_baseline", fake_fit)
+    model, sigma = fit_named_model("elo-dc-v2.1", [], AS_OF)
+    assert (model, sigma) == ("MODEL", 0.0)
+    assert seen["params"].g_pseudo == 0.0 and seen["params"].k == 24
+    assert seen["alpha"] == 0.005 and seen["elo"] == "ELO"
+
+
+def test_fit_named_model_unknown_raises(monkeypatch):
+    import uclpred.backtest as bt
+    from uclpred.export import fit_named_model
+
+    monkeypatch.setattr(bt, "load_model_params", lambda: {"elo-dc-v2": {}})
+    with pytest.raises(ValueError, match="unknown model"):
+        fit_named_model("elo-dc-v9", [], AS_OF)
+
+
+def test_build_lambdas_records_v21_name():
+    model = SimpleNamespace(
+        as_of=AS_OF, rho=0.0, coef_elo=0.0,
+        lambdas=lambda a, b, v: (1.0, 1.0), ratings={}, attack={},
+    )  # fmt: skip
+    out = build_lambdas(model, ["a", "b"], 0.0, "elo-dc-v2.1")
+    assert out["model"] == "elo-dc-v2.1"
+
+
+def test_default_model_is_v21_and_cli_follows(monkeypatch):
+    from uclpred import cli
+    from uclpred.config import MODEL_NAME
+
+    assert MODEL_NAME == "elo-dc-v2.1"
+    seen = {}
+
+    def fake_export(args):
+        seen["model"] = args.model
+        return 0
+
+    monkeypatch.setattr(cli, "_export", fake_export)
+    assert cli.main(["export", "--as-of", "preseason", "--out", "x"]) == 0
+    assert seen["model"] == MODEL_NAME
+
+
+def test_lambdas_carry_model_elo_ratings():
+    model = BaselineModel(
+        as_of=AS_OF, rho=-0.05, mu=0.2, coef_home=0.25, coef_elo=0.1,
+        attack={}, defence={}, ratings={"x": 1712.34}, mean_elo=1500.0,
+    )  # fmt: skip
+    lam = build_lambdas(model, ["x", "unseen"])
+    # Unrated teams carry the mean rating the model itself uses for them.
+    assert lam["ratings"] == {"x": 1712.3, "unseen": 1500.0}
+
+
+def test_lambdas_without_ratings_when_model_has_none():
+    _, lam = _snapshot()
+    assert "ratings" not in lam
+
+
+def test_validate_rejects_bad_ratings():
+    season, lam = _snapshot()
+    ids = [t["id"] for t in season["teams"]]
+    lam["ratings"] = dict.fromkeys(ids, 1500.0)
+    validate_snapshot(season, lam)
+    missing = copy.deepcopy(lam)
+    del missing["ratings"][ids[0]]
+    with pytest.raises(ValueError, match="ratings"):
+        validate_snapshot(season, missing)
+    nan = copy.deepcopy(lam)
+    nan["ratings"][ids[1]] = float("nan")
+    with pytest.raises(ValueError, match="rating"):
+        validate_snapshot(season, nan)

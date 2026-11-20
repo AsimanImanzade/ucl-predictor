@@ -1,0 +1,36 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  min-width: 0;
+}
+
+.badge__crest {
+  flex: none;
+  object-fit: contain;
+}
+
+.badge__chip {
+  flex: none;
+  border-radius: var(--radius-sm);
+  box-shadow: inset 0 0 0 1px rgba(245, 248, 255, 0.28);
+}
+
+.badge__code {
+  flex: none;
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--silver);
+}
+
+.badge__code--solo {
+  color: var(--floodlight);
+}
+
+.badge__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}

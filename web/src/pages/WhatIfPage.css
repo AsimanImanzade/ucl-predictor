@@ -1,0 +1,224 @@
+.whatif {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s6);
+}
+.whatif__editor,
+.whatif__results {
+  min-width: 0;
+}
+@media (min-width: 1024px) {
+  .whatif {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 500px);
+    align-items: start;
+  }
+  .whatif__results {
+    position: sticky;
+    top: var(--s4);
+    max-height: calc(100vh - 2 * var(--s4));
+    overflow-y: auto;
+  }
+}
+
+.whatif__toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  margin-bottom: var(--s4);
+  flex-wrap: wrap;
+}
+.whatif__toolbar .fineprint {
+  margin-right: auto;
+}
+
+.whatif__md {
+  font-size: var(--step-2);
+  margin-bottom: var(--s2);
+}
+
+.whatif__results-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s3);
+  margin-bottom: var(--s3);
+}
+.whatif__results-head h2 {
+  font-size: var(--step-2);
+}
+
+.guesses {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: color-mix(in srgb, var(--stand) 88%, transparent);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+}
+
+.guess {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-areas:
+    'home inputs away'
+    'meta meta meta';
+  align-items: center;
+  gap: var(--s1) var(--s3);
+  padding: var(--s3) var(--s4);
+  border-bottom: 1px solid var(--rule);
+}
+.guess:last-child {
+  border-bottom: 0;
+}
+.guess--set {
+  box-shadow: inset 3px 0 0 var(--beam);
+}
+.guess--locked {
+  opacity: 0.7;
+}
+
+.guess__team {
+  grid-area: away;
+  min-width: 0;
+  display: flex;
+}
+.guess__team--home {
+  grid-area: home;
+  justify-content: flex-end;
+}
+.guess__team--home .badge {
+  flex-direction: row-reverse;
+}
+.guess__inputs,
+.guess__locked {
+  grid-area: inputs;
+}
+.guess__inputs {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  color: var(--dim);
+}
+.guess__locked {
+  min-width: 92px;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 700;
+}
+.guess__meta {
+  grid-area: meta;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: var(--s3);
+}
+
+.goal-input {
+  width: 42px;
+  height: 40px;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 700;
+  background: var(--night);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  color: var(--beam);
+}
+.goal-input::placeholder {
+  color: var(--dim);
+}
+.goal-input:focus-visible {
+  outline: 2px solid var(--beam);
+  outline-offset: 1px;
+}
+
+.link-btn {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--silver);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  font-size: inherit;
+}
+
+.table-note {
+  margin-top: var(--s3);
+}
+
+.dropped-list {
+  margin: var(--s2) 0 0;
+  padding-left: var(--s5);
+  font-size: var(--step--1);
+  color: var(--silver);
+}
+
+/* Phones: one line per team, its goal box on the right, like a scorecard. */
+@media (max-width: 599px) {
+  .guess {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'home hin'
+      'away ain'
+      'meta meta';
+    row-gap: var(--s2);
+  }
+  .guess__team--home {
+    justify-content: flex-start;
+  }
+  .guess__team--home .badge {
+    flex-direction: row;
+  }
+  .guess__inputs {
+    display: contents;
+  }
+  .guess__inputs > :first-child {
+    grid-area: hin;
+  }
+  .guess__inputs > :last-child {
+    grid-area: ain;
+  }
+  .guess__inputs > span {
+    display: none;
+  }
+  .guess__locked {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    min-width: 0;
+  }
+  .guess__meta {
+    justify-content: flex-start;
+  }
+}
+
+.whatif__bar {
+  display: none;
+}
+@media (max-width: 1023px) {
+  .whatif__bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: var(--s3);
+    margin: var(--s4) calc(-1 * var(--gutter)) 0;
+    padding: var(--s3) var(--gutter);
+    background: color-mix(in srgb, var(--stand) 94%, transparent);
+    border-top: 1px solid var(--beam);
+    backdrop-filter: blur(6px);
+    font-size: var(--step--1);
+  }
+  .whatif__bar p {
+    flex: 1;
+    min-width: 0;
+    color: var(--silver);
+  }
+  .whatif__bar strong {
+    color: var(--floodlight);
+  }
+}

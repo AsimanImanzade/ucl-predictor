@@ -1,0 +1,50 @@
+{
+  "season": "2026-27",
+  "model": "elo-dc-v2.1",
+  "updatedAt": "2026-11-10T16:05:46Z",
+  "liveId": "live",
+  "snapshots": [
+    {
+      "id": "md00",
+      "label": "Before matchday 1",
+      "matchday": 0,
+      "asOf": "2026-09-07T00:00:00Z",
+      "file": "md00.json"
+    },
+    {
+      "id": "md01",
+      "label": "After matchday 1",
+      "matchday": 1,
+      "asOf": "2026-09-11T00:00:00Z",
+      "file": "md01.json"
+    },
+    {
+      "id": "md02",
+      "label": "After matchday 2",
+      "matchday": 2,
+      "asOf": "2026-10-15T00:00:00Z",
+      "file": "md02.json"
+    },
+    {
+      "id": "md03",
+      "label": "After matchday 3",
+      "matchday": 3,
+      "asOf": "2026-10-22T00:00:00Z",
+      "file": "md03.json"
+    },
+    {
+      "id": "md04",
+      "label": "After matchday 4",
+      "matchday": 4,
+      "asOf": "2026-11-05T00:00:00Z",
+      "file": "md04.json"
+    },
+    {
+      "id": "live",
+      "label": "Live",
+      "matchday": null,
+      "asOf": "2026-11-10T16:05:46Z",
+      "file": "live.json"
+    }
+  ]
+}

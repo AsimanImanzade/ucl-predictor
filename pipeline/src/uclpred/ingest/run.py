@@ -1,0 +1,126 @@
+"""Network orchestration for `uclpred ingest`."""
+
+import json
+import logging
+from pathlib import Path
+
+from uclpred.config import PROCESSED, RAW
+from uclpred.ingest.football_data import (
+    FD_COMPETITIONS,
+    FootballDataClient,
+    normalize_fd_match,
+)
+from uclpred.ingest.openfootball_json import DOMESTIC_CODES, load_football_json
+from uclpred.ingest.openfootball_txt import load_openfootball_euro
+from uclpred.matches import (
+    MATCHES_PATH,
+    combine,
+    season_label,
+    to_frame,
+    validate_matches,
+)
+from uclpred.teams import TeamResolver
+
+log = logging.getLogger(__name__)
+
+EURO_SEASONS = [season_label(y) for y in range(2011, 2027)]  # 2011-12 .. 2026-27
+JSON_SEASONS = [season_label(y) for y in range(2010, 2027)]  # 2010-11 .. 2026-27
+FD_SEASONS = {"CL": [2024, 2025, 2026]}
+FD_SEASONS.update({c: [2025, 2026] for c in FD_COMPETITIONS if c != "CL"})
+
+
+def write_processed_cl(
+    years=(2024, 2025, 2026),
+    raw_root: Path = RAW / "football-data",
+    out_dir: Path = PROCESSED,
+) -> list[Path]:
+    """Network-free: copy each year's CL matches/teams from the newest raw dir holding them."""
+    out_dir.mkdir(parents=True, exist_ok=True)
+    written = []
+    for year in years:
+        for kind, key, name in (
+            ("matches", "matches", "fd"),
+            ("teams", "teams", "teams"),
+        ):
+            cands = sorted(
+                raw_root.glob(f"*/CL_{year}_{kind}.json"), key=lambda p: p.parent.name
+            )
+            if not cands:
+                raise FileNotFoundError(
+                    f"no cached CL_{year}_{kind}.json under {raw_root}"
+                )
+            body = json.loads(cands[-1].read_text(encoding="utf-8"))
+            dest = out_dir / f"cl_{year}_{name}.json"
+            dest.write_text(json.dumps(body[key]), encoding="utf-8")
+            written.append(dest)
+    return written
+
+
+def run_ingest(token: str) -> None:
+    resolver = TeamResolver()
+    frames = []
+
+    for season in EURO_SEASONS:
+        rows = [
+            (code, season, m, "openfootball")
+            for code, m in load_openfootball_euro(season)
+        ]
+        frames.append(to_frame(rows, resolver))
+    for season in JSON_SEASONS:
+        for code in DOMESTIC_CODES:
+            rows = [
+                (code, season, m, "openfootball")
+                for m in load_football_json(season, code)
+            ]
+            frames.append(to_frame(rows, resolver))
+
+    client = FootballDataClient(token)
+    for fd_code, seasons in FD_SEASONS.items():
+        comp = FD_COMPETITIONS[fd_code]
+        for year in seasons:
+            label = season_label(year)
+            try:
+                teams = client.teams(fd_code, year)
+                matches = client.matches(fd_code, year)
+            except PermissionError as e:
+                log.warning("skipping football-data %s %s: %s", fd_code, label, e)
+                print(f"skipped football-data {fd_code} {label} (403)")
+                continue
+            team_country = {t["id"]: t["area"]["code"] for t in teams}
+            norm = (normalize_fd_match(m, team_country) for m in matches)
+            rows = [(comp, label, m, "football-data") for m in norm if m is not None]
+            frames.append(to_frame(rows, resolver))
+
+    write_processed_cl()
+    df = combine(frames)
+    validate_matches(df)
+    MATCHES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(MATCHES_PATH, index=False)
+    counts = df.groupby(["competition", "season"]).agg(
+        rows=("match_id", "size"),
+        finished=("status", lambda s: int((s == "FINISHED").sum())),
+    )
+    print(counts.to_string())
+    print(f"total rows: {len(df)} -> {MATCHES_PATH}")
+
+
+def run_coverage() -> str:
+    """Write reports/coverage.md; return a text summary incl. duplicate candidates."""
+    import pandas as pd
+
+    from uclpred.config import REFERENCE, REPORTS
+    from uclpred.coverage import coverage_report, duplicate_candidates
+    from uclpred.matches import load_matches
+
+    df = load_matches()
+    teams = json.loads((PROCESSED / "cl_2026_teams.json").read_text(encoding="utf-8"))
+    coefs = pd.read_csv(REFERENCE / "coefficients.csv")
+    report = coverage_report(df, teams, coefs)
+    REPORTS.mkdir(parents=True, exist_ok=True)
+    (REPORTS / "coverage.md").write_text(report, encoding="utf-8")
+    cands = duplicate_candidates(df)
+    return (
+        report
+        + f"\nDuplicate candidates: {len(cands)}\n"
+        + "\n".join(f"{a}  <->  {b}" for a, b in cands)
+    )

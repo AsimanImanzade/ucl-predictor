@@ -1,0 +1,122 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--night);
+  color: var(--floodlight);
+  font-family: var(--font-text);
+  font-size: var(--step-0);
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Sky: navy gradient, two floodlight glows from the top corners, sparse static stars. */
+.sky {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60vmax 42vmax at -6% -10%, rgba(214, 228, 255, 0.13), transparent 62%),
+    radial-gradient(52vmax 38vmax at 106% -12%, rgba(214, 228, 255, 0.1), transparent 60%),
+    linear-gradient(180deg, var(--night) 0%, var(--night) 45%, var(--night-deep) 100%);
+}
+
+.sky svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 60%;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.01em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--step-4);
+}
+h2 {
+  font-size: var(--step-3);
+}
+h3 {
+  font-size: var(--step-1);
+  font-weight: 650;
+}
+
+p {
+  margin: 0;
+  max-width: 68ch;
+}
+
+a {
+  color: inherit;
+  text-decoration-color: rgba(201, 211, 230, 0.45);
+  text-underline-offset: 3px;
+}
+a:hover {
+  text-decoration-color: var(--beam);
+}
+
+:focus-visible {
+  outline: 2px solid var(--beam);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .wide-only {
+    display: none;
+  }
+}
+@media (min-width: 768px) {
+  .narrow-only {
+    display: none;
+  }
+}

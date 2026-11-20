@@ -1,0 +1,174 @@
+import pandas as pd
+import pytest
+
+import uclpred.backtest as bt
+from uclpred.backtest import run_grid, select_params
+
+
+def _grid_df(rows):
+    return pd.DataFrame(
+        [
+            {"k": 20.0, "k_euro": 1.5, "g": 0.7, "alpha": 0.002, "rps": 0.2, "log_loss": 1.0,
+             "brier": 0.6, "league_gap": 0.0, **r}
+            for r in rows
+        ]
+    )  # fmt: skip
+
+
+def test_select_lowest_rps():
+    df = _grid_df([{"k": 16.0, "rps": 0.21}, {"k": 20.0, "rps": 0.19}, {"k": 24.0, "rps": 0.20}])
+    assert select_params(df)["k"] == 20.0
+
+
+def test_select_tie_goes_to_smaller_gap():
+    df = _grid_df([
+        {"k": 16.0, "rps": 0.1900, "league_gap": 0.08},
+        {"k": 20.0, "rps": 0.1903, "league_gap": -0.01},
+        {"k": 24.0, "rps": 0.1950, "league_gap": 0.0},
+    ])  # fmt: skip
+    got = select_params(df)
+    assert got["k"] == 20.0
+    assert got["home_adv"] == 60.0
+    assert set(got) >= {"k", "k_euro", "g", "home_adv", "alpha"}
+
+
+def test_select_full_tie_is_deterministic():
+    rows = [{"k": 24.0}, {"k": 16.0}, {"k": 20.0}]
+    a = select_params(_grid_df(rows))
+    b = select_params(_grid_df(rows[::-1]))
+    assert a == b and a["k"] == 16.0
+
+
+def test_run_grid_shape_and_elo_reuse(monkeypatch):
+    calls = {"elo": 0, "gap": 0}
+
+    class _R:
+        pre = pd.DataFrame({"match_id": [], "home_elo_pre": [], "away_elo_pre": []})
+
+    def fake_elo(m, p):
+        calls["elo"] += 1
+        return _R()
+
+    def fake_gap(m, pre, ha, **kw):
+        calls["gap"] += 1
+        return 0.05, 3
+
+    def fake_wf(m, elo, seasons, alpha):
+        return pd.DataFrame({
+            "match_id": ["a", "b"], "season": ["2019-20"] * 2,
+            "p_home": [0.5, 0.2], "p_draw": [0.3, 0.3], "p_away": [0.2, 0.5],
+            "outcome": [0, 2],
+        })  # fmt: skip
+
+    monkeypatch.setattr(bt, "run_elo_v2", fake_elo)
+    monkeypatch.setattr(bt, "league_gap", fake_gap)
+    monkeypatch.setattr(bt, "walk_forward", fake_wf)
+    grid = {"k": [16.0, 20.0], "k_euro": [1.5], "g": [0.7], "alpha": [0.002]}
+    df = run_grid(pd.DataFrame(), ["2019-20"], grid)
+    assert len(df) == 2
+    assert {"k", "k_euro", "g", "alpha", "rps", "log_loss", "brier", "league_gap"} <= set(df.columns)
+    assert calls == {"elo": 2, "gap": 4}
+    assert (df["league_gap"] == 0.05).all()
+
+    grid["alpha"] = [0.0005, 0.005]
+    calls.update(elo=0, gap=0)
+    df = run_grid(pd.DataFrame(), ["2019-20"], grid)
+    assert len(df) == 4 and calls == {"elo": 2, "gap": 4}
+
+
+def test_params_roundtrip(tmp_path, monkeypatch):
+    p = tmp_path / "model_params.json"
+    monkeypatch.setattr(bt, "PARAMS_PATH", p)
+    with pytest.raises(FileNotFoundError):
+        bt.load_model_params()
+    p.write_text('{"elo-dc-v2": {"alpha": 0.002}}')
+    assert bt.load_model_params()["elo-dc-v2"]["alpha"] == 0.002
+
+
+def test_select_alt_gap_column_and_candidates():
+    df = _grid_df([
+        {"k": 16.0, "rps": 0.1900, "league_gap": 0.01, "league_gap_tuning": 0.09},
+        {"k": 20.0, "rps": 0.1903, "league_gap": 0.09, "league_gap_tuning": 0.01},
+        {"k": 24.0, "rps": 0.1950},
+    ])  # fmt: skip
+    assert len(bt.tie_candidates(df)) == 2
+    assert select_params(df)["k"] == 16.0
+    assert select_params(df, gap_col="league_gap_tuning")["k"] == 20.0
+
+
+def test_merge_report_preserves_foreign_sections():
+    sections = [("Grid (top 10)", "new grid"), ("League gap", "new gap")]
+    old = (
+        "# Calibration report\n\nold intro\n\n## Grid (top 10)\n\nold grid\n\n"
+        "## Tournament check\n\ntc body\n\n## Gate verdict\n\nPASS\n\n"
+        "## League gap\n\nold gap\n"
+    )
+    out = bt.merge_report(old, "new intro", sections)
+    assert "old grid" not in out and "old gap" not in out and "old intro" not in out
+    assert "new grid" in out and "new gap" in out and "new intro" in out
+    assert "## Gate verdict\n\nPASS" in out and "## Tournament check\n\ntc body" in out
+    assert out.count("## Grid (top 10)") == 1
+    again = bt.merge_report(out, "new intro", sections)
+    assert again == out
+    assert bt.merge_report(None, "i", sections).startswith("# Calibration report")
+
+
+def test_write_model_params_preserves_sigma(tmp_path):
+    p = tmp_path / "model_params.json"
+    p.write_text('{"elo-dc-v2": {"rating_sigma": 70}}')
+    out = bt.write_model_params({"k": 16.0}, 0.0005, "2026-01-01", path=p)
+    assert out["elo-dc-v2"]["rating_sigma"] == 70
+    import json
+
+    assert json.loads(p.read_text())["elo-dc-v2"]["rating_sigma"] == 70
+    p.unlink()
+    assert bt.write_model_params({"k": 16.0}, 0.0005, "2026-01-01", path=p)["elo-dc-v2"][
+        "rating_sigma"
+    ] is None
+
+
+CANON = [
+    "Gate verdict", "Tournament check", "Grid (top 10)", "Chosen parameters",
+    "Report seasons: v1 vs v2", "Calibration (v2)", "League gap",
+    "Sensitivity (outside the pre-registered selection)",
+]  # fmt: skip
+
+
+def _titles(text):
+    return [ln[3:] for ln in text.splitlines() if ln.startswith("## ")]
+
+
+def test_merge_report_fixed_order_from_either_tool():
+    bt_secs = [(t, "b") for t in reversed(CANON[2:])]
+    tc_secs = [("Tournament check", "t")]
+    old = "# Calibration report\n\nintro\n\n## Zzz extra\n\nx\n\n## Gate verdict\n\nv\n"
+    a = bt.merge_report(old, "intro", bt_secs)
+    assert _titles(a) == ["Gate verdict", *CANON[2:], "Zzz extra"]
+    a2 = bt.merge_report(a, "intro", tc_secs)
+    assert _titles(a2) == ["Gate verdict", "Tournament check", *CANON[2:], "Zzz extra"]
+    assert bt.merge_report(a2, "intro", tc_secs) == a2
+    assert bt.merge_report(a2, "intro", bt_secs) == bt.merge_report(
+        bt.merge_report(a2, "intro", bt_secs), "intro", bt_secs
+    )
+    assert _titles(bt.merge_report(a2, "intro", bt_secs)) == _titles(a2)
+
+
+def test_merge_report_stale_line_once():
+    old = "# Calibration report\n\nintro\n\n## Gate verdict\n\n_stamp_\n\nbody\n"
+    one = bt.merge_report(old, "i", [("League gap", "g")], stale=("tool-a", "2026-01-01"))
+    two = bt.merge_report(one, "i", [("League gap", "g")], stale=("tool-b", "2026-01-02"))
+    assert two.count("Stale:") == 1
+    assert "## Gate verdict\n\n> ⚠️ Stale: tool-b re-ran on 2026-01-02; numbers below may no" in two
+    assert "\n\n_stamp_\n\nbody" in two
+    # no gate section -> nothing inserted
+    assert "Stale" not in bt.merge_report(None, "i", [("League gap", "g")], stale=("t", "d"))
+
+
+def test_write_model_params_preserves_other_model_entries(tmp_path):
+    import json
+
+    p = tmp_path / "model_params.json"
+    v21 = {"elo": {"g_pseudo": 0.0}, "alpha": 0.005, "rating_sigma": 0}
+    p.write_text(json.dumps({"elo-dc-v2": {"rating_sigma": 70}, "elo-dc-v2.1": v21}))
+    bt.write_model_params({"k": 16.0}, 0.0005, "2026-01-01", path=p)
+    assert json.loads(p.read_text())["elo-dc-v2.1"] == v21

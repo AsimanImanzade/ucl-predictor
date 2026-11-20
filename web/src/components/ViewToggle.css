@@ -1,0 +1,90 @@
+.view-toggle {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 3px;
+  background: var(--stand);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  max-width: 100%;
+}
+
+.view-toggle button,
+.view-toggle select {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--silver);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  min-height: 32px;
+}
+
+.view-toggle button:hover {
+  color: var(--floodlight);
+}
+
+.view-toggle button[aria-pressed='true'] {
+  background: var(--floodlight);
+  color: var(--night);
+  font-weight: 600;
+}
+
+.view-toggle .view-toggle__scenario[aria-pressed='true'] {
+  background: var(--beam);
+}
+
+.view-toggle__after {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+}
+
+.view-toggle__after button {
+  padding-right: 4px;
+}
+
+.view-toggle__after select {
+  padding: 6px 22px 6px 6px;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: right 11px center, right 7px center;
+  background-size: 4px 4px, 4px 4px;
+  background-repeat: no-repeat;
+  font-variant-numeric: tabular-nums;
+}
+
+.view-toggle__after.is-on {
+  background: var(--floodlight);
+}
+.view-toggle__after.is-on button,
+.view-toggle__after.is-on select {
+  color: var(--night);
+  font-weight: 600;
+  background-color: transparent;
+}
+.view-toggle__after.is-on button[aria-pressed='true'] {
+  background: transparent;
+}
+
+.view-toggle select option {
+  color: var(--floodlight);
+  background: var(--stand);
+}
+
+@media (max-width: 767px) {
+  .view-toggle button,
+  .view-toggle select {
+    padding-left: 11px;
+    padding-right: 11px;
+  }
+  .view-toggle__after button {
+    padding-right: 3px;
+  }
+  .view-toggle__after select {
+    padding-left: 4px;
+    padding-right: 20px;
+  }
+}

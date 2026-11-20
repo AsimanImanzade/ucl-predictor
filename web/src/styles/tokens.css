@@ -1,0 +1,67 @@
+/* Floodlit design tokens. The page is always a night scene: one theme, no light mode. */
+:root {
+  color-scheme: dark;
+
+  /* Surfaces */
+  --night: #0b1736; /* page background: deep navy sky */
+  --night-deep: #071029; /* bottom of the sky gradient */
+  --stand: #14244f; /* raised surfaces: table, panels */
+  --stand-raised: #1b2e61; /* sticky cells, hover rows */
+  --rule: rgba(201, 211, 230, 0.14); /* hairlines */
+  --track: rgba(201, 211, 230, 0.12); /* empty part of a meter */
+
+  /* Ink */
+  --floodlight: #f5f8ff; /* primary text, key numbers (16.6:1 on night) */
+  --silver: #c9d3e6; /* secondary text (11.7:1) */
+  --dim: #97a4c4; /* labels, axis text (7.1:1 on night, 6.0:1 on stand) */
+
+  /* The single accent: focus, "My scenario", the active path */
+  --beam: #7fd6ff;
+  --beam-soft: rgba(127, 214, 255, 0.16);
+
+  /* Probability up / down: dataviz diverging blue <-> red, dark steps (validated on --stand) */
+  --rise: #3987e5;
+  --fall: #e66767;
+  /* Lighter steps of the same hues for delta text (6.0:1 and 6.2:1 on stand) */
+  --rise-ink: #6da7ec;
+  --fall-ink: #f08a8a;
+
+  /* W/D/L bar: positional, labelled; neutral ink only, so colour stays free for deltas */
+  --wdl-home: #e8eefc;
+  --wdl-draw: #5d6c94;
+  --wdl-away: #aab7d6;
+
+  /* Type */
+  --font-display: 'Big Shoulders Display Variable', 'Arial Narrow', sans-serif;
+  --font-text: 'Barlow', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Scale (1.25 ratio from a 16px body) */
+  --step--1: 0.8125rem; /* 13px: labels, table meta */
+  --step-0: 1rem; /* 16px: body */
+  --step-1: 1.25rem; /* 20px */
+  --step-2: 1.5625rem; /* 25px */
+  --step-3: 1.953rem; /* 31px */
+  --step-4: 2.441rem; /* 39px */
+  --step-5: 3.815rem; /* 61px: hero figure */
+
+  /* Space (4px grid) */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --s8: 64px;
+
+  --radius-sm: 3px; /* meters, chips */
+  --radius-md: 8px; /* panels */
+  --page-max: 1180px;
+  --gutter: 16px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: 32px;
+  }
+}

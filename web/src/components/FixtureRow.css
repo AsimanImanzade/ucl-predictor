@@ -1,0 +1,106 @@
+.fixtures {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: color-mix(in srgb, var(--stand) 88%, transparent);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-md);
+}
+
+.fx {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) 64px minmax(0, 1fr) minmax(240px, 300px);
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s3) var(--s4);
+  border-bottom: 1px solid var(--rule);
+}
+.fx:last-child {
+  border-bottom: 0;
+}
+
+.fx__time {
+  font-size: var(--step--1);
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.fx__team {
+  min-width: 0;
+  display: flex;
+}
+.fx__team--home {
+  justify-content: flex-end;
+}
+.fx__team--home .badge {
+  flex-direction: row-reverse;
+}
+
+.fx__score {
+  justify-self: center;
+  display: inline-grid;
+  place-items: center;
+  min-width: 56px;
+  min-height: 34px;
+  padding: 0 var(--s2);
+  border-radius: var(--radius-sm);
+  background: var(--stand-raised);
+  border: 1px solid var(--rule);
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 700;
+}
+.fx__score:hover {
+  border-color: var(--beam);
+}
+.fx__v {
+  font-family: var(--font-text);
+  font-size: var(--step--1);
+  font-weight: 500;
+  color: var(--silver);
+}
+
+.fx__odds {
+  display: grid;
+  gap: 4px;
+}
+
+.fx__likely {
+  font-size: 12px;
+  color: var(--dim);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px var(--s3);
+}
+.fx__likely-item .num:first-child {
+  color: var(--floodlight);
+  font-weight: 600;
+}
+
+@media (max-width: 899px) {
+  .fx {
+    grid-template-columns: minmax(0, 1fr) 56px minmax(0, 1fr);
+    row-gap: var(--s2);
+  }
+  .fx__time {
+    grid-column: 1 / -1;
+  }
+  .fx__odds {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Compact W/D/L: one row of numbers under a thinner bar */
+.wdl--compact .wdl__bar {
+  height: 6px;
+}
+.wdl--compact .wdl__labels {
+  font-size: 12px;
+}
+.wdl--compact .wdl__pct {
+  font-size: 12px;
+}
+.wdl--compact .wdl__who {
+  display: none;
+}
