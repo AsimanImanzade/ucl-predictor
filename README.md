@@ -97,13 +97,13 @@ pnpm --filter @uclpred/sim cli -- --input data/export/live [--runs 50000] [--see
 
 ## Live updates
 
-`.github/workflows/update.yml` keeps the site current. It runs every 15 minutes on Tuesday to Thursday from 16:00 to 23:45 UTC, once a day at 06:00 UTC (this run also re-fetches the domestic leagues), and on demand ("Run workflow", with optional `force` and `domestic`). Each run:
+`.github/workflows/update.yml` keeps the site current. A small Cloudflare Worker (`scheduler/`) starts it every 15 minutes on Tuesday to Thursday from 16:00 to 23:45 UTC and once a day at 06:00 UTC (this run also re-fetches the domestic leagues), because GitHub's own cron is best-effort and once skipped a whole match night. The workflow keeps a daily GitHub schedule as a backup and can be run on demand ("Run workflow", with optional `force` and `domestic`). Each run:
 
 1. `uclpred refresh` fetches the current Champions League season from football-data.org in one request, always live (never today's cached copy). Only results, kick-off times and pairings count as changes; a match in play does not. If nothing changed, the run stops here.
 2. `uclpred update` (no network) exports `live`, and an `mdNN` snapshot for each newly complete matchday from the first run after midnight UTC following its last kick-off. It runs the official simulation for each (50,000 runs, seed 1, sigma 0), then `build-data`.
 3. The site is built and deployed to Cloudflare Pages (direct upload). `web/public/data` and `data/snapshots` are committed as `data: live update …`.
 
-Snapshots in `data/snapshots/2026-27/` are immutable: `build-data` adds new ones and refuses to overwrite one. The git-ignored `data/raw` and `data/processed` live in the GitHub Actions cache, because football-data's data is not republished as a dump here. A new cache entry is saved only after a successful deploy, so a failed run is retried by the next one. On a cache miss, the workflow runs the full `uclpred ingest` once, which can take over an hour.
+Snapshots in `data/snapshots/2026-27/` are immutable: `build-data` adds new ones and refuses to overwrite one. The git-ignored `data/raw` and `data/processed` live in the GitHub Actions cache, because football-data's data is not republished as a dump here. A new cache entry is saved only after a successful deploy, so a failed run is retried by the next one. On a cache miss, the workflow runs the full `uclpred ingest` once (about 5 minutes in CI).
 
 Repository secrets (Settings → Secrets and variables → Actions):
 
@@ -112,6 +112,15 @@ Repository secrets (Settings → Secrets and variables → Actions):
 | `FOOTBALL_DATA_TOKEN` | your football-data.org API token |
 | `CLOUDFLARE_API_TOKEN` | a Cloudflare API token with the *Cloudflare Pages: Edit* permission |
 | `CLOUDFLARE_ACCOUNT_ID` | your Cloudflare account id |
+
+The scheduler Worker needs a fine-grained GitHub token limited to this repository with *Actions: Read and write*:
+
+```sh
+cd scheduler
+npx wrangler@4.160.0 deploy                     # cron triggers from wrangler.toml
+npx wrangler@4.160.0 secret put GITHUB_TOKEN    # paste the token at the prompt
+node --test worker.test.js
+```
 
 The same update by hand, from the repo root:
 
@@ -155,6 +164,7 @@ Tests marked `data` need the local data caches; tests marked `network` need the 
 | `data/reference/` | Team aliases, club coefficients and fitted model parameters |
 | `data/snapshots/` | Immutable per-matchday snapshots (assembled dashboard JSON) |
 | `.github/workflows/` | `ci.yml` (tests) and `update.yml` (live updates and deploys) |
+| `scheduler/` | Cloudflare Worker whose cron triggers start `update.yml` |
 | `reports/` | Coverage, calibration and evaluation reports |
 
 Football data provided by the Football-Data.org API

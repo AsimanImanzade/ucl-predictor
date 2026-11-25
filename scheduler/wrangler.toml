@@ -1,0 +1,13 @@
+# Deploy from this folder: npx wrangler@4.160.0 deploy
+# Secret (once): npx wrangler@4.160.0 secret put GITHUB_TOKEN
+name = "ucl-predictor-scheduler"
+main = "worker.js"
+compatibility_date = "2026-11-25"
+workers_dev = false
+
+[vars]
+REPO = "AsimanImanzade/ucl-predictor"
+
+[triggers]
+# UTC. Cloudflare counts weekdays 1-7 from Sunday, so use names.
+crons = ["*/15 16-23 * * tue-thu", "0 6 * * *"]

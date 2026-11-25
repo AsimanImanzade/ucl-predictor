@@ -3,10 +3,12 @@ name: update
 # Live updates: fetch the CL results, and when anything changed re-export `live`,
 # run the 50,000-run simulation, add an immutable mdNN snapshot when a matchday is
 # complete, deploy to Cloudflare Pages (direct upload) and commit the site data.
+# Started by the Cloudflare Worker in scheduler/ (every 15 min Tue-Thu 16:00-23:45
+# UTC, daily 06:00 UTC with domestic=true): GitHub's own cron is best-effort and
+# missed a whole match night. The daily schedule below is only a backup.
 on:
   schedule:
-    - cron: "*/15 16-23 * * 2-4" # matchday windows, Tue-Thu (UTC)
-    - cron: "0 6 * * *" # daily, also re-fetches the domestic leagues
+    - cron: "0 6 * * *" # backup daily run, also re-fetches the domestic leagues
   workflow_dispatch:
     inputs:
       force:
@@ -34,6 +36,8 @@ jobs:
       FOOTBALL_DATA_TOKEN: ${{ secrets.FOOTBALL_DATA_TOKEN }}
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: main # the latest main, also for a run queued behind another
 
       - uses: astral-sh/setup-uv@v6
         with:

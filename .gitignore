@@ -11,3 +11,4 @@ data/processed/
 data/export/
 .pytest_cache/
 web/dist/
+.wrangler/
