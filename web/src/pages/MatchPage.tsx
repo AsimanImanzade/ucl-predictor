@@ -1,10 +1,12 @@
 import { Link, useParams } from 'react-router';
 import { Heatmap } from '../components/Heatmap';
 import { WdlBar } from '../components/Prob';
+import { LiveBadge } from '../components/LiveBadge';
 import { TeamBadge } from '../components/TeamBadge';
 import { formatPct } from '../lib/format';
 import { snapshotBefore, useManifest, useSnapshot, useTeams } from '../lib/data';
 import { formatDate, formatDay, formatTime } from '../lib/labels';
+import { useLiveScores } from '../lib/liveScores';
 import { matchProbs } from '../lib/match';
 import './pages.css';
 import './MatchPage.css';
@@ -70,6 +72,7 @@ export function MatchPage() {
   const manifest = useManifest();
   const live = useSnapshot(manifest.liveId);
   const teams = useTeams();
+  const scores = useLiveScores(live.season.fixtures);
   const f = live.season.fixtures.find((x) => String(x.id) === id);
   if (!f) {
     return (
@@ -85,6 +88,8 @@ export function MatchPage() {
   const away = teams[f.awayId]!;
   const forecastId = snapshotBefore(manifest, f.utcDate) ?? manifest.liveId;
   const actual: [number, number] | null = f.played ? [f.homeGoals!, f.awayGoals!] : null;
+  const now = f.played ? undefined : scores.get(f.id);
+  const shown = actual ?? (now ? [now.home, now.away] : null);
   return (
     <div className="page">
       <p className="fineprint">
@@ -96,14 +101,14 @@ export function MatchPage() {
           <span className="scoreboard__name">{home.name}</span>
         </Link>
         <div className="scoreboard__mid">
-          {actual ? (
+          {shown ? (
             <span className="scoreboard__score num">
-              {actual[0]}&ndash;{actual[1]}
+              {shown[0]}&ndash;{shown[1]}
             </span>
           ) : (
             <span className="scoreboard__time num">{formatTime(f.utcDate)}</span>
           )}
-          <span className="fineprint">{actual ? 'Full time' : 'Kick-off, your time'}</span>
+          {now ? <LiveBadge status={now.status} /> : <span className="fineprint">{actual ? 'Full time' : 'Kick-off, your time'}</span>}
         </div>
         <Link to={`/team/${away.id}`} className="scoreboard__team scoreboard__team--away">
           <TeamBadge team={away} size={44} label="none" />
@@ -117,6 +122,12 @@ export function MatchPage() {
         {formatDay(f.utcDate)}
         {home.venue ? `, ${home.venue}` : ''}
       </p>
+      {now && (
+        <p className="fineprint live-note">
+          {now.status === 'FINISHED' ? 'Full-time score' : 'Live score'}, updated every minute. The forecast updates after full time, once the result is
+          official.
+        </p>
+      )}
       <Forecast snapshotId={forecastId} homeId={f.homeId} awayId={f.awayId} actual={actual} />
     </div>
   );

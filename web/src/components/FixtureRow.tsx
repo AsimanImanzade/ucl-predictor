@@ -1,9 +1,11 @@
 import { Link } from 'react-router';
 import type { Fixture, Lambdas } from '@uclpred/sim';
 import { formatPct } from '../lib/format';
+import type { LiveScore } from '../lib/liveScores';
 import { formatTime } from '../lib/labels';
 import { matchProbs } from '../lib/match';
 import type { TeamsFile } from '../lib/types';
+import { LiveBadge } from './LiveBadge';
 import { WdlBar } from './Prob';
 import { TeamBadge } from './TeamBadge';
 import './FixtureRow.css';
@@ -13,22 +15,27 @@ interface Props {
   teams: TeamsFile;
   /** Live lambdas for upcoming fixtures. */
   lambdas: Lambdas;
+  /** Live score from the Worker; ignored once live.json counts the game. */
+  live?: LiveScore;
 }
 
-export function FixtureRow({ fixture: f, teams, lambdas }: Props) {
+export function FixtureRow({ fixture: f, teams, lambdas, live: liveScore }: Props) {
   const home = teams[f.homeId]!;
   const away = teams[f.awayId]!;
   const m = f.played ? null : matchProbs(lambdas, f.homeId, f.awayId);
+  const live = f.played ? undefined : liveScore;
+  const score = f.played ? ([f.homeGoals, f.awayGoals] as const) : live ? ([live.home, live.away] as const) : null;
+  const label = `${home.name} v ${away.name}${live ? `, ${live.status === 'FINISHED' ? 'full-time' : 'live'} score ${live.home}–${live.away}` : ''}, match details`;
   return (
-    <li className={`fx${f.played ? ' fx--played' : ''}`}>
-      <span className="fx__time">{formatTime(f.utcDate)}</span>
+    <li className={`fx${f.played ? ' fx--played' : ''}${live && live.status !== 'FINISHED' ? ' fx--live' : ''}`}>
+      <span className="fx__time">{live ? <LiveBadge status={live.status} /> : formatTime(f.utcDate)}</span>
       <span className="fx__team fx__team--home">
         <TeamBadge team={home} />
       </span>
-      <Link className="fx__score" to={`/match/${f.id}`} aria-label={`${home.name} v ${away.name}, match details`}>
-        {f.played ? (
+      <Link className="fx__score" to={`/match/${f.id}`} aria-label={label}>
+        {score ? (
           <span className="num">
-            {f.homeGoals}&ndash;{f.awayGoals}
+            {score[0]}&ndash;{score[1]}
           </span>
         ) : (
           <span className="fx__v">v</span>

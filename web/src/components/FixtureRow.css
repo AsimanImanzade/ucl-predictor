@@ -51,6 +51,9 @@
   font-size: var(--step-1);
   font-weight: 700;
 }
+.fx--live .fx__score {
+  border-color: var(--live);
+}
 .fx__score:hover {
   border-color: var(--beam);
 }

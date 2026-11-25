@@ -150,9 +150,26 @@ cd pipeline && uv run ruff check . && uv run pytest && uv run pytest -m data
 pnpm -r test
 pnpm --filter @uclpred/sim exec tsc --noEmit
 pnpm --filter @uclpred/web exec tsc --noEmit
+node --test scheduler/worker.test.js live/worker.test.js
 ```
 
 Tests marked `data` need the local data caches; tests marked `network` need the network. Both are skipped by default. `.github/workflows/ci.yml` runs the default tests, ruff and the web build on every push to `main`.
+
+## Live scores
+
+While a game is on, the Matches and Match pages show a red **LIVE** badge (or **HT** at half time) with the current score, and **FT** once football-data has the final score but the update workflow has not yet counted it. They are display only: the odds, the table and the what-if lab use `live.json`, which counts a game only once it is finished.
+
+The scores come from a second Cloudflare Worker, `live/` (`ucl-predictor-live`). Cloudflare's Cache API does nothing on `*.workers.dev`, so visitors never reach football-data. Instead a cron runs every minute on Tuesday to Thursday from 16:00 to 23:59 UTC. It asks football-data for today's matches only when a game is on, a kick-off is less than 5 minutes away, or it is the first check of the day, and it saves the result in Workers KV only when something changed. `GET /` reads KV and returns today's games that are in play, at half time or finished (`{date, updatedAt, matches: [{id, status, home, away}], attribution}`). That is at most one football-data request a minute, however many people are watching. CORS allows only the Pages site. The dashboard polls once a minute from kick-off to 2 h 30 after it, only while the tab is visible.
+
+One-time setup, from `live/`:
+
+```sh
+npx wrangler@4.160.0 kv namespace create LIVE              # put the printed id in wrangler.toml
+npx wrangler@4.160.0 secret put FOOTBALL_DATA_TOKEN        # paste the football-data token at the prompt
+npx wrangler@4.160.0 deploy                                # prints the workers.dev URL
+```
+
+The site reads the URL from `LIVE_URL` in `web/src/lib/config.ts`; `VITE_LIVE_URL` overrides it, and an empty value turns live scores off.
 
 ## Files
 
@@ -165,6 +182,7 @@ Tests marked `data` need the local data caches; tests marked `network` need the 
 | `data/snapshots/` | Immutable per-matchday snapshots (assembled dashboard JSON) |
 | `.github/workflows/` | `ci.yml` (tests) and `update.yml` (live updates and deploys) |
 | `scheduler/` | Cloudflare Worker whose cron triggers start `update.yml` |
+| `live/` | Cloudflare Worker that serves live scores to the dashboard (display only) |
 | `reports/` | Coverage, calibration and evaluation reports |
 
 Football data provided by the Football-Data.org API

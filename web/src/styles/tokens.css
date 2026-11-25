@@ -25,6 +25,8 @@
   /* Lighter steps of the same hues for delta text (6.0:1 and 6.2:1 on stand) */
   --rise-ink: #6da7ec;
   --fall-ink: #f08a8a;
+  /* Live-score badge fill: a deeper red than --fall so it never reads as a delta (floodlight text 5.3:1) */
+  --live: #c42b2b;
 
   /* W/D/L bar: positional, labelled; neutral ink only, so colour stays free for deltas */
   --wdl-home: #e8eefc;

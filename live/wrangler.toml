@@ -1,0 +1,20 @@
+# Live scores for the dashboard. Deploy from this folder: npx wrangler@4.160.0 deploy
+# Secret (once): npx wrangler@4.160.0 secret put FOOTBALL_DATA_TOKEN
+name = "ucl-predictor-live"
+main = "worker.js"
+compatibility_date = "2026-11-25"
+workers_dev = true
+
+[vars]
+SEASON = "2026"
+ALLOWED_ORIGIN = "https://asiman-ucl-predictor.pages.dev"
+
+# Created once with: npx wrangler@4.160.0 kv namespace create LIVE
+[[kv_namespaces]]
+binding = "LIVE"
+id = "8bebd6b81ce84a69a0ba603a2aa4e461"
+
+[triggers]
+# UTC, every minute in the match-night window. refresh() skips football-data unless
+# a game is on or about to start, so most of these runs make no outside request.
+crons = ["* 16-23 * * tue-thu"]

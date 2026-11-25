@@ -4,12 +4,14 @@ import type { Fixture } from '@uclpred/sim';
 import { FixtureRow } from '../components/FixtureRow';
 import { useManifest, useSnapshot, useTeams } from '../lib/data';
 import { formatDate, formatDay } from '../lib/labels';
+import { useLiveScores } from '../lib/liveScores';
 import './pages.css';
 
 export function MatchesPage() {
   const manifest = useManifest();
   const live = useSnapshot(manifest.liveId);
   const teams = useTeams();
+  const scores = useLiveScores(live.season.fixtures);
   const [params, setParams] = useSearchParams();
   const mds = useMemo(() => [...new Set(live.season.fixtures.map((f) => f.matchday))].sort((a, b) => a - b), [live]);
   const next = mds.find((md) => live.season.fixtures.some((f) => f.matchday === md && !f.played)) ?? mds.at(-1)!;
@@ -60,7 +62,7 @@ export function MatchesPage() {
             <h3 className="md-day__title">{day}</h3>
             <ul className="fixtures">
               {fx.map((f) => (
-                <FixtureRow key={f.id} fixture={f} teams={teams} lambdas={live.lambdas} />
+                <FixtureRow key={f.id} fixture={f} teams={teams} lambdas={live.lambdas} live={scores.get(f.id)} />
               ))}
             </ul>
           </div>

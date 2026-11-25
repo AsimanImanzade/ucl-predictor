@@ -12,3 +12,4 @@ data/export/
 .pytest_cache/
 web/dist/
 .wrangler/
+.dev.vars*
