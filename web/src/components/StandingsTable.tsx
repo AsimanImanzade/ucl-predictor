@@ -26,14 +26,16 @@ interface Props {
   /** Changes when a new scenario result arrives, so the delta fade replays. */
   deltaKey?: string | number;
   caption: string;
-  /** Narrow panel: points and chances only. */
+  /** Narrow panel: goals, points and chances only. */
   compact?: boolean;
+  /** Clubs in a game that is running now (as-it-stands tables). */
+  playing?: Set<TeamId>;
 }
 
 const zone = (rank: number) => (rank <= 8 ? 'top8' : rank <= 24 ? 'playoff' : 'out');
 const signed = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `−${-n}` : '0');
 
-export function StandingsTable({ rows, chances, teams, certainty, tone = 'official', deltas, deltaKey, caption, compact }: Props) {
+export function StandingsTable({ rows, chances, teams, certainty, tone = 'official', deltas, deltaKey, caption, compact, playing }: Props) {
   const ref = useFlip<HTMLTableSectionElement>(rows.map((r) => r.teamId).join());
   return (
     <div className="table-panel">
@@ -51,9 +53,9 @@ export function StandingsTable({ rows, chances, teams, certainty, tone = 'offici
               <th scope="col" className="hide-sm"><abbr title="Won">W</abbr></th>
               <th scope="col" className="hide-sm"><abbr title="Drawn">D</abbr></th>
               <th scope="col" className="hide-sm"><abbr title="Lost">L</abbr></th>
-              <th scope="col" className="hide-sm hide-md"><abbr title="Goals for">GF</abbr></th>
-              <th scope="col" className="hide-sm hide-md"><abbr title="Goals against">GA</abbr></th>
-              <th scope="col" className="hide-compact"><abbr title="Goal difference">GD</abbr></th>
+              <th scope="col" className="hide-sm hide-md show-compact"><abbr title="Goals for">GF</abbr></th>
+              <th scope="col" className="hide-sm hide-md show-compact"><abbr title="Goals against">GA</abbr></th>
+              <th scope="col" className="show-compact"><abbr title="Goal difference">GD</abbr></th>
               <th scope="col"><abbr title="Points">Pts</abbr></th>
               <th scope="col" className="col-gap hide-sm">Form</th>
               <th scope="col" className="col-gap">Top 8</th>
@@ -76,14 +78,19 @@ export function StandingsTable({ rows, chances, teams, certainty, tone = 'offici
                     <Link className="team-link" to={`/team/${r.teamId}`}>
                       <TeamBadge team={t} />
                     </Link>
+                    {playing?.has(r.teamId) && (
+                      <span className="playing-dot">
+                        <span className="visually-hidden">Playing now</span>
+                      </span>
+                    )}
                   </td>
                   <td className="muted hide-sm">{r.played}</td>
                   <td className="muted hide-sm">{r.won}</td>
                   <td className="muted hide-sm">{r.drawn}</td>
                   <td className="muted hide-sm">{r.lost}</td>
-                  <td className="muted hide-sm hide-md">{r.gf}</td>
-                  <td className="muted hide-sm hide-md">{r.ga}</td>
-                  <td className="muted hide-compact">{signed(r.gd)}</td>
+                  <td className="muted hide-sm hide-md show-compact">{r.gf}</td>
+                  <td className="muted hide-sm hide-md show-compact">{r.ga}</td>
+                  <td className="muted show-compact">{signed(r.gd)}</td>
                   <td className="col-pts">{r.pts}</td>
                   <td className="col-gap hide-sm">
                     <FormPills form={r.form} />

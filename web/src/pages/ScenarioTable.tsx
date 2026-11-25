@@ -5,6 +5,8 @@ import { DroppedNotice } from '../components/DroppedNotice';
 import { StandingsTable, type RowDeltas } from '../components/StandingsTable';
 import { useManifest, useSnapshot, useTeams } from '../lib/data';
 import { shownDelta } from '../lib/delta';
+import { useLiveScores } from '../lib/liveScores';
+import { playingNow, usedGuessCount, withLive } from '../lib/liveTable';
 import { applyGuesses } from '../lib/scenario';
 import { useReconciledScenario } from '../lib/scenarioStore';
 import { standings } from '../lib/standings';
@@ -15,9 +17,18 @@ export function ScenarioTable() {
   const live = useSnapshot(manifest.liveId);
   const teams = useTeams();
   const { guesses, dropped } = useReconciledScenario(live.season);
-  const sim = useScenarioSim(live, guesses);
-  const count = Object.keys(guesses).length;
-  const rows = useMemo(() => standings(applyGuesses(live.season, guesses)), [live, guesses]);
+  const scores = useLiveScores(live.season.fixtures);
+  const scenario = useMemo(() => withLive(guesses, live.season, scores), [guesses, live.season, scores]);
+  const playing = useMemo(() => playingNow(live.season, scores), [live.season, scores]);
+  const sim = useScenarioSim(live, scenario);
+  const count = Object.keys(scenario).length;
+  const mine = usedGuessCount(guesses, scenario);
+  const fromLive = count - mine;
+  const parts = [
+    mine > 0 && `${mine} ${mine === 1 ? 'score' : 'scores'} you entered`,
+    fromLive > 0 && `${fromLive} live ${fromLive === 1 ? 'score' : 'scores'}`,
+  ].filter(Boolean);
+  const rows = useMemo(() => standings(applyGuesses(live.season, scenario)), [live, scenario]);
 
   const { chances, deltas } = useMemo(() => {
     const res = sim.result;
@@ -56,7 +67,7 @@ export function ScenarioTable() {
     <>
       <DroppedNotice dropped={dropped} season={live.season} teams={teams} />
       <p className="snapshot">
-        My scenario: live data plus {count} {count === 1 ? 'score' : 'scores'} you entered.{' '}
+        My scenario: live data plus {parts.join(' and ')}.{' '}
         <Link to="/what-if" className="fineprint">
           Edit scores
         </Link>
@@ -75,6 +86,7 @@ export function ScenarioTable() {
           deltas={deltas}
           deltaKey={sim.result?.asOf + String(sim.ms)}
           caption="League phase table with your scenario"
+          playing={playing}
         />
       ) : (
         <p className="fineprint" aria-live="polite">

@@ -12,6 +12,14 @@
     grid-template-columns: minmax(0, 1fr) minmax(0, 500px);
     align-items: start;
   }
+}
+/* Room for goals for / against / difference beside the chances. */
+@media (min-width: 1200px) {
+  .whatif {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 590px);
+  }
+}
+@media (min-width: 1024px) {
   .whatif__results {
     position: sticky;
     top: var(--s4);

@@ -217,11 +217,21 @@
 .ltable--compact .hide-compact {
   display: none;
 }
+.ltable--compact .show-compact {
+  display: table-cell;
+}
+/* Phones, and the narrow What-if side column (1024-1199px): goals for/against give way so
+   the chances stay on screen; GD stays. */
+@media (max-width: 767px), (min-width: 1024px) and (max-width: 1199px) {
+  .ltable--compact .hide-sm.show-compact {
+    display: none;
+  }
+}
 .ltable--compact {
   font-size: 0.875rem;
 }
 .ltable--compact .col-team .badge {
-  max-width: 150px;
+  max-width: 132px;
 }
 .ltable--compact td,
 .ltable--compact th {
@@ -230,4 +240,15 @@
 }
 .ltable--compact .prob {
   min-width: 48px;
+}
+
+/* A club in a game running now (as-it-stands tables). Static, no pulse. */
+.playing-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: var(--live);
+  vertical-align: middle;
 }
