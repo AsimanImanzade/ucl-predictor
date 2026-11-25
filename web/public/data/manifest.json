@@ -1,7 +1,7 @@
 {
   "season": "2026-27",
   "model": "elo-dc-v2.1",
-  "updatedAt": "2026-11-25T19:44:05Z",
+  "updatedAt": "2026-11-25T19:45:27Z",
   "liveId": "live",
   "snapshots": [
     {
@@ -43,7 +43,7 @@
       "id": "live",
       "label": "Live",
       "matchday": null,
-      "asOf": "2026-11-25T19:44:05Z",
+      "asOf": "2026-11-25T19:45:27Z",
       "file": "live.json"
     }
   ]
