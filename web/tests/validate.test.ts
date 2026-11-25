@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { snapshotLabel, validateSnapshot, validateTeams } from '../src/lib/validate';
+import { checkMatchdayLabel, checkSnapshotOrder, snapshotLabel, validateSnapshot, validateTeams } from '../src/lib/validate';
 import { makeSeason, makeSnapshot, makeTeams } from './fixtures';
 
 describe('validateSnapshot', () => {
@@ -95,5 +95,25 @@ describe('validateSimInputs', () => {
     expect(p.some((m) => m.includes('no valid score'))).toBe(true);
     expect(p.some((m) => m.includes('order'))).toBe(true);
     expect(p.some((m) => m.includes('asOf'))).toBe(true);
+  });
+});
+
+describe('snapshot store checks', () => {
+  const meta = (id: string, matchday: number | null, asOf: string) => ({ id, label: id, matchday, asOf, file: `${id}.json` });
+
+  it('mdNN needs matchdays 1..N played; md00 none', () => {
+    expect(checkMatchdayLabel('md02', makeSeason(2))).toEqual([]);
+    expect(checkMatchdayLabel('md03', makeSeason(2))[0]).toContain('matchday 3');
+    expect(checkMatchdayLabel('md00', makeSeason(0))).toEqual([]);
+    expect(checkMatchdayLabel('md00', makeSeason(1))[0]).toContain('md00');
+    expect(checkMatchdayLabel('live', makeSeason(5))).toEqual([]);
+  });
+
+  it('snapshots run in matchday and time order, live last', () => {
+    const ok = [meta('md00', 0, '2026-09-07T00:00:00Z'), meta('md01', 1, '2026-09-11T00:00:00Z'), meta('live', null, '2026-09-12T08:00:00Z')];
+    expect(checkSnapshotOrder(ok)).toEqual([]);
+    expect(checkSnapshotOrder([ok[1]!, ok[0]!, ok[2]!]).length).toBeGreaterThan(0);
+    expect(checkSnapshotOrder([ok[0]!, meta('md01', 1, '2026-09-01T00:00:00Z'), ok[2]!])[0]).toContain('md01');
+    expect(checkSnapshotOrder([ok[0]!, ok[1]!, meta('live', null, '2026-09-10T00:00:00Z')])[0]).toContain('live');
   });
 });

@@ -1,11 +1,27 @@
 """Tiny on-disk HTTP cache."""
 
+import os
+import tempfile
 import time
 from pathlib import Path
 
 import requests
 
 _last_request_at = 0.0
+
+
+def atomic_write_bytes(path: Path, data: bytes) -> None:
+    """Write via a temp file in the same directory, then rename: never a partial file."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=path.parent, prefix=f".{path.name}.", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "wb") as f:
+            f.write(data)
+        os.replace(tmp, path)
+    except BaseException:
+        Path(tmp).unlink(missing_ok=True)
+        raise
 
 
 def get_cached(
@@ -30,6 +46,5 @@ def get_cached(
     finally:
         _last_request_at = time.monotonic()
     resp.raise_for_status()
-    cache_path.parent.mkdir(parents=True, exist_ok=True)
-    cache_path.write_bytes(resp.content)
+    atomic_write_bytes(cache_path, resp.content)
     return resp.content

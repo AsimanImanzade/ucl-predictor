@@ -1,3 +1,6 @@
 packages:
   - sim
   - web
+# pnpm 10 skips dependency build scripts unless listed; esbuild's only checks its binary.
+onlyBuiltDependencies:
+  - esbuild

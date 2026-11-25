@@ -17,6 +17,17 @@ def _ingest(args: argparse.Namespace) -> int:
         for p in write_processed_cl():
             print(f"wrote {p}")
         return 0
+    token = _token()
+    if not token:
+        return 2
+    from uclpred.ingest.run import run_ingest
+
+    run_ingest(token)
+    return 0
+
+
+def _token() -> str | None:
+    """FOOTBALL_DATA_TOKEN from the environment or .env. Never printed."""
     load_dotenv(ROOT / ".env")
     token = os.environ.get("FOOTBALL_DATA_TOKEN")
     if not token:
@@ -24,10 +35,27 @@ def _ingest(args: argparse.Namespace) -> int:
             "error: FOOTBALL_DATA_TOKEN is not set (put it in .env at the repo root)",
             file=sys.stderr,
         )
-        return 2
-    from uclpred.ingest.run import run_ingest
+    return token
 
-    run_ingest(token)
+
+def _refresh(args: argparse.Namespace) -> int:
+    token = _token()
+    if not token:
+        return 2
+    from uclpred.ingest.football_data import FootballDataClient
+    from uclpred.refresh import run_refresh, write_github_output
+
+    res = run_refresh(FootballDataClient(token, force=True), domestic=args.domestic)
+    print(f"changed: {', '.join(res.changed) or 'nothing'}")
+    print(f"snapshots due: {', '.join(s for s, _ in res.due) or 'none'}")
+    write_github_output(res.any)
+    return 0
+
+
+def _update(_args: argparse.Namespace) -> int:
+    from uclpred.update import run_update
+
+    print(f"built: {', '.join(run_update())}")
     return 0
 
 
@@ -117,6 +145,20 @@ def main(argv: list[str] | None = None) -> int:
         help="no network: only rebuild data/processed/cl_{year}_{fd,teams}.json from cached raw",
     )
     i.set_defaults(func=_ingest)
+    r = sub.add_parser(
+        "refresh",
+        help="fast: re-fetch the current CL season (live, no same-day cache) into data/processed",
+    )
+    r.add_argument(
+        "--domestic",
+        action="store_true",
+        help="also re-fetch the current domestic seasons (done anyway when a snapshot is due)",
+    )
+    r.set_defaults(func=_refresh)
+    sub.add_parser(
+        "update",
+        help="no network: export live + due mdNN, run the 50k sims, assemble web/public/data",
+    ).set_defaults(func=_update)
     c = sub.add_parser(
         "coefficients", help="fetch UEFA club coefficients into data/reference"
     )

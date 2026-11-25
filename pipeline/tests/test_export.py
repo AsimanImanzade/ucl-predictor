@@ -75,6 +75,22 @@ def test_finished_before_as_of_is_played():
     assert s["fixtures"][0]["homeGoals"] == 2 and s["fixtures"][0]["awayGoals"] == 1
 
 
+def test_kickoff_equal_to_as_of_is_unplayed():
+    as_of = datetime(2026, 9, 8, 16, 45, tzinfo=UTC)  # the fixtures' kickoff
+    s = _season(_fd_matches(status="FINISHED"), as_of=as_of)
+    assert not any(f["played"] for f in s["fixtures"])
+
+
+def test_finished_without_score_warns_and_is_unplayed(caplog):
+    ms = _fd_matches(status="FINISHED", date="2026-09-01T16:45:00Z")
+    ms[0]["score"] = {"duration": "REGULAR", "fullTime": {"home": None, "away": None}}
+    with caplog.at_level("WARNING"):
+        s = _season(ms)
+    assert s["fixtures"][0]["played"] is False
+    assert sum(f["played"] for f in s["fixtures"]) == 143
+    assert "downgraded to unplayed" in caplog.text and str(ms[0]["id"]) in caplog.text
+
+
 def test_postponed_unplayed_but_counted():
     ms = _fd_matches(status="FINISHED", date="2026-09-01T16:45:00Z")
     ms[0]["status"] = "POSTPONED"

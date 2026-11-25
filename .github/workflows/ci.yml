@@ -1,0 +1,35 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Python lint and tests (no downloaded data needed)
+        working-directory: pipeline
+        run: |
+          uv sync --locked
+          uv run ruff check src tests
+          uv run pytest
+
+      - uses: pnpm/action-setup@v4 # version from package.json "packageManager"
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r test
+      - run: pnpm --filter @uclpred/web build

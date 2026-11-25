@@ -10,6 +10,7 @@ from uclpred.ingest.football_data import (
     FootballDataClient,
     normalize_fd_match,
 )
+from uclpred.ingest.http_cache import atomic_write_bytes
 from uclpred.ingest.openfootball_json import DOMESTIC_CODES, load_football_json
 from uclpred.ingest.openfootball_txt import load_openfootball_euro
 from uclpred.matches import (
@@ -51,9 +52,20 @@ def write_processed_cl(
                 )
             body = json.loads(cands[-1].read_text(encoding="utf-8"))
             dest = out_dir / f"cl_{year}_{name}.json"
-            dest.write_text(json.dumps(body[key]), encoding="utf-8")
+            atomic_write_bytes(dest, json.dumps(body[key]).encode("utf-8"))
             written.append(dest)
     return written
+
+
+def warn_if_empty_fd_block(fd_code: str, label: str, rows: list) -> bool:
+    """An empty football-data block silently hands that season to openfootball."""
+    if rows:
+        return False
+    log.warning(
+        "football-data %s %s returned no usable matches; openfootball rows (if any) "
+        "are used for this competition-season instead", fd_code, label,
+    )  # fmt: skip
+    return True
 
 
 def run_ingest(token: str) -> None:
@@ -89,6 +101,7 @@ def run_ingest(token: str) -> None:
             team_country = {t["id"]: t["area"]["code"] for t in teams}
             norm = (normalize_fd_match(m, team_country) for m in matches)
             rows = [(comp, label, m, "football-data") for m in norm if m is not None]
+            warn_if_empty_fd_block(fd_code, label, rows)
             frames.append(to_frame(rows, resolver))
 
     write_processed_cl()

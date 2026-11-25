@@ -8,11 +8,14 @@ from datetime import UTC, datetime
 import requests
 
 from uclpred.config import RAW
+from uclpred.ingest.http_cache import atomic_write_bytes
 from uclpred.ingest.openfootball_txt import RawMatch
 from uclpred.teams import ISO3_TO_FIFA
 
 BASE_URL = "https://api.football-data.org/v4"
 MIN_INTERVAL_S = 6.5
+MAX_429_RETRIES = 3
+RESET_FALLBACK_S = 60.0
 FD_COMPETITIONS = {
     "CL": "uefa.cl", "PL": "en.1", "PD": "es.1", "BL1": "de.1",
     "SA": "it.1", "FL1": "fr.1", "DED": "nl.1", "PPL": "pt.1",
@@ -33,38 +36,74 @@ class FdMatch(RawMatch):
     away_crest: str
 
 
+class FootballDataError(RuntimeError):
+    """A football-data.org request failed. Never carries the request (it holds the token)."""
+
+
+def _reset_seconds(headers) -> float:
+    try:
+        return max(float(headers.get("X-RequestCounter-Reset", RESET_FALLBACK_S)), 1.0)
+    except (TypeError, ValueError):
+        return RESET_FALLBACK_S
+
+
 class FootballDataClient:
-    def __init__(self, token: str):
+    """football-data.org v4 client with a per-day raw cache.
+
+    force=True ignores today's cached file and overwrites it, so a run later the
+    same day sees results that finished after the first fetch.
+    """
+
+    def __init__(self, token: str, force: bool = False):
         self._headers = {"X-Auth-Token": token}
         self._last_request_at: float | None = None
+        self.force = force
 
-    def _fetch(self, url: str) -> bytes:
+    def _get_once(self, url: str):
         if self._last_request_at is not None:
             wait = MIN_INTERVAL_S - (time.monotonic() - self._last_request_at)
             if wait > 0:
                 time.sleep(wait)
         try:
-            resp = requests.get(url, headers=self._headers, timeout=30)
+            return requests.get(url, headers=self._headers, timeout=30)
+        except requests.RequestException as e:
+            # `raise ... from None`: the original exception holds request.headers,
+            # i.e. the token. Only its type name and the URL survive.
+            raise FootballDataError(f"{type(e).__name__} fetching {url}") from None
         finally:
             self._last_request_at = time.monotonic()
+
+    def _fetch(self, url: str) -> bytes:
+        for attempt in range(MAX_429_RETRIES + 1):
+            resp = self._get_once(url)
+            if resp.status_code == 429 and attempt < MAX_429_RETRIES:
+                time.sleep(_reset_seconds(resp.headers))
+                continue
+            break
         if resp.status_code == 403:
             raise PermissionError(f"football-data.org returned 403 for {url} (plan/permission)")
-        resp.raise_for_status()
-        # Out of quota: wait for the counter to reset before the next call.
-        h = resp.headers
-        if h.get("X-Requests-Available") == "0":
-            time.sleep(float(h.get("X-RequestCounter-Reset", MIN_INTERVAL_S)))
+        if resp.status_code >= 400:
+            raise FootballDataError(f"HTTP {resp.status_code} for {url}")
+        # Minute quota used up: wait for the counter to reset before the next call.
+        if resp.headers.get("X-Requests-Available-Minute") == "0":
+            time.sleep(_reset_seconds(resp.headers))
         return resp.content
 
     def _get(self, path: str, code: str, season: int, kind: str) -> dict:
         day = datetime.now(UTC).strftime("%Y-%m-%d")
         cache = RAW / "football-data" / day / f"{code}_{season}_{kind}.json"
-        if cache.exists():
+        if cache.exists() and not self.force:
             return json.loads(cache.read_bytes())
-        body = self._fetch(f"{BASE_URL}/competitions/{code}/{path}?season={season}")
-        cache.parent.mkdir(parents=True, exist_ok=True)
-        cache.write_bytes(body)  # response body only; the token is a request header
-        return json.loads(body)
+        url = f"{BASE_URL}/competitions/{code}/{path}?season={season}"
+        body = self._fetch(url)
+        try:
+            data = json.loads(body)
+        except ValueError:
+            raise FootballDataError(f"invalid JSON from {url}") from None
+        if not isinstance(data, dict) or not isinstance(data.get(kind), list):
+            raise FootballDataError(f"no '{kind}' list in response from {url}")
+        atomic_write_bytes(cache, body)  # response body only; the token is a request header
+        return data
 
     def matches(self, code: str, season: int) -> list[dict]:
         return self._get("matches", code, season, "matches")["matches"]

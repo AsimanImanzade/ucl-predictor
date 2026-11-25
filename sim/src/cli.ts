@@ -1,12 +1,8 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { simulate } from './simulate.js';
 import type { Lambdas, Season, SimResult } from './types.js';
-
-function arg(name: string, fallback?: string): string | undefined {
-  const i = process.argv.indexOf(`--${name}`);
-  return i >= 0 ? process.argv[i + 1] : fallback;
-}
 
 function pct(x: number): string {
   return (x * 100).toFixed(1).padStart(5) + '%';
@@ -32,29 +28,54 @@ export function formatTable(season: Season, res: SimResult, ms: number): string 
   return lines.join('\n');
 }
 
-function main(): void {
-  const input = arg('input');
-  if (!input) {
-    console.error('usage: pnpm --filter @uclpred/sim cli -- --input <dir> [--runs 50000] [--seed 1] [--sigma 0] [--out <file>]');
-    console.error('  <dir> is absolute or relative to the repo root (pnpm runs this with cwd = sim/).');
-    process.exit(2);
-  }
-  const runs = Number(arg('runs', '50000'));
-  const seed = Number(arg('seed', '1'));
-  if (!Number.isFinite(runs) || !Number.isFinite(seed)) {
-    console.error('--runs and --seed must be finite numbers');
-    process.exit(2);
-  }
-  const sigmaArg = arg('sigma');
-  const sigma = sigmaArg === undefined ? undefined : Number(sigmaArg);
-  if (sigma !== undefined && (!Number.isFinite(sigma) || sigma < 0)) {
-    console.error('--sigma must be a finite number >= 0');
-    process.exit(2);
-  }
-  const fromRoot = (p: string): string => (path.isAbsolute(p) ? p : path.resolve(process.cwd(), '..', p));
+/** Repo root (sim/src/.. /..): relative paths never depend on the cwd pnpm picks. */
+export const REPO_ROOT = path.resolve(import.meta.dirname, '../..');
+
+export interface CliArgs {
+  input: string;
+  out: string;
+  runs: number;
+  seed: number;
+  sigma: number | undefined;
+}
+
+const USAGE = 'usage: pnpm --filter @uclpred/sim cli -- --input <dir> [--runs 50000] [--seed 1] [--sigma 0] [--out <file>]  (paths: absolute or relative to the repo root)';
+
+export function parseArgs(argv: string[]): CliArgs | { error: string } {
+  const get = (name: string): string | undefined | null => {
+    const i = argv.indexOf(`--${name}`);
+    if (i < 0) return undefined;
+    const v = argv[i + 1];
+    return v === undefined || v.startsWith('--') ? null : v;
+  };
+  const input = get('input');
+  if (!input) return { error: USAGE };
+  const int = (name: string, fallback: number, min: number): number | string => {
+    const raw = get(name);
+    if (raw === undefined) return fallback;
+    const n = raw === null ? NaN : Number(raw);
+    return Number.isSafeInteger(n) && n >= min ? n : `--${name} must be an integer >= ${min}`;
+  };
+  const runs = int('runs', 50000, 1);
+  if (typeof runs === 'string') return { error: runs };
+  const seed = int('seed', 1, 0);
+  if (typeof seed === 'string') return { error: seed };
+  const sigmaRaw = get('sigma');
+  const sigma = sigmaRaw === undefined ? undefined : sigmaRaw === null ? NaN : Number(sigmaRaw);
+  if (sigma !== undefined && !(Number.isFinite(sigma) && sigma >= 0)) return { error: '--sigma must be a finite number >= 0' };
+  const fromRoot = (p: string): string => (path.isAbsolute(p) ? p : path.resolve(REPO_ROOT, p));
   const dir = fromRoot(input);
-  const outArg = arg('out');
-  const outPath = outArg ? fromRoot(outArg) : path.join(dir, 'chances.json');
+  const out = get('out');
+  return { input: dir, out: out ? fromRoot(out) : path.join(dir, 'chances.json'), runs, seed, sigma };
+}
+
+function main(): void {
+  const args = parseArgs(process.argv.slice(2));
+  if ('error' in args) {
+    console.error(args.error);
+    process.exit(2);
+  }
+  const { input: dir, out: outPath, runs, seed, sigma } = args;
   const season = JSON.parse(readFileSync(path.join(dir, 'season.json'), 'utf8')) as Season;
   const lambdas = JSON.parse(readFileSync(path.join(dir, 'lambdas.json'), 'utf8')) as Lambdas;
   const t0 = performance.now();
@@ -65,4 +86,5 @@ function main(): void {
   console.log(formatTable(season, res, ms));
 }
 
-main();
+// Run only as a script, never on import (tests import parseArgs / formatTable).
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();

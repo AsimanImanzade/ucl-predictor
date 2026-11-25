@@ -1,5 +1,5 @@
 import type { Lambdas, Season } from '@uclpred/sim';
-import type { Snapshot, TeamsFile } from './types.ts';
+import type { Snapshot, SnapshotMeta, TeamsFile } from './types.ts';
 
 const EPS = 1e-6;
 
@@ -80,4 +80,33 @@ export function snapshotLabel(id: string): { label: string; matchday: number | n
   if (!m) throw new Error(`unknown snapshot id ${id}`);
   const n = Number(m[1]);
   return n === 0 ? { label: 'Before matchday 1', matchday: 0 } : { label: `After matchday ${n}`, matchday: n };
+}
+
+/** mdNN claims "after matchday N": matchdays 1..N must be fully played (md00: nothing played). */
+export function checkMatchdayLabel(id: string, season: Season): string[] {
+  const { matchday } = snapshotLabel(id);
+  if (matchday === null) return [];
+  if (matchday === 0) {
+    const n = season.fixtures.filter((f) => f.played).length;
+    return n ? [`md00 has ${n} played fixtures`] : [];
+  }
+  const problems: string[] = [];
+  for (let md = 1; md <= matchday; md++) {
+    const open = season.fixtures.filter((f) => f.matchday === md && !f.played).length;
+    if (open) problems.push(`${id}: matchday ${md} has ${open} unplayed fixtures`);
+  }
+  return problems;
+}
+
+/** Manifest order: md snapshots by matchday with increasing asOf, live last and not older. */
+export function checkSnapshotOrder(metas: SnapshotMeta[]): string[] {
+  const problems: string[] = [];
+  for (let i = 1; i < metas.length; i++) {
+    const a = metas[i - 1]!;
+    const b = metas[i]!;
+    if (a.matchday === null) problems.push(`${a.id} must be last`);
+    else if (b.matchday !== null && b.matchday <= a.matchday) problems.push(`${b.id} is out of matchday order`);
+    if (b.matchday !== null ? b.asOf <= a.asOf : b.asOf < a.asOf) problems.push(`${b.id} asOf ${b.asOf} is not after ${a.id} ${a.asOf}`);
+  }
+  return problems;
 }

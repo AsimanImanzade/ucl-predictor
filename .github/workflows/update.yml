@@ -1,0 +1,115 @@
+name: update
+
+# Live updates: fetch the CL results, and when anything changed re-export `live`,
+# run the 50,000-run simulation, add an immutable mdNN snapshot when a matchday is
+# complete, deploy to Cloudflare Pages (direct upload) and commit the site data.
+on:
+  schedule:
+    - cron: "*/15 16-23 * * 2-4" # matchday windows, Tue-Thu (UTC)
+    - cron: "0 6 * * *" # daily, also re-fetches the domestic leagues
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Rebuild and deploy even if no result changed
+        type: boolean
+        default: false
+      domestic:
+        description: Also re-fetch the domestic leagues
+        type: boolean
+        default: false
+
+permissions:
+  contents: write # commit web/public/data and data/snapshots
+
+concurrency:
+  group: update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    # A normal run takes a few minutes. Only a data-cache miss runs the full ingest.
+    timeout-minutes: 180
+    env:
+      FOOTBALL_DATA_TOKEN: ${{ secrets.FOOTBALL_DATA_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+        working-directory: pipeline
+
+      # data/raw and data/processed are git-ignored (football-data terms: no public
+      # data dump), so they live in the Actions cache. A new entry is saved only after
+      # a successful deploy, so a failed run is retried by the next one.
+      - name: Restore data cache
+        id: cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            data/raw
+            data/processed
+          key: data-v1-${{ github.run_id }}
+          restore-keys: data-v1-
+
+      - name: Bootstrap data (full ingest, only on a cache miss)
+        if: steps.cache.outputs.cache-matched-key == ''
+        working-directory: pipeline
+        run: uv run uclpred ingest
+
+      - name: Refresh CL results
+        id: refresh
+        working-directory: pipeline
+        run: uv run uclpred refresh ${{ (github.event.schedule == '0 6 * * *' || inputs.domestic) && '--domestic' || '' }}
+
+      - name: Decide
+        id: go
+        run: echo "run=${{ steps.refresh.outputs.changed == 'true' || inputs.force == true || steps.cache.outputs.cache-matched-key == '' }}" >> "$GITHUB_OUTPUT"
+
+      - if: steps.go.outputs.run == 'true'
+        uses: pnpm/action-setup@v4
+      - if: steps.go.outputs.run == 'true'
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - if: steps.go.outputs.run == 'true'
+        run: pnpm install --frozen-lockfile
+
+      - name: Export, simulate, assemble site data
+        if: steps.go.outputs.run == 'true'
+        working-directory: pipeline
+        run: uv run uclpred update
+
+      - name: Build site
+        if: steps.go.outputs.run == 'true'
+        run: pnpm --filter @uclpred/web build
+
+      - name: Deploy to Cloudflare Pages
+        if: steps.go.outputs.run == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@4.160.0 pages deploy web/dist --project-name asiman-ucl-predictor --branch main --commit-dirty=true
+
+      - name: Commit site data
+        if: steps.go.outputs.run == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/public/data data/snapshots
+          if git diff --cached --quiet; then echo "no data changes to commit"; exit 0; fi
+          git commit -m "data: live update $(date -u +%Y-%m-%dT%H:%MZ)"
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Save data cache
+        if: steps.go.outputs.run == 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            data/raw
+            data/processed
+          key: data-v1-${{ github.run_id }}

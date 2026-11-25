@@ -57,6 +57,10 @@ def build_season(
             if norm is not None and norm.home_goals is not None:
                 hg, ag = int(norm.home_goals), int(norm.away_goals)
             else:
+                log.warning(
+                    "fixture %s is %s before as_of but has no 90-minute score: "
+                    "downgraded to unplayed (it will be simulated)", m["id"], m["status"],
+                )  # fmt: skip
                 played = False
         fixtures.append({
             "id": m["id"],

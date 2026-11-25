@@ -95,15 +95,41 @@ pnpm --filter @uclpred/sim cli -- --input data/export/live [--runs 50000] [--see
 
 `--sigma` sets rating uncertainty in Elo points; `--out` writes the chances JSON to the given path.
 
-Rebuild the dashboard data after new exports and simulations:
+## Live updates
+
+`.github/workflows/update.yml` keeps the site current. It runs every 15 minutes on Tuesday to Thursday from 16:00 to 23:45 UTC, once a day at 06:00 UTC (this run also re-fetches the domestic leagues), and on demand ("Run workflow", with optional `force` and `domestic`). Each run:
+
+1. `uclpred refresh` fetches the current Champions League season from football-data.org in one request, always live (never today's cached copy). Only results, kick-off times and pairings count as changes; a match in play does not. If nothing changed, the run stops here.
+2. `uclpred update` (no network) exports `live`, and an `mdNN` snapshot for each newly complete matchday from the first run after midnight UTC following its last kick-off. It runs the official simulation for each (50,000 runs, seed 1, sigma 0), then `build-data`.
+3. The site is built and deployed to Cloudflare Pages (direct upload). `web/public/data` and `data/snapshots` are committed as `data: live update …`.
+
+Snapshots in `data/snapshots/2026-27/` are immutable: `build-data` adds new ones and refuses to overwrite one. The git-ignored `data/raw` and `data/processed` live in the GitHub Actions cache, because football-data's data is not republished as a dump here. A new cache entry is saved only after a successful deploy, so a failed run is retried by the next one. On a cache miss, the workflow runs the full `uclpred ingest` once, which can take over an hour.
+
+Repository secrets (Settings → Secrets and variables → Actions):
+
+| Secret | Value |
+|---|---|
+| `FOOTBALL_DATA_TOKEN` | your football-data.org API token |
+| `CLOUDFLARE_API_TOKEN` | a Cloudflare API token with the *Cloudflare Pages: Edit* permission |
+| `CLOUDFLARE_ACCOUNT_ID` | your Cloudflare account id |
+
+The same update by hand, from the repo root:
 
 ```sh
-(cd pipeline && uv run uclpred export --as-of 2026-11-05T00:00:00Z --out data/export/md04)   # one per snapshot
-pnpm --filter @uclpred/sim cli -- --input data/export/md04                                  # writes chances.json there
-(cd pipeline && uv run uclpred calibration-bins)                                            # reports/calibration-bins-v21.json
-pnpm --filter @uclpred/web build-data                                                       # validates, then writes web/public/data
-pnpm --filter @uclpred/web dev                                                              # http://localhost:5173
-pnpm --filter @uclpred/web build                                                            # tsc + vite build -> web/dist
+(cd pipeline && uv run uclpred refresh)     # [--domestic]; prints what changed and which snapshots are due
+(cd pipeline && uv run uclpred update)      # export live + due mdNN, 50k sims, build-data
+pnpm --filter @uclpred/web build            # tsc + vite build -> web/dist
+npx wrangler@4.160.0 pages deploy web/dist --project-name asiman-ucl-predictor --branch main
+```
+
+Lower-level steps:
+
+```sh
+(cd pipeline && uv run uclpred export --as-of now --out data/export/live)
+pnpm --filter @uclpred/sim cli -- --input data/export/live --runs 50000 --seed 1 --sigma 0   # writes chances.json there
+(cd pipeline && uv run uclpred calibration-bins)        # reports/calibration-bins-v21.json
+pnpm --filter @uclpred/web build-data [mdNN ...] live   # stored snapshots + these exports -> web/public/data
+pnpm --filter @uclpred/web dev                          # http://localhost:5173
 ```
 
 Snapshot dates are the day after each matchday's last kick-off (md01 2026-09-11, md02 2026-10-15, md03 2026-10-22, md04 2026-11-05); md00 is 2026-09-07. `VITE_SHOW_CRESTS=false` builds the site without club crests.
@@ -117,7 +143,7 @@ pnpm --filter @uclpred/sim exec tsc --noEmit
 pnpm --filter @uclpred/web exec tsc --noEmit
 ```
 
-Tests marked `data` need the local data caches; tests marked `network` need the network. Both are skipped by default.
+Tests marked `data` need the local data caches; tests marked `network` need the network. Both are skipped by default. `.github/workflows/ci.yml` runs the default tests, ruff and the web build on every push to `main`.
 
 ## Files
 
@@ -127,6 +153,8 @@ Tests marked `data` need the local data caches; tests marked `network` need the 
 | `sim/` | TypeScript Monte Carlo simulator: league table, UEFA tiebreaks, bracket, two-legged ties |
 | `web/` | React dashboard and in-browser what-if (Vite) |
 | `data/reference/` | Team aliases, club coefficients and fitted model parameters |
+| `data/snapshots/` | Immutable per-matchday snapshots (assembled dashboard JSON) |
+| `.github/workflows/` | `ci.yml` (tests) and `update.yml` (live updates and deploys) |
 | `reports/` | Coverage, calibration and evaluation reports |
 
 Football data provided by the Football-Data.org API

@@ -170,3 +170,12 @@ def test_football_json_list_score():
                          "score": [1, 2]}]}  # fmt: skip
     (m,) = openfootball_json._parse(data, "ENG")
     assert (m.home_goals, m.away_goals) == (1, 2)
+
+
+def test_empty_fd_block_warns(caplog):
+    from uclpred.ingest.run import warn_if_empty_fd_block
+
+    with caplog.at_level("WARNING"):
+        assert warn_if_empty_fd_block("PL", "2026-27", []) is True
+        assert warn_if_empty_fd_block("PL", "2026-27", [object()]) is False
+    assert caplog.text.count("openfootball") == 1

@@ -9,6 +9,7 @@ RAW = DATA / "raw"
 PROCESSED = DATA / "processed"
 REFERENCE = DATA / "reference"
 EXPORT = DATA / "export"
+SNAPSHOTS = DATA / "snapshots"
 REPORTS = ROOT / "reports"
 
 SEASONS: dict[str, dict] = {
