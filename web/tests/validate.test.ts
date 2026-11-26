@@ -50,6 +50,33 @@ describe('validateSnapshot', () => {
     expect(p.some((m) => m.includes('winner'))).toBe(true);
   });
 
+  it('accepts a snapshot without points thresholds (stored before they existed)', () => {
+    const s = makeSnapshot();
+    delete s.thresholds;
+    expect(validateSnapshot(s)).toEqual([]);
+  });
+
+  it('rejects points thresholds that do not add up', () => {
+    const bad = (edit: (t: NonNullable<ReturnType<typeof makeSnapshot>['thresholds']>) => void) => {
+      const s = makeSnapshot();
+      edit(s.thresholds!);
+      return validateSnapshot(s).filter((m) => m.includes('thresholds'));
+    };
+    expect(bad((t) => t.count.pop())).not.toEqual([]);
+    expect(bad((t) => (t.count[10]! += 1))).not.toEqual([]);
+    expect(bad((t) => (t.top8[12]! += 1))).not.toEqual([]);
+    // Moving a top-24 finish to a total where it outnumbers the clubs on it.
+    expect(
+      bad((t) => {
+        const from = t.top24.findIndex((v) => v > 0);
+        const to = t.count.findIndex((v, p) => p > from && v > 0 && t.top24[p] === v);
+        t.top24[from]! -= 1;
+        t.top24[to]! += 1;
+      }),
+    ).not.toEqual([]);
+    expect(bad((t) => (t.top8[3] = 0.5))).not.toEqual([]);
+  });
+
   it('rejects ratings that miss a team', () => {
     const s = makeSnapshot();
     delete s.ratings![s.season.teams[0]!.id];

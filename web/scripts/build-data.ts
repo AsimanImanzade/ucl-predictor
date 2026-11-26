@@ -54,6 +54,7 @@ function buildSnapshot(id: string): Snapshot {
     season,
     lambdas,
     chances: sim.chances,
+    ...(sim.thresholds ? { thresholds: sim.thresholds } : {}),
     ...(ratings ? { ratings } : {}),
   };
   return checked(snap);

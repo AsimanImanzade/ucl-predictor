@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router';
 import type { Fixture, TeamChances } from '@uclpred/sim';
 import { DroppedNotice } from '../components/DroppedNotice';
 import { LiveBadge } from '../components/LiveBadge';
+import { PointsNeeded } from '../components/PointsNeeded';
 import { StandingsTable, type RowDeltas } from '../components/StandingsTable';
 import { TeamBadge } from '../components/TeamBadge';
 import { useManifest, useSnapshot, useTeams } from '../lib/data';
@@ -354,6 +355,15 @@ export function WhatIfPage() {
             marks the clubs playing now.{' '}
             <Link to="/?view=scenario">Open the full table</Link>.
           </p>
+          {sim.result?.thresholds && (
+            <PointsNeeded
+              thresholds={sim.result.thresholds}
+              baseline={used ? sim.baseline?.thresholds : undefined}
+              runs={sim.result.runs}
+              tone="scenario"
+              deltaKey={String(sim.ms)}
+            />
+          )}
         </section>
       </div>
     </div>

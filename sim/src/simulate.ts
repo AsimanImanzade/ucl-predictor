@@ -4,7 +4,7 @@ import { buildRecords, type MatchResult } from './table.js';
 import { rankTable } from './tiebreak.js';
 import { drawBracket, drawPlayoffs } from './bracket.js';
 import { playFinal, playTwoLegged, type MatchSampler } from './tie.js';
-import type { Lambdas, Overrides, Season, SimResult, Stage, TeamChances, TeamId } from './types.js';
+import type { Lambdas, Overrides, PointsThresholds, Season, SimResult, Stage, TeamChances, TeamId } from './types.js';
 
 export interface SimOptions {
   runs: number;
@@ -49,6 +49,12 @@ export function simulate(season: Season, lambdas: Lambdas, opts: SimOptions): Si
   const stages: Stage[] = ['po', 'r16', 'qf', 'sf', 'final', 'winner'];
   const reach = new Map<Stage, Int32Array>(stages.map((s) => [s, new Int32Array(n)]));
   const pointsSum = new Float64Array(n);
+  const games = new Map<TeamId, number>();
+  for (const f of season.fixtures) for (const id of [f.homeId, f.awayId]) games.set(id, (games.get(id) ?? 0) + 1);
+  const maxPts = 3 * Math.max(0, ...games.values());
+  const ptsCount = new Int32Array(maxPts + 1);
+  const ptsTop8 = new Int32Array(maxPts + 1);
+  const ptsTop24 = new Int32Array(maxPts + 1);
   const bump = (stage: Stage, id: TeamId): void => {
     reach.get(stage)![teamIndex.get(id)!]!++;
   };
@@ -85,6 +91,10 @@ export function simulate(season: Season, lambdas: Lambdas, opts: SimOptions): Si
       const id = ranking[p]!;
       position[teamIndex.get(id)! * n + p]!++;
       if (p >= 8 && p < 24) bump('po', id);
+      const pts = records.get(id)!.pts;
+      ptsCount[pts]!++;
+      if (p < 8) ptsTop8[pts]!++;
+      if (p < 24) ptsTop24[pts]!++;
     }
 
     const ties = drawPlayoffs(ranking, rng);
@@ -121,5 +131,6 @@ export function simulate(season: Season, lambdas: Lambdas, opts: SimOptions): Si
     return { teamId, position: pos, top8, top24, out: 1 - top24, reach: r, expectedPoints: pointsSum[i]! / runs };
   });
   chances.sort((a, b) => (a.teamId < b.teamId ? -1 : a.teamId > b.teamId ? 1 : 0));
-  return { runs, seed, asOf: season.asOf, chances };
+  const thresholds: PointsThresholds = { count: Array.from(ptsCount), top8: Array.from(ptsTop8), top24: Array.from(ptsTop24) };
+  return { runs, seed, asOf: season.asOf, chances, thresholds };
 }

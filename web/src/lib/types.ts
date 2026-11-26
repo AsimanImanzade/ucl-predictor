@@ -1,4 +1,4 @@
-import type { Lambdas, Season, TeamChances, TeamId } from '@uclpred/sim';
+import type { Lambdas, PointsThresholds, Season, TeamChances, TeamId } from '@uclpred/sim';
 
 /** One forecast snapshot listed in `manifest.json`. */
 export interface SnapshotMeta {
@@ -27,6 +27,8 @@ export interface Snapshot {
   season: Season;
   lambdas: Lambdas;
   chances: TeamChances[];
+  /** Top-8 / top-24 counts per final points total; missing in md00-md05 (stored before it existed). */
+  thresholds?: PointsThresholds;
   /** Elo at asOf (display only). */
   ratings?: Record<TeamId, number>;
 }

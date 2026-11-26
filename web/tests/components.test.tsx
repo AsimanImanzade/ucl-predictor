@@ -98,3 +98,40 @@ describe('What-if lock-in', () => {
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!)).toEqual({ [open.id]: { homeGoals: 1, awayGoals: 1 } });
   });
 });
+
+describe('PointsNeeded', () => {
+  const runs = 2000;
+  const snap = makeSnapshot(2, runs);
+
+  it('lists the totals in play with their top-8 and top-24 shares and a plain headline', async () => {
+    const { PointsNeeded } = await import('../src/components/PointsNeeded');
+    const { pointsRows, evenChance } = await import('../src/lib/thresholds');
+    render(<PointsNeeded thresholds={snap.thresholds!} runs={runs} />);
+    expect(screen.getByRole('heading', { name: 'Points needed' })).toBeTruthy();
+    const rows = pointsRows(snap.thresholds!);
+    const bodyRows = screen.getAllByRole('row').slice(1);
+    expect(bodyRows).toHaveLength(rows.length);
+    expect(bodyRows[0]!.querySelector('th')!.textContent).toBe(`${rows[0]!.points} pts`);
+    const even = evenChance(rows, 'top8')!;
+    expect(screen.getByText(/More likely than not/).textContent).toContain(`top 8 from ${even.points} pts`);
+  });
+
+  it('dashes thin totals and shows changes against the baseline', async () => {
+    const { PointsNeeded } = await import('../src/components/PointsNeeded');
+    const make = (spec: Record<number, [number, number, number]>) => {
+      const t = { count: Array<number>(25).fill(0), top8: Array<number>(25).fill(0), top24: Array<number>(25).fill(0) };
+      for (const [p, [n, a, b]] of Object.entries(spec)) [t.count[+p], t.top8[+p], t.top24[+p]] = [n, a, b];
+      return t;
+    };
+    const baseline = make({ 7: [5000, 0, 2500], 8: [5000, 1500, 4500], 9: [100, 60, 100], 10: [5000, 4500, 5000] });
+    const now = make({ 7: [5000, 0, 2500], 8: [5000, 2500, 4500], 9: [100, 60, 100], 10: [5000, 4500, 5000] });
+    const { container } = render(<PointsNeeded thresholds={now} baseline={baseline} runs={20000} tone="scenario" deltaKey="1" />);
+    const row = (p: number) => [...container.querySelectorAll('tbody tr')].find((r) => r.querySelector('th')!.textContent === `${p} pts`)!;
+    expect(row(8).querySelector('.delta--rise')!.textContent).toContain('+20.0');
+    expect(row(7).querySelector('.delta')).toBeNull();
+    expect(row(9).classList.contains('is-few')).toBe(true);
+    expect(row(9).textContent).toContain('Too few simulations');
+    expect(screen.getByText(/A dash means fewer than 400/)).toBeTruthy();
+    expect(screen.getByText(/Changes are against live chances from the same 20,000 simulations/)).toBeTruthy();
+  });
+});

@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { simulate } from '../src/simulate.js';
+import { buildRecords } from '../src/table.js';
+import { rankTable } from '../src/tiebreak.js';
 import type { Fixture, Lambdas, Season, Team } from '../src/types.js';
 
 const N = 36;
@@ -94,5 +96,54 @@ describe('simulate', () => {
     expect(b).toEqual(a);
     const c = simulate(open, lambdas, { runs: 2000, seed: 6 });
     expect(c).not.toEqual(a);
+  });
+});
+
+describe('points thresholds', () => {
+  it('counts every (team, run) once, with 8 and 24 qualifiers per run', () => {
+    const runs = 1500;
+    const r = simulate(open, lambdas, { runs, seed: 11 });
+    const t = r.thresholds!;
+    expect(t.count).toHaveLength(25);
+    expect(t.top8).toHaveLength(25);
+    expect(t.top24).toHaveLength(25);
+    const total = (a: number[]) => a.reduce((x, y) => x + y, 0);
+    expect(total(t.count)).toBe(N * runs);
+    expect(total(t.top8)).toBe(8 * runs);
+    expect(total(t.top24)).toBe(24 * runs);
+    for (let p = 0; p < 25; p++) {
+      expect(Number.isInteger(t.count[p])).toBe(true);
+      expect(t.top8[p]!).toBeLessThanOrEqual(t.top24[p]!);
+      expect(t.top24[p]!).toBeLessThanOrEqual(t.count[p]!);
+    }
+    // More points never makes the top 8 less likely in aggregate (checked where samples are plentiful).
+    const rate = (p: number) => t.top8[p]! / t.count[p]!;
+    const busy = [...Array(25).keys()].filter((p) => t.count[p]! >= 2000);
+    for (let i = 1; i < busy.length; i++) expect(rate(busy[i]!)).toBeGreaterThanOrEqual(rate(busy[i - 1]!));
+  });
+
+  it('matches the real table when every game is fixed', () => {
+    const full = makeSeason((f) => [(f.id * 7) % 4, (f.id * 3) % 3]);
+    const runs = 40;
+    const t = simulate(full, lambdas, { runs, seed: 1 }).thresholds!;
+    const records = buildRecords(ids, full.fixtures.map((f) => ({ homeId: f.homeId, awayId: f.awayId, homeGoals: f.homeGoals!, awayGoals: f.awayGoals! })));
+    const ranking = rankTable(records, new Map(full.teams.map((x) => [x.id, x.coefficient])));
+    const count = new Array<number>(25).fill(0);
+    const top8 = new Array<number>(25).fill(0);
+    const top24 = new Array<number>(25).fill(0);
+    ranking.forEach((id, i) => {
+      const p = records.get(id)!.pts;
+      count[p]! += runs;
+      if (i < 8) top8[p]! += runs;
+      if (i < 24) top24[p]! += runs;
+    });
+    expect(t).toEqual({ count, top8, top24 });
+  });
+
+  it('follows overrides', () => {
+    const r = simulate(open, lambdas, { runs: 300, seed: 4, overrides: Object.fromEntries(open.fixtures.map((f) => [f.id, { homeGoals: 1, awayGoals: 1 }])) });
+    const t = r.thresholds!;
+    expect(t.count[8]).toBe(N * 300);
+    expect(t.top8[8]).toBe(8 * 300);
   });
 });

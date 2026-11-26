@@ -60,9 +60,21 @@ export interface TeamChances {
   expectedPoints: number;
 }
 
+/**
+ * Per final league-phase points total (array index = points, 0..3 x most games any team plays):
+ * how many (team, run) pairs finished on exactly that total, and how many of those ranked 1-8 / 1-24.
+ */
+export interface PointsThresholds {
+  count: number[];
+  top8: number[];
+  top24: number[];
+}
+
 export interface SimResult {
   runs: number;
   seed: number;
   asOf: string;
   chances: TeamChances[];
+  /** Missing in results written before 2026-11-26 (stored snapshots md00-md05). */
+  thresholds?: PointsThresholds;
 }

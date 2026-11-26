@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router';
 import type { TeamChances } from '@uclpred/sim';
 import { DroppedNotice } from '../components/DroppedNotice';
+import { PointsNeeded } from '../components/PointsNeeded';
 import { StandingsTable, type RowDeltas } from '../components/StandingsTable';
 import { useManifest, useSnapshot, useTeams } from '../lib/data';
 import { shownDelta } from '../lib/delta';
@@ -94,6 +95,15 @@ export function ScenarioTable() {
         </p>
       )}
       <p className="fineprint table-note">Changes are against live chances from the same 20,000 simulations; changes smaller than the simulation noise are not shown.</p>
+      {sim.result?.thresholds && (
+        <PointsNeeded
+          thresholds={sim.result.thresholds}
+          baseline={sim.baseline?.thresholds}
+          runs={sim.result.runs}
+          tone="scenario"
+          deltaKey={sim.result.asOf + String(sim.ms)}
+        />
+      )}
     </>
   );
 }

@@ -49,10 +49,28 @@ export function validateSnapshot(s: Snapshot): string[] {
     if (c.position.length !== 36 || Math.abs(pos - 1) > EPS) p.push(`${c.teamId}: position distribution sums to ${pos}`);
   }
 
+  if (s.thresholds) p.push(...checkThresholds(s.thresholds, s.meta.runs, teams.length));
+
   if (s.ratings) {
     const r = s.ratings;
     if (Object.keys(r).sort().join() !== [...teams].sort().join()) p.push('ratings do not cover exactly the season teams');
     for (const [t, v] of Object.entries(r)) if (!Number.isFinite(v)) p.push(`${t}: rating ${v} is not finite`);
+  }
+  return p;
+}
+
+/** Counts per points total: 8 games each gives totals 0..24; every (team, run) counted once. */
+function checkThresholds(t: NonNullable<Snapshot['thresholds']>, runs: number, nTeams: number): string[] {
+  const p: string[] = [];
+  const len = 3 * 8 + 1;
+  if ([t.count, t.top8, t.top24].some((a) => a.length !== len)) return [`thresholds: expected ${len} points totals`];
+  if ([...t.count, ...t.top8, ...t.top24].some((v) => !Number.isInteger(v) || v < 0)) return ['thresholds: counts must be whole numbers >= 0'];
+  const sum = (a: number[]) => a.reduce((x, y) => x + y, 0);
+  if (sum(t.count) !== nTeams * runs) p.push(`thresholds: ${sum(t.count)} team finishes, expected ${nTeams * runs}`);
+  if (sum(t.top8) !== 8 * runs) p.push(`thresholds: ${sum(t.top8)} top-8 finishes, expected ${8 * runs}`);
+  if (sum(t.top24) !== 24 * runs) p.push(`thresholds: ${sum(t.top24)} top-24 finishes, expected ${24 * runs}`);
+  for (let i = 0; i < len; i++) {
+    if (!(t.top8[i]! <= t.top24[i]! && t.top24[i]! <= t.count[i]!)) p.push(`thresholds at ${i} points: top 8 ${t.top8[i]} <= top 24 ${t.top24[i]} <= ${t.count[i]} fails`);
   }
   return p;
 }

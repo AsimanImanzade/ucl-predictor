@@ -1,0 +1,62 @@
+.points-needed {
+  margin-top: var(--s7);
+  max-width: 34rem;
+}
+.points-needed > h2 {
+  margin-bottom: var(--s2);
+}
+.points-needed__key {
+  margin: var(--s3) 0 var(--s4);
+  color: var(--floodlight);
+}
+.points-needed__panel {
+  padding: var(--s2) var(--s4);
+}
+
+.ptable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+}
+.ptable th,
+.ptable td {
+  padding: var(--s2);
+  text-align: right;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.ptable tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.ptable thead th {
+  font-size: var(--step--1);
+  font-weight: 500;
+  color: var(--dim);
+  padding-top: var(--s3);
+}
+.ptable th:first-child {
+  text-align: left;
+  padding-left: 0;
+}
+.ptable td:last-child,
+.ptable th:last-child {
+  padding-right: 0;
+}
+.ptable tbody th {
+  font-weight: 600;
+  color: var(--floodlight);
+}
+.ptable td {
+  width: 40%;
+}
+.ptable .prob {
+  width: 100%;
+  max-width: 10rem;
+}
+.ptable tr.is-few th,
+.ptable__few {
+  color: var(--dim);
+}

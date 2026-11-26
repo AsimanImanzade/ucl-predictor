@@ -44,6 +44,7 @@ export function makeSnapshot(playedThrough = 0, runs = 300): Snapshot {
     season,
     lambdas,
     chances: res.chances,
+    thresholds: res.thresholds,
     ratings: Object.fromEntries(ids.map((id, i) => [id, 1800 - i * 10])),
   };
 }

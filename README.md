@@ -56,6 +56,8 @@ ClubElo and football-data.co.uk are not used (their terms do not allow bots or M
 
 A static site with no server. Pages: Table, Matches, Match, Team, Knockout odds, What-if and Methodology. The What-if page runs the same simulator code in a Web Worker: set any score and 20,000 seasons rerun in the browser. Snapshots before matchday 1 and after each matchday show how the chances moved.
 
+**Points needed.** Under the Table and in the What-if lab, a small table shows, for each final points total, how often a club finishing on it made the top 8 and the top 24 (over all 36 clubs and all simulations). The simulator counts these per run (`thresholds` in `chances.json` and `live.json`); in the What-if lab they come from your scenario's 20,000 runs, with the change against live. Totals with fewer than 400 simulated finishes show a dash. Snapshots stored before 26 November 2026 (md00 to md05) do not have it, so their view leaves it out.
+
 ## Run it
 
 ```sh

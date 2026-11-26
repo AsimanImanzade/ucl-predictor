@@ -1,6 +1,7 @@
 import { Suspense, useMemo } from 'react';
 import type { TeamChances } from '@uclpred/sim';
 import { Loading } from '../components/Layout';
+import { PointsNeeded } from '../components/PointsNeeded';
 import { StandingsTable } from '../components/StandingsTable';
 import { SCENARIO, useView, ViewToggle } from '../components/ViewToggle';
 import { certainty } from '../lib/certainty';
@@ -45,6 +46,8 @@ function SnapshotTable({ id }: { id: string }) {
         </p>
       )}
       <StandingsTable rows={rows} chances={chances} teams={teams} certainty={cert} playing={playing} caption={`League phase table, ${snap.meta.label}`} />
+      {/* Snapshots stored before 2026-11-26 have no thresholds. */}
+      {snap.thresholds && <PointsNeeded thresholds={snap.thresholds} runs={snap.meta.runs} />}
     </>
   );
 }
